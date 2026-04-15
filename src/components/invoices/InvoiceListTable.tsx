@@ -1,10 +1,7 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  TableListHeaderControls,
-  TablePaginationControls,
-} from "@/components/crud/ListUiControls";
+import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { useDisplayCurrency } from "@/contexts/currency-display-context";
 import { extractListRows } from "@/lib/api/extractApiData";
@@ -155,6 +152,129 @@ export function InvoiceListTable({
   const fmt = (amount: number, code?: string) =>
     formatInCurrency(amount, code ?? "USD");
 
+  const columns = [
+    {
+      key: "invoice_number",
+      header: "Invoice #",
+      cellClassName: "px-3 py-2",
+      render: (inv: Invoice) => (
+        <button
+          type="button"
+          className="font-mono text-left text-sky-700 underline decoration-sky-400/60 hover:text-sky-600 dark:text-sky-400"
+          onClick={() => onView(inv.id)}
+        >
+          {inv.invoice_number}
+        </button>
+      ),
+    },
+    {
+      key: "po_number",
+      header: "PO #",
+      cellClassName: "max-w-[8rem] truncate px-3 py-2 text-zinc-500",
+      render: (inv: Invoice) => inv.po_number || "—",
+    },
+    ...(isSuperAdmin
+      ? [
+          {
+            key: "type",
+            header: "Type",
+            cellClassName: "px-3 py-2",
+            render: (inv: Invoice) =>
+              inv.crm_company_id ? (
+                <span className="rounded-md bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-sky-900 dark:bg-sky-900/40 dark:text-sky-100">
+                  Customer
+                </span>
+              ) : (
+                <span className="rounded-md bg-zinc-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200">
+                  Tenant
+                </span>
+              ),
+          },
+        ]
+      : []),
+    {
+      key: "bill_to",
+      header: "Bill to",
+      cellClassName: "max-w-[12rem] truncate px-3 py-2 text-zinc-800 dark:text-zinc-200",
+      render: (inv: Invoice) => (
+        <span title={billToLabel(inv, tenantDisplayNameById, crmCompanyNameById)}>
+          {billToLabel(inv, tenantDisplayNameById, crmCompanyNameById)}
+        </span>
+      ),
+    },
+    {
+      key: "invoice_date",
+      header: "Invoice date",
+      cellClassName: "whitespace-nowrap px-3 py-2",
+      render: (inv: Invoice) => formatShortDate(inv.invoice_date),
+    },
+    {
+      key: "due_date",
+      header: "Due",
+      cellClassName: "whitespace-nowrap px-3 py-2",
+      render: (inv: Invoice) => {
+        const outstanding =
+          inv.outstanding_amount ?? (inv.total_amount ?? 0) - (inv.paid_amount ?? 0);
+        const overdue = isOverdue(inv.due_date, inv.status, outstanding) && inv.status !== "overdue";
+        return (
+          <span className={overdue ? "font-semibold text-rose-600 dark:text-rose-400" : ""}>
+            {formatShortDate(inv.due_date)}
+          </span>
+        );
+      },
+    },
+    {
+      key: "total_amount",
+      header: "Total",
+      headerClassName: "whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200",
+      cellClassName: "whitespace-nowrap px-3 py-2 text-right font-mono",
+      render: (inv: Invoice) => fmt(inv.total_amount, inv.currency_code),
+    },
+    {
+      key: "fees",
+      header: "Fees",
+      headerClassName: "whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200",
+      cellClassName: "whitespace-nowrap px-3 py-2 text-right font-mono text-zinc-600",
+      render: (inv: Invoice) => fmt(invoiceProcessingFeeTotal(inv), inv.currency_code),
+    },
+    {
+      key: "due_amount",
+      header: "Due amt",
+      headerClassName: "whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200",
+      cellClassName: "whitespace-nowrap px-3 py-2 text-right font-mono",
+      render: (inv: Invoice) => {
+        const dueAmt = invoiceAmountDue(inv);
+        return (
+          <span className={dueAmt > 0 ? "font-semibold text-amber-700 dark:text-amber-400" : ""}>
+            {fmt(dueAmt, inv.currency_code)}
+          </span>
+        );
+      },
+    },
+    {
+      key: "status",
+      header: "Status",
+      cellClassName: "px-3 py-2",
+      render: (inv: Invoice) => {
+        const outstanding =
+          inv.outstanding_amount ?? (inv.total_amount ?? 0) - (inv.paid_amount ?? 0);
+        const overdue = isOverdue(inv.due_date, inv.status, outstanding) && inv.status !== "overdue";
+        return (
+          <div className="flex flex-wrap items-center gap-1">
+            <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold capitalize ${statusBadgeClasses(inv.status)}`}>
+              {String(inv.status).replace(/_/g, " ")}
+            </span>
+            {overdue ? (
+              <span className="rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                Overdue
+              </span>
+            ) : null}
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -171,213 +291,49 @@ export function InvoiceListTable({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <TableListHeaderControls
-          title={title}
-          pagination={pagination}
-          rowCount={invoices.length}
-          limit={limit}
-          limitOptions={limitOptions}
-          onLimitChange={onLimitChange}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[56rem] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b-2 border-zinc-300 bg-zinc-50/50 dark:border-zinc-600 dark:bg-zinc-900/30">
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Invoice #
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  PO #
-                </th>
-                {isSuperAdmin ? (
-                  <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                    Type
-                  </th>
-                ) : null}
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Bill to
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Invoice date
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Due
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Total
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Fees
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Due amt
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Status
-                </th>
-                <th className="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {invoices.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={isSuperAdmin ? 11 : 10}
-                    className="px-3 py-8 text-center text-sm text-zinc-500"
-                  >
-                    No invoices match these filters.
-                  </td>
-                </tr>
-              ) : (
-                invoices.map((inv) => {
-                  const dueAmt = invoiceAmountDue(inv);
-                  const outstanding =
-                    inv.outstanding_amount ??
-                    (inv.total_amount ?? 0) - (inv.paid_amount ?? 0);
-                  const overdue =
-                    isOverdue(
-                      inv.due_date,
-                      inv.status,
-                      outstanding,
-                    ) && inv.status !== "overdue";
-                  return (
-                    <tr
-                      key={inv.id}
-                      className="border-b border-zinc-200 odd:bg-white/40 even:bg-zinc-50/30 dark:border-zinc-700 dark:odd:bg-transparent dark:even:bg-zinc-900/20"
-                    >
-                      <td className="px-3 py-2">
-                        <button
-                          type="button"
-                          className="font-mono text-left text-sky-700 underline decoration-sky-400/60 hover:text-sky-600 dark:text-sky-400"
-                          onClick={() => onView(inv.id)}
-                        >
-                          {inv.invoice_number}
-                        </button>
-                      </td>
-                      <td className="max-w-[8rem] truncate px-3 py-2 text-zinc-500">
-                        {inv.po_number || "—"}
-                      </td>
-                      {isSuperAdmin ? (
-                        <td className="px-3 py-2">
-                          {inv.crm_company_id ? (
-                            <span className="rounded-md bg-sky-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-sky-900 dark:bg-sky-900/40 dark:text-sky-100">
-                              Customer
-                            </span>
-                          ) : (
-                            <span className="rounded-md bg-zinc-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-800 dark:bg-zinc-700 dark:text-zinc-200">
-                              Tenant
-                            </span>
-                          )}
-                        </td>
-                      ) : null}
-                      <td
-                        className="max-w-[12rem] truncate px-3 py-2 text-zinc-800 dark:text-zinc-200"
-                        title={billToLabel(
-                          inv,
-                          tenantDisplayNameById,
-                          crmCompanyNameById,
-                        )}
-                      >
-                        {billToLabel(
-                          inv,
-                          tenantDisplayNameById,
-                          crmCompanyNameById,
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-2">
-                        {formatShortDate(inv.invoice_date)}
-                      </td>
-                      <td
-                        className={`whitespace-nowrap px-3 py-2 ${overdue ? "font-semibold text-rose-600 dark:text-rose-400" : ""}`}
-                      >
-                        {formatShortDate(inv.due_date)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-2 text-right font-mono">
-                        {fmt(inv.total_amount, inv.currency_code)}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-2 text-right font-mono text-zinc-600">
-                        {fmt(
-                          invoiceProcessingFeeTotal(inv),
-                          inv.currency_code,
-                        )}
-                      </td>
-                      <td
-                        className={`whitespace-nowrap px-3 py-2 text-right font-mono ${dueAmt > 0 ? "font-semibold text-amber-700 dark:text-amber-400" : ""}`}
-                      >
-                        {fmt(dueAmt, inv.currency_code)}
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex flex-wrap items-center gap-1">
-                          <span
-                            className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold capitalize ${statusBadgeClasses(inv.status)}`}
-                          >
-                            {String(inv.status).replace(/_/g, " ")}
-                          </span>
-                          {overdue ? (
-                            <span className="rounded-md bg-rose-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
-                              Overdue
-                            </span>
-                          ) : null}
-                        </div>
-                      </td>
-                      <td className="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right align-middle">
-                        <div className="flex flex-nowrap items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => onView(inv.id)}
-                            className="shrink-0 rounded-lg bg-zinc-100 px-2 py-1 text-[11px] font-medium text-zinc-800 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
-                          >
-                            View
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onEdit(inv.id)}
-                            className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            disabled={inv.status === "paid"}
-                            title={
-                              inv.status === "paid"
-                                ? "Cannot delete a paid invoice"
-                                : "Delete"
-                            }
-                            onClick={() => onDelete(inv.id)}
-                            className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <TablePaginationControls
+      <UniversalDataTable
+        title={title}
+        rows={invoices}
+        columns={columns}
+        getRowKey={(inv) => inv.id}
+        emptyMessage="No invoices match these filters."
+        minTableWidthClassName="min-w-[56rem]"
         pagination={pagination}
         onPageChange={onPageChange}
+        limit={limit}
+        limitOptions={limitOptions}
+        onLimitChange={onLimitChange}
+        rawResponse={query.data ?? null}
+        actionsHeader="Actions"
+        actionsColumnClassName="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200"
+        renderActions={(inv) => (
+          <>
+            <button
+              type="button"
+              onClick={() => onView(inv.id)}
+              className="shrink-0 rounded-lg bg-zinc-100 px-2 py-1 text-[11px] font-medium text-zinc-800 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+            >
+              View
+            </button>
+            <button
+              type="button"
+              onClick={() => onEdit(inv.id)}
+              className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              disabled={inv.status === "paid"}
+              title={inv.status === "paid" ? "Cannot delete a paid invoice" : "Delete"}
+              onClick={() => onDelete(inv.id)}
+              className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
+            >
+              Delete
+            </button>
+          </>
+        )}
       />
-
-      <details className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/80">
-        <summary className="cursor-pointer px-4 py-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          Raw API response
-        </summary>
-        <pre className="max-h-[min(40vh,320px)] overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-          {query.data === undefined || query.data === null
-            ? "—"
-            : JSON.stringify(query.data, null, 2)}
-        </pre>
-      </details>
     </div>
   );
 }

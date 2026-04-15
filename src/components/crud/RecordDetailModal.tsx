@@ -2,24 +2,37 @@
 
 import type { ReactNode } from "react";
 import { formatCellValue } from "@/lib/api/extractApiData";
+import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+
+function humanizeKey(key: string) {
+  return key.replace(/_/g, " ");
+}
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
+}
 
 function DetailBlock({ data, depth = 0 }: { data: unknown; depth?: number }) {
   if (data === null || data === undefined) {
     return <span className="text-zinc-400">—</span>;
   }
   if (typeof data !== "object") {
-    return <span className="text-zinc-800 dark:text-zinc-100">{formatCellValue(data)}</span>;
+    return (
+      <span className="text-zinc-800 tabular-nums dark:text-zinc-100">
+        {formatCellValue(data)}
+      </span>
+    );
   }
   if (Array.isArray(data)) {
     if (data.length === 0) {
-      return <span className="text-zinc-400">[]</span>;
+      return <span className="text-sm text-zinc-400">No items</span>;
     }
     return (
       <ul className="space-y-2">
         {data.map((item, i) => (
           <li
             key={i}
-            className="rounded-lg border border-zinc-200/70 bg-white/60 px-3 py-2 dark:border-zinc-800/80 dark:bg-zinc-950/40"
+            className="rounded-lg bg-zinc-100/80 px-3 py-2.5 dark:bg-zinc-900/60"
           >
             <DetailBlock data={item} depth={depth + 1} />
           </li>
@@ -27,30 +40,61 @@ function DetailBlock({ data, depth = 0 }: { data: unknown; depth?: number }) {
       </ul>
     );
   }
+
   const o = data as Record<string, unknown>;
   const entries = Object.entries(o).filter(([k]) => !k.startsWith("_"));
+  if (entries.length === 0) {
+    return <span className="text-sm text-zinc-400">—</span>;
+  }
+
+  const primitives: [string, unknown][] = [];
+  const nested: [string, unknown][] = [];
+  for (const [key, value] of entries) {
+    if (isPlainObject(value)) {
+      nested.push([key, value]);
+    } else {
+      primitives.push([key, value]);
+    }
+  }
+
+  const rowBase =
+    "grid grid-cols-1 gap-1 border-b border-zinc-200/70 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(9rem,32%)_1fr] sm:items-start sm:gap-6 dark:border-zinc-800/80";
+
   return (
-    <dl className="grid gap-3 sm:grid-cols-2">
-      {entries.map(([key, value]) => (
-        <div
+    <div className={depth === 0 ? "space-y-6" : "space-y-4"}>
+      {primitives.length > 0 ? (
+        <dl className="overflow-hidden rounded-xl border border-zinc-200/60 bg-white/70 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40">
+          {primitives.map(([key, value]) => (
+            <div key={key} className={rowBase}>
+              <dt className="text-xs font-medium capitalize text-zinc-500 dark:text-zinc-400">
+                {humanizeKey(key)}
+              </dt>
+              <dd className="min-w-0 text-sm leading-relaxed text-zinc-900 dark:text-zinc-100">
+                {value !== null && typeof value === "object" ? (
+                  <DetailBlock data={value} depth={depth + 1} />
+                ) : (
+                  formatCellValue(value)
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+
+      {nested.map(([key, value]) => (
+        <section
           key={key}
-          className="rounded-xl border border-zinc-200/50 bg-gradient-to-br from-zinc-50/90 to-white px-3 py-2.5 dark:border-zinc-800/60 dark:from-zinc-900/50 dark:to-zinc-950/60"
+          className="overflow-hidden rounded-xl border border-zinc-200/55 bg-gradient-to-b from-zinc-50/90 to-white dark:border-zinc-800/70 dark:from-zinc-900/35 dark:to-zinc-950/50"
         >
-          <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-zinc-500 dark:text-zinc-400">
-            {key.replace(/_/g, " ")}
-          </dt>
-          <dd className="mt-1.5 text-sm font-medium leading-snug text-zinc-900 dark:text-zinc-100">
-            {typeof value === "object" && value !== null ? (
-              <div className="mt-2 border-l-2 border-emerald-500/35 pl-3">
-                <DetailBlock data={value} depth={depth + 1} />
-              </div>
-            ) : (
-              formatCellValue(value)
-            )}
-          </dd>
-        </div>
+          <h3 className="border-b border-zinc-200/60 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+            {humanizeKey(key)}
+          </h3>
+          <div className="p-4 sm:p-5">
+            <DetailBlock data={value} depth={depth + 1} />
+          </div>
+        </section>
       ))}
-    </dl>
+    </div>
   );
 }
 
@@ -63,6 +107,8 @@ type RecordDetailModalProps = {
   /** Unwrapped entity or full API payload — nested objects are rendered as cards. */
   data: unknown;
   onClose: () => void;
+  /** When set, replaces the default key/value tree for `data` (same loading/error shell). */
+  renderData?: (inner: unknown) => ReactNode;
   /** Rendered below the detail tree (e.g. invoice payment UI). */
   afterBody?: ReactNode;
 };
@@ -75,17 +121,16 @@ export function RecordDetailModal({
   error,
   data,
   onClose,
+  renderData,
   afterBody,
 }: RecordDetailModalProps) {
   if (!open) return null;
 
+  /** Match backend `success` variants (boolean, 1, "true") like `unwrapApiSuccessData`. */
   const inner =
-    data &&
-    typeof data === "object" &&
-    "data" in (data as object) &&
-    (data as { success?: unknown }).success === true
-      ? (data as { data: unknown }).data
-      : data;
+    data == null || data === undefined
+      ? null
+      : (unwrapApiSuccessData<unknown>(data) ?? data);
 
   return (
     <div
@@ -100,7 +145,7 @@ export function RecordDetailModal({
         aria-label="Close"
         onClick={onClose}
       />
-      <div className="relative z-10 flex max-h-[min(90vh,720px)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="relative z-10 flex max-h-[min(90vh,800px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
         <div className="border-b border-zinc-200/70 bg-gradient-to-r from-emerald-50/90 to-teal-50/40 px-5 py-4 dark:border-zinc-800 dark:from-emerald-950/40 dark:to-zinc-950">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -123,7 +168,7 @@ export function RecordDetailModal({
             </button>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-8">
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -140,7 +185,7 @@ export function RecordDetailModal({
             <p className="text-sm text-zinc-500">No data.</p>
           ) : (
             <>
-              <DetailBlock data={inner} />
+              {renderData ? renderData(inner) : <DetailBlock data={inner} />}
               {afterBody}
             </>
           )}

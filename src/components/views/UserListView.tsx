@@ -14,18 +14,30 @@ const LIMIT_OPTIONS = [10, 20, 50, 100] as const;
 export function UserListView() {
   const [search, setSearch] = useState("");
   const [companyId, setCompanyId] = useState("");
+  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [loadRanks, setLoadRanks] = useState(false);
+
+  const filterKey = useMemo(
+    () => [search, companyId, loadRanks].join("\0"),
+    [search, companyId, loadRanks],
+  );
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const listParams = useMemo(() => {
     const cid = parseInt(companyId.trim(), 10);
     return {
+      page,
       limit,
       ...(search.trim() ? { search: search.trim() } : {}),
       ...(Number.isFinite(cid) ? { company_id: cid } : {}),
       ...(loadRanks ? { load_ranks: true } : {}),
     };
-  }, [search, companyId, limit, loadRanks]);
+  }, [page, search, companyId, limit, loadRanks]);
 
   const listQuery = useUsers(listParams);
   const [detailId, setDetailId] = useState<number | string | null>(null);
@@ -57,22 +69,6 @@ export function UserListView() {
             placeholder="Optional"
           />
         </div>
-        <div className="min-w-[6rem]">
-          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Limit
-          </label>
-          <select
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            value={limit}
-            onChange={(ev) => setLimit(Number(ev.target.value))}
-          >
-            {LIMIT_OPTIONS.map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
-        </div>
         <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900">
           <input
             type="checkbox"
@@ -89,6 +85,13 @@ export function UserListView() {
         query={listQuery}
         title="Users"
         onView={(id) => setDetailId(id)}
+        onPageChange={(next) => setPage(next)}
+        limit={limit}
+        limitOptions={LIMIT_OPTIONS}
+        onLimitChange={(next) => {
+          setLimit(next);
+          setPage(1);
+        }}
       />
 
       <RecordDetailModal

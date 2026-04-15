@@ -5,6 +5,7 @@ import { DeleteConfirmationDialog } from "@/components/crud/DeleteConfirmationDi
 import { CrudEntityTable } from "@/components/crud/CrudEntityTable";
 import { FormField, FormModal } from "@/components/crud/FormModal";
 import { RecordDetailModal } from "@/components/crud/RecordDetailModal";
+import { RankDetailContent } from "@/components/ranks/RankDetailContent";
 import { useRank } from "@/hooks/ranks/useRank";
 import { useRankMutations } from "@/hooks/ranks/useRankMutations";
 import { useRanks } from "@/hooks/ranks/useRanks";
@@ -16,8 +17,16 @@ import {
 } from "@/lib/toast/appToast";
 import type { Rank } from "@/models/Rank";
 
+const LIMIT_OPTIONS = [10, 20, 50, 100] as const;
+
 export function RankCrudView() {
-  const listQuery = useRanks();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const listParams = useMemo(
+    () => ({ page, limit }),
+    [page, limit],
+  );
+  const listQuery = useRanks(listParams);
   const mutations = useRankMutations();
   const [detailId, setDetailId] = useState<number | string | null>(null);
   const [editId, setEditId] = useState<number | string | null>(null);
@@ -38,6 +47,7 @@ export function RankCrudView() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
+  /* eslint-disable react-hooks/set-state-in-effect -- hydrate create/edit rank form when modal opens or GET /ranks/:id resolves */
   useEffect(() => {
     if (!formOpen) return;
     if (editId == null) {
@@ -50,6 +60,7 @@ export function RankCrudView() {
     setName(raw.name ?? "");
     setDescription(raw.description ?? "");
   }, [formOpen, editId, editQuery.data]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const openCreate = () => {
     setEditId(null);
@@ -105,16 +116,30 @@ export function RankCrudView() {
           setFormOpen(true);
         }}
         onDelete={(id) => setDeleteId(id)}
+        onPageChange={(next) => setPage(next)}
+        limit={limit}
+        limitOptions={LIMIT_OPTIONS}
+        onLimitChange={(next) => {
+          setLimit(next);
+          setPage(1);
+        }}
       />
 
       <RecordDetailModal
         open={detailId != null}
         title="Rank"
-        subtitle="Permission rank from GET /ranks/{id}."
+        subtitle="Name, description, users, and permission matrix."
         data={detailQuery.data ?? null}
         loading={detailQuery.isPending && detailId != null}
         error={detailQuery.isError ? String(detailQuery.error) : null}
         onClose={() => setDetailId(null)}
+        renderData={(inner) =>
+          inner != null && typeof inner === "object" && !Array.isArray(inner) ? (
+            <RankDetailContent rank={inner as Record<string, unknown>} />
+          ) : (
+            <p className="text-sm text-zinc-500">Nothing to display.</p>
+          )
+        }
       />
 
       <FormModal

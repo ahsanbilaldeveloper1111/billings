@@ -1,15 +1,10 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  TableListHeaderControls,
-  TablePaginationControls,
-} from "@/components/crud/ListUiControls";
+import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { extractListRows } from "@/lib/api/extractApiData";
 import type { ProductCategory } from "@/models/ProductCategory";
-
-const SORTABLE = ["name", "created_at"] as const;
 
 type Row = ProductCategory & Record<string, unknown>;
 
@@ -122,6 +117,50 @@ export function ProductCategoryListTable({
 
   const { rows } = extractListRows<Row>(query.data);
   const categories = rows;
+  const sortHeader = (col: string, label?: string) => (
+    <button
+      type="button"
+      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
+      onClick={() => onSort(col)}
+    >
+      {label ?? col}
+      <SortChevron active={sortField === col} dir={sortDir} />
+    </button>
+  );
+  const columns = [
+    {
+      key: "name",
+      header: sortHeader("name", "name"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      cellClassName: "px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100",
+      render: (c: Row) =>
+        canView ? (
+          <button
+            type="button"
+            onClick={() => onView(c.id)}
+            className="text-left text-sky-700 underline decoration-sky-400/60 hover:text-sky-900 dark:text-sky-300 dark:hover:text-sky-100"
+          >
+            {c.name ?? "—"}
+          </button>
+        ) : (
+          <span>{c.name ?? "—"}</span>
+        ),
+    },
+    {
+      key: "created_at",
+      header: sortHeader("created_at", "Created"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: Row) => formatCreated(c.created_at),
+    },
+    {
+      key: "description",
+      header: "Description",
+      cellClassName: "max-w-[14rem] truncate px-3 py-2 text-zinc-600 dark:text-zinc-400",
+      render: (c: Row) =>
+        c.description?.trim() ? String(c.description) : <span className="text-zinc-400">No description</span>,
+    },
+    { key: "parent", header: "Parent", render: (c: Row) => parentLabel(c) },
+  ];
 
   return (
     <div className="space-y-4">
@@ -139,120 +178,28 @@ export function ProductCategoryListTable({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <TableListHeaderControls
-          title={title}
-          pagination={pagination}
-          rowCount={categories.length}
-          limit={limit}
-          limitOptions={limitOptions}
-          onLimitChange={onLimitChange}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b-2 border-zinc-300 bg-zinc-50/50 dark:border-zinc-600 dark:bg-zinc-900/30">
-                {(SORTABLE as readonly string[]).map((col) => (
-                  <th key={col} className="whitespace-nowrap px-3 py-2">
-                    <button
-                      type="button"
-                      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
-                      onClick={() => onSort(col)}
-                    >
-                      {col === "created_at" ? "Created" : col}
-                      <SortChevron
-                        active={sortField === col}
-                        dir={sortDir}
-                      />
-                    </button>
-                  </th>
-                ))}
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Description
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Parent
-                </th>
-                <th className="min-w-[10rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-3 py-8 text-center text-sm text-zinc-500"
-                  >
-                    No categories match these filters.
-                  </td>
-                </tr>
-              ) : (
-                categories.map((c) => (
-                  <tr
-                    key={c.id}
-                    className="border-b border-zinc-200 odd:bg-white/40 even:bg-zinc-50/30 dark:border-zinc-700 dark:odd:bg-transparent dark:even:bg-zinc-900/20"
-                  >
-                    <td className="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">
-                      {canView ? (
-                        <button
-                          type="button"
-                          onClick={() => onView(c.id)}
-                          className="text-left text-sky-700 underline decoration-sky-400/60 hover:text-sky-900 dark:text-sky-300 dark:hover:text-sky-100"
-                        >
-                          {c.name ?? "—"}
-                        </button>
-                      ) : (
-                        <span>{c.name ?? "—"}</span>
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                      {formatCreated(c.created_at)}
-                    </td>
-                    <td className="max-w-[14rem] truncate px-3 py-2 text-zinc-600 dark:text-zinc-400">
-                      {c.description?.trim()
-                        ? String(c.description)
-                        : (
-                            <span className="text-zinc-400">No description</span>
-                          )}
-                    </td>
-                    <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                      {parentLabel(c)}
-                    </td>
-                    <td className="min-w-[10rem] whitespace-nowrap px-3 py-2 text-right">
-                      <div className="flex flex-nowrap items-center justify-end gap-1">
-                        {canUpdate ? (
-                          <button
-                            type="button"
-                            onClick={() => onEdit(c.id)}
-                            className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50"
-                          >
-                            Edit
-                          </button>
-                        ) : null}
-                        {canDelete ? (
-                          <button
-                            type="button"
-                            onClick={() => onDelete(c.id)}
-                            className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
-                          >
-                            Delete
-                          </button>
-                        ) : null}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <TablePaginationControls
+      <UniversalDataTable
+        title={title}
+        rows={categories}
+        columns={columns}
+        getRowKey={(c) => c.id}
+        emptyMessage="No categories match these filters."
+        minTableWidthClassName="min-w-[44rem]"
         pagination={pagination}
         onPageChange={onPageChange}
+        limit={limit}
+        limitOptions={limitOptions}
+        onLimitChange={onLimitChange}
+        renderActions={(c) => (
+          <>
+            {canUpdate ? (
+              <button type="button" onClick={() => onEdit(c.id)} className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50">Edit</button>
+            ) : null}
+            {canDelete ? (
+              <button type="button" onClick={() => onDelete(c.id)} className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40">Delete</button>
+            ) : null}
+          </>
+        )}
       />
     </div>
   );

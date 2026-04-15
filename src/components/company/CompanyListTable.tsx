@@ -1,25 +1,12 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  TableListHeaderControls,
-  TablePaginationControls,
-} from "@/components/crud/ListUiControls";
+import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { useDisplayCurrency } from "@/contexts/currency-display-context";
 import { extractListRows } from "@/lib/api/extractApiData";
 import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import type { Company } from "@/models/Company";
-
-/** Column order matches body cells: name, credit, country, outstanding, email, created. */
-const SORTABLE = [
-  "name",
-  "credit_limit",
-  "country",
-  "outstanding_amount",
-  "email",
-  "created_at",
-] as const;
 
 type CompanyRow = Company & Record<string, unknown>;
 
@@ -142,6 +129,92 @@ export function CompanyListTable({
 
   const { rows } = extractListRows<CompanyRow>(query.data);
   const companies = rows;
+  const sortHeader = (col: string, label?: string) => (
+    <button
+      type="button"
+      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
+      onClick={() => onSort(col)}
+    >
+      {label ?? col.replace(/_/g, " ")}
+      <SortChevron active={sortField === col} dir={sortDir} />
+    </button>
+  );
+
+  const columns = [
+    {
+      key: "name",
+      header: sortHeader("name", "name"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      cellClassName: "px-3 py-2",
+      render: (c: CompanyRow) => {
+        const phone =
+          c.phone != null
+            ? String(c.phone)
+            : c.phone_no != null
+              ? String(c.phone_no)
+              : null;
+        return (
+          <>
+            <div className="font-medium text-zinc-900 dark:text-zinc-100">
+              {displayName(c, mainAppResellerNameMap)}
+            </div>
+            {phone ? (
+              <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                {phone}
+              </div>
+            ) : null}
+          </>
+        );
+      },
+    },
+    {
+      key: "credit_limit",
+      header: sortHeader("credit_limit", "Credit limit"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CompanyRow) => {
+        const cur = c.profile?.currency ?? "USD";
+        const credit =
+          c.profile?.credit_limit != null && c.profile.credit_limit > 0
+            ? formatInCurrency(Number(c.profile.credit_limit), cur)
+            : null;
+        return credit ?? <span className="text-zinc-400">Not set</span>;
+      },
+    },
+    {
+      key: "country",
+      header: sortHeader("country", "country"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CompanyRow) => c.country ?? "—",
+    },
+    {
+      key: "outstanding_amount",
+      header: sortHeader("outstanding_amount", "Outstanding"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      cellClassName: "px-3 py-2 text-right font-mono text-zinc-800 dark:text-zinc-200",
+      render: (c: CompanyRow) => {
+        const cur = c.profile?.currency ?? "USD";
+        return formatInCurrency(c.profile?.outstanding_amount ?? 0, cur);
+      },
+    },
+    {
+      key: "email",
+      header: sortHeader("email", "email"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CompanyRow) => c.email ?? "—",
+    },
+    {
+      key: "created_at",
+      header: sortHeader("created_at", "created at"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CompanyRow) =>
+        c.created_at ? new Date(c.created_at).toLocaleDateString() : "—",
+    },
+    {
+      key: "vendor",
+      header: "Vendor",
+      render: (c: CompanyRow) => vendorLabel(c),
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -159,177 +232,61 @@ export function CompanyListTable({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <TableListHeaderControls
-          title={title}
-          pagination={pagination}
-          rowCount={companies.length}
-          limit={limit}
-          limitOptions={limitOptions}
-          onLimitChange={onLimitChange}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[52rem] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b-2 border-zinc-300 bg-zinc-50/50 dark:border-zinc-600 dark:bg-zinc-900/30">
-                {(SORTABLE as readonly string[]).map((col) => (
-                  <th key={col} className="whitespace-nowrap px-3 py-2">
-                    <button
-                      type="button"
-                      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
-                      onClick={() => onSort(col)}
-                    >
-                      {col === "credit_limit"
-                        ? "Credit limit"
-                        : col === "outstanding_amount"
-                          ? "Outstanding"
-                          : col.replace(/_/g, " ")}
-                      <SortChevron
-                        active={sortField === col}
-                        dir={sortDir}
-                      />
-                    </button>
-                  </th>
-                ))}
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Vendor
-                </th>
-                <th className="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    className="px-3 py-8 text-center text-sm text-zinc-500"
-                  >
-                    No companies match these filters.
-                  </td>
-                </tr>
-              ) : (
-                companies.map((c, idx) => {
-                  const cur = c.profile?.currency ?? "USD";
-                  const credit =
-                    c.profile?.credit_limit != null &&
-                    c.profile.credit_limit > 0
-                      ? formatInCurrency(
-                          Number(c.profile.credit_limit),
-                          cur,
-                        )
-                      : null;
-                  const outstanding = formatInCurrency(
-                    c.profile?.outstanding_amount ?? 0,
-                    cur,
-                  );
-                  const phone =
-                    c.phone != null
-                      ? String(c.phone)
-                      : c.phone_no != null
-                        ? String(c.phone_no)
-                        : null;
-                  return (
-                    <tr
-                      key={c.id ?? c.tenant_id ?? idx}
-                      className="border-b border-zinc-200 odd:bg-white/40 even:bg-zinc-50/30 dark:border-zinc-700 dark:odd:bg-transparent dark:even:bg-zinc-900/20"
-                    >
-                      <td className="px-3 py-2">
-                        <div className="font-medium text-zinc-900 dark:text-zinc-100">
-                          {displayName(c, mainAppResellerNameMap)}
-                        </div>
-                        {phone ? (
-                          <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                            {phone}
-                          </div>
-                        ) : null}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-800 dark:text-zinc-200">
-                        {credit ?? (
-                          <span className="text-zinc-400">Not set</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {c.country ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono text-zinc-800 dark:text-zinc-200">
-                        {outstanding}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {c.email ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {c.created_at
-                          ? new Date(c.created_at).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {vendorLabel(c)}
-                      </td>
-                      <td className="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right">
-                        <div className="flex flex-nowrap items-center justify-end gap-1">
-                          {canView ? (
-                            <button
-                              type="button"
-                              onClick={() => onView(c)}
-                              className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100 dark:hover:bg-sky-900/40"
-                            >
-                              View
-                            </button>
-                          ) : null}
-                          {canUpdate ? (
-                            <button
-                              type="button"
-                              onClick={() => onEdit(c)}
-                              className="shrink-0 rounded-lg bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-950 hover:bg-amber-200 dark:bg-amber-950/50 dark:text-amber-100 dark:hover:bg-amber-900/40"
-                            >
-                              Edit
-                            </button>
-                          ) : null}
-                          <button
-                            type="button"
-                            onClick={() => onProductPricing(c)}
-                            className="shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-[11px] font-medium text-violet-900 hover:bg-violet-200 dark:bg-violet-950/50 dark:text-violet-100 dark:hover:bg-violet-900/40"
-                            title="Open product pricing (new tab)"
-                          >
-                            Pricing
-                          </button>
-                          {canDelete ? (
-                            <button
-                              type="button"
-                              onClick={() => onDelete(c)}
-                              className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
-                            >
-                              Delete
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <TablePaginationControls
+      <UniversalDataTable
+        title={title}
+        rows={companies}
+        columns={columns}
+        getRowKey={(c, idx) => c.id ?? c.tenant_id ?? idx}
+        emptyMessage="No companies match these filters."
+        minTableWidthClassName="min-w-[52rem]"
         pagination={pagination}
         onPageChange={onPageChange}
+        limit={limit}
+        limitOptions={limitOptions}
+        onLimitChange={onLimitChange}
+        rawResponse={query.data ?? null}
+        actionsHeader="Actions"
+        actionsColumnClassName="min-w-[11rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200"
+        renderActions={(c) => (
+          <>
+            {canView ? (
+              <button
+                type="button"
+                onClick={() => onView(c)}
+                className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100 dark:hover:bg-sky-900/40"
+              >
+                View
+              </button>
+            ) : null}
+            {canUpdate ? (
+              <button
+                type="button"
+                onClick={() => onEdit(c)}
+                className="shrink-0 rounded-lg bg-amber-100 px-2 py-1 text-[11px] font-medium text-amber-950 hover:bg-amber-200 dark:bg-amber-950/50 dark:text-amber-100 dark:hover:bg-amber-900/40"
+              >
+                Edit
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => onProductPricing(c)}
+              className="shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-[11px] font-medium text-violet-900 hover:bg-violet-200 dark:bg-violet-950/50 dark:text-violet-100 dark:hover:bg-violet-900/40"
+              title="Open product pricing (new tab)"
+            >
+              Pricing
+            </button>
+            {canDelete ? (
+              <button
+                type="button"
+                onClick={() => onDelete(c)}
+                className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
+              >
+                Delete
+              </button>
+            ) : null}
+          </>
+        )}
       />
-
-      <details className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/80">
-        <summary className="cursor-pointer px-4 py-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          Raw API response
-        </summary>
-        <pre className="max-h-[min(40vh,320px)] overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-          {query.data === undefined || query.data === null
-            ? "—"
-            : JSON.stringify(query.data, null, 2)}
-        </pre>
-      </details>
     </div>
   );
 }

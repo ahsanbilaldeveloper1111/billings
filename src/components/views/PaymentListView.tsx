@@ -47,12 +47,49 @@ export function PaymentListView() {
   const [tenantId, setTenantId] = useState("");
   const [sortField, setSortField] = useState("payment_date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [crmNotNull, setCrmNotNull] = useState(false);
+
+  const filterKey = useMemo(
+    () =>
+      [
+        search,
+        status,
+        paymentMethod,
+        dateFrom,
+        dateTo,
+        vendorId,
+        crmCompanyId,
+        tenantId,
+        sortField,
+        sortDir,
+        crmNotNull,
+      ].join("\0"),
+    [
+      search,
+      status,
+      paymentMethod,
+      dateFrom,
+      dateTo,
+      vendorId,
+      crmCompanyId,
+      tenantId,
+      sortField,
+      sortDir,
+      crmNotNull,
+    ],
+  );
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
+    setPage(1);
+  }
 
   const listParams = useMemo(() => {
     const vid = parseInt(vendorId.trim(), 10);
     return {
+      page,
       limit,
       sort_field: sortField,
       sort_direction: sortDir,
@@ -67,6 +104,7 @@ export function PaymentListView() {
       ...(crmNotNull ? { crm_company_not_null: true } : {}),
     };
   }, [
+    page,
     limit,
     sortField,
     sortDir,
@@ -134,22 +172,6 @@ export function PaymentListView() {
               {PAYMENT_METHOD_FILTER_OPTIONS.map((m) => (
                 <option key={m || "all"} value={m}>
                   {m ? m.replace(/_/g, " ") : "All"}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Limit
-            </label>
-            <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-              value={limit}
-              onChange={(ev) => setLimit(Number(ev.target.value))}
-            >
-              {LIMIT_OPTIONS.map((n) => (
-                <option key={n} value={n}>
-                  {n}
                 </option>
               ))}
             </select>
@@ -263,12 +285,19 @@ export function PaymentListView() {
         query={listQuery}
         title="Payments"
         onView={(id) => setDetailId(id)}
+        onPageChange={(next) => setPage(next)}
+        limit={limit}
+        limitOptions={LIMIT_OPTIONS}
+        onLimitChange={(next) => {
+          setLimit(next);
+          setPage(1);
+        }}
       />
 
       <RecordDetailModal
         open={detailId != null}
         title="Payment"
-        subtitle="Full payment record from GET /payments/{id}."
+        subtitle="Invoice amounts, method, and related metadata."
         data={detailQuery.data ?? null}
         loading={detailQuery.isPending && detailId != null}
         error={detailQuery.isError ? String(detailQuery.error) : null}

@@ -1,16 +1,11 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  TableListHeaderControls,
-  TablePaginationControls,
-} from "@/components/crud/ListUiControls";
+import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { extractListRows } from "@/lib/api/extractApiData";
 import { formatCurrency } from "@/lib/currency";
 import type { Product } from "@/models/Product";
-
-const SORTABLE = ["name", "base_price", "created_at"] as const;
 
 type ProductRow = Product & Record<string, unknown>;
 
@@ -120,6 +115,73 @@ export function ProductListTable({
 
   const { rows } = extractListRows<ProductRow>(query.data);
   const products = rows;
+  const sortHeader = (col: string, label?: string) => (
+    <button
+      type="button"
+      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
+      onClick={() => onSort(col)}
+    >
+      {label ?? col.replace(/_/g, " ")}
+      <SortChevron active={sortField === col} dir={sortDir} />
+    </button>
+  );
+  const columns = [
+    {
+      key: "name",
+      header: sortHeader("name", "name"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      cellClassName: "px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100",
+      render: (p: ProductRow) => p.name ?? "—",
+    },
+    {
+      key: "base_price",
+      header: sortHeader("base_price", "Base price"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      cellClassName: "px-3 py-2 text-right font-mono text-zinc-800 dark:text-zinc-200",
+      render: (p: ProductRow) => {
+        const cur = typeof p.currency === "string" && p.currency.trim() ? p.currency : "USD";
+        return formatCurrency(p.base_price, cur);
+      },
+    },
+    {
+      key: "created_at",
+      header: sortHeader("created_at", "created at"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (p: ProductRow) => (p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"),
+    },
+    {
+      key: "sku",
+      header: "SKU",
+      cellClassName: "max-w-[10rem] truncate px-3 py-2 text-zinc-600 dark:text-zinc-400",
+      render: (p: ProductRow) => (p.sku?.trim() ? p.sku : "—"),
+    },
+    {
+      key: "category",
+      header: "Category",
+      render: (p: ProductRow) => categoryLabel(p),
+    },
+    {
+      key: "type",
+      header: "Type",
+      render: (p: ProductRow) => {
+        const typeService =
+          p.is_service === true ||
+          String((p as Record<string, unknown>).is_service).toLowerCase() === "true" ||
+          Number((p as Record<string, unknown>).is_service) === 1;
+        return (
+          <span
+            className={
+              typeService
+                ? "rounded-md bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-900 dark:bg-sky-950/50 dark:text-sky-100"
+                : "rounded-md bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100"
+            }
+          >
+            {typeService ? "Service" : "Product"}
+          </span>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -146,148 +208,31 @@ export function ProductListTable({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <TableListHeaderControls
-          title={title}
-          pagination={pagination}
-          rowCount={products.length}
-          limit={limit}
-          limitOptions={limitOptions}
-          onLimitChange={onLimitChange}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b-2 border-zinc-300 bg-zinc-50/50 dark:border-zinc-600 dark:bg-zinc-900/30">
-                {(SORTABLE as readonly string[]).map((col) => (
-                  <th key={col} className="whitespace-nowrap px-3 py-2">
-                    <button
-                      type="button"
-                      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
-                      onClick={() => onSort(col)}
-                    >
-                      {col === "base_price"
-                        ? "Base price"
-                        : col.replace(/_/g, " ")}
-                      <SortChevron
-                        active={sortField === col}
-                        dir={sortDir}
-                      />
-                    </button>
-                  </th>
-                ))}
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  SKU
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Category
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Type
-                </th>
-                <th className="min-w-[10rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-3 py-8 text-center text-sm text-zinc-500"
-                  >
-                    No products match these filters.
-                  </td>
-                </tr>
-              ) : (
-                products.map((p) => {
-                  const cur =
-                    typeof p.currency === "string" && p.currency.trim()
-                      ? p.currency
-                      : "USD";
-                  const typeService =
-                    p.is_service === true ||
-                    String(
-                      (p as Record<string, unknown>).is_service,
-                    ).toLowerCase() === "true" ||
-                    Number((p as Record<string, unknown>).is_service) === 1;
-                  return (
-                    <tr
-                      key={p.id}
-                      className="border-b border-zinc-200 odd:bg-white/40 even:bg-zinc-50/30 dark:border-zinc-700 dark:odd:bg-transparent dark:even:bg-zinc-900/20"
-                    >
-                      <td className="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">
-                        {p.name ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-right font-mono text-zinc-800 dark:text-zinc-200">
-                        {formatCurrency(p.base_price, cur)}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {p.created_at
-                          ? new Date(p.created_at).toLocaleDateString()
-                          : "—"}
-                      </td>
-                      <td className="max-w-[10rem] truncate px-3 py-2 text-zinc-600 dark:text-zinc-400">
-                        {p.sku?.trim() ? p.sku : "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {categoryLabel(p)}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span
-                          className={
-                            typeService
-                              ? "rounded-md bg-sky-100 px-2 py-0.5 text-[11px] font-medium text-sky-900 dark:bg-sky-950/50 dark:text-sky-100"
-                              : "rounded-md bg-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100"
-                          }
-                        >
-                          {typeService ? "Service" : "Product"}
-                        </span>
-                      </td>
-                      <td className="min-w-[10rem] whitespace-nowrap px-3 py-2 text-right">
-                        <div className="flex flex-nowrap items-center justify-end gap-1">
-                          {canView ? (
-                            <button
-                              type="button"
-                              onClick={() => onView(p)}
-                              className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100 dark:hover:bg-sky-900/40"
-                            >
-                              View
-                            </button>
-                          ) : null}
-                          {canUpdate ? (
-                            <button
-                              type="button"
-                              onClick={() => onEdit(p.id)}
-                              className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50"
-                            >
-                              Edit
-                            </button>
-                          ) : null}
-                          {canDelete ? (
-                            <button
-                              type="button"
-                              onClick={() => onDelete(p.id)}
-                              className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40"
-                            >
-                              Delete
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <TablePaginationControls
+      <UniversalDataTable
+        title={title}
+        rows={products}
+        columns={columns}
+        getRowKey={(p) => p.id}
+        emptyMessage="No products match these filters."
+        minTableWidthClassName="min-w-[44rem]"
         pagination={pagination}
         onPageChange={onPageChange}
+        limit={limit}
+        limitOptions={limitOptions}
+        onLimitChange={onLimitChange}
+        renderActions={(p) => (
+          <>
+            {canView ? (
+              <button type="button" onClick={() => onView(p)} className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100 dark:hover:bg-sky-900/40">View</button>
+            ) : null}
+            {canUpdate ? (
+              <button type="button" onClick={() => onEdit(p.id)} className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-100 dark:hover:bg-emerald-900/50">Edit</button>
+            ) : null}
+            {canDelete ? (
+              <button type="button" onClick={() => onDelete(p.id)} className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100 dark:hover:bg-rose-900/40">Delete</button>
+            ) : null}
+          </>
+        )}
       />
     </div>
   );

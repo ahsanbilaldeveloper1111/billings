@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { RecordDetailModal } from "@/components/crud/RecordDetailModal";
+import { RawResponseDisclosure } from "@/components/ui/RawResponseDisclosure";
 import type { ApiSuccessResponse } from "@/lib/api/types";
 import {
   extractListRows,
@@ -66,14 +67,11 @@ export function ModelListBody({
     return (
       <div className="space-y-4">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">{emptyMessage}</p>
-        <details className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/80">
-          <summary className="cursor-pointer px-4 py-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-            Raw response
-          </summary>
-          <pre className="max-h-64 overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] dark:border-zinc-800">
-            {rawJson}
-          </pre>
-        </details>
+        <RawResponseDisclosure
+          label="Raw response"
+          content={typeof rawJson === "string" ? rawJson : String(rawJson)}
+          preClassName="max-h-64 overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300"
+        />
       </div>
     );
   }
@@ -161,14 +159,10 @@ export function ModelListBody({
           </div>
         </div>
 
-        <details className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/80">
-          <summary className="cursor-pointer px-4 py-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-            Raw API response
-          </summary>
-          <pre className="max-h-[min(40vh,320px)] overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-            {rawJson}
-          </pre>
-        </details>
+        <RawResponseDisclosure
+          label="Raw API response"
+          content={typeof rawJson === "string" ? rawJson : String(rawJson)}
+        />
       </div>
 
       {viewable ? (

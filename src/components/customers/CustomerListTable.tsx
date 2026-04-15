@@ -1,15 +1,10 @@
 "use client";
 
 import type { UseQueryResult } from "@tanstack/react-query";
-import {
-  TableListHeaderControls,
-  TablePaginationControls,
-} from "@/components/crud/ListUiControls";
+import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { extractListRows } from "@/lib/api/extractApiData";
 import type { Customer } from "@/models/Customer";
-
-const SORTABLE = ["name", "email", "phone"] as const;
 
 type CustomerRow = Customer & Record<string, unknown>;
 
@@ -109,6 +104,77 @@ export function CustomerListTable({
 
   const { rows } = extractListRows<CustomerRow>(query.data);
   const customers = rows;
+  const sortHeader = (col: string, label?: string) => (
+    <button
+      type="button"
+      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
+      onClick={() => onSort(col)}
+    >
+      {label ?? col.charAt(0).toUpperCase() + col.slice(1)}
+      <SortChevron active={sortField === col} dir={sortDir} />
+    </button>
+  );
+  const columns = [
+    {
+      key: "name",
+      header: sortHeader("name"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CustomerRow) => c.name ?? "—",
+      cellClassName: "px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100",
+    },
+    {
+      key: "email",
+      header: sortHeader("email"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CustomerRow) => c.email ?? "—",
+    },
+    {
+      key: "phone",
+      header: sortHeader("phone"),
+      headerClassName: "whitespace-nowrap px-3 py-2",
+      render: (c: CustomerRow) => c.phone ?? "—",
+    },
+    {
+      key: "crm_company",
+      header: "CRM company",
+      render: (c: CustomerRow) => {
+        const crmId = c.crm_company_id != null ? String(c.crm_company_id).trim() : "";
+        const crmName = crmId && crmCompanyNameMap[crmId]?.trim() ? crmCompanyNameMap[crmId] : "";
+        if (!crmId) return "—";
+        return (
+          <div>
+            <p>{crmName || crmId}</p>
+            {crmName && crmName !== crmId ? (
+              <p className="text-[11px] text-zinc-500">{crmId}</p>
+            ) : null}
+          </div>
+        );
+      },
+    },
+    {
+      key: "tenant",
+      header: "Tenant",
+      render: (c: CustomerRow) => {
+        const tid = c.tenant_id != null ? String(c.tenant_id).trim() : "";
+        const tenantName = tid && tenantNameMap[tid]?.trim() ? tenantNameMap[tid] : "";
+        if (!tid) return "—";
+        return (
+          <div>
+            <p>{tenantName || tid}</p>
+            {tenantName && tenantName !== tid ? (
+              <p className="text-[11px] text-zinc-500">{tid}</p>
+            ) : null}
+          </div>
+        );
+      },
+    },
+    {
+      key: "invoices",
+      header: "Invoices",
+      render: (c: CustomerRow) => c.invoices_count ?? 0,
+      cellClassName: "px-3 py-2 text-zinc-800 dark:text-zinc-200",
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -126,174 +192,61 @@ export function CustomerListTable({
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <TableListHeaderControls
-          title={title}
-          pagination={pagination}
-          rowCount={customers.length}
-          limit={limit}
-          limitOptions={limitOptions}
-          onLimitChange={onLimitChange}
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[48rem] border-collapse text-left text-xs">
-            <thead>
-              <tr className="border-b-2 border-zinc-300 bg-zinc-50/50 dark:border-zinc-600 dark:bg-zinc-900/30">
-                {(SORTABLE as readonly string[]).map((col) => (
-                  <th key={col} className="whitespace-nowrap px-3 py-2">
-                    <button
-                      type="button"
-                      className="inline-flex items-center font-semibold text-zinc-700 hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
-                      onClick={() => onSort(col)}
-                    >
-                      {col.charAt(0).toUpperCase() + col.slice(1)}
-                      <SortChevron
-                        active={sortField === col}
-                        dir={sortDir}
-                      />
-                    </button>
-                  </th>
-                ))}
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  CRM company
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Tenant
-                </th>
-                <th className="whitespace-nowrap px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200">
-                  Invoices
-                </th>
-                <th className="min-w-[12rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {customers.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="px-4 py-8 text-center text-sm text-zinc-500"
-                  >
-                    No customers match the current filters.
-                  </td>
-                </tr>
-              ) : (
-                customers.map((c, idx) => {
-                  const tid =
-                    c.tenant_id != null ? String(c.tenant_id).trim() : "";
-                  const tenantName =
-                    tid && tenantNameMap[tid]?.trim() ? tenantNameMap[tid] : "";
-                  const crmId =
-                    c.crm_company_id != null ? String(c.crm_company_id).trim() : "";
-                  const crmName =
-                    crmId && crmCompanyNameMap[crmId]?.trim()
-                      ? crmCompanyNameMap[crmId]
-                      : "";
-                  return (
-                    <tr
-                      key={c.crm_company_id ?? c.id ?? idx}
-                      className="border-b border-zinc-200 odd:bg-white/40 even:bg-zinc-50/30 dark:border-zinc-700 dark:odd:bg-transparent dark:even:bg-zinc-900/20"
-                    >
-                      <td className="px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100">
-                        {c.name ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {c.email ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {c.phone ?? "—"}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {crmId ? (
-                          <div>
-                            <p>{crmName || crmId}</p>
-                            {crmName && crmName !== crmId ? (
-                              <p className="text-[11px] text-zinc-500">{crmId}</p>
-                            ) : null}
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-700 dark:text-zinc-300">
-                        {tid ? (
-                          <div>
-                            <p>{tenantName || tid}</p>
-                            {tenantName && tenantName !== tid ? (
-                              <p className="text-[11px] text-zinc-500">{tid}</p>
-                            ) : null}
-                          </div>
-                        ) : (
-                          "—"
-                        )}
-                      </td>
-                      <td className="px-3 py-2 text-zinc-800 dark:text-zinc-200">
-                        {c.invoices_count ?? 0}
-                      </td>
-                      <td className="min-w-[12rem] whitespace-nowrap px-3 py-2 text-right">
-                        <div className="flex flex-nowrap items-center justify-end gap-1">
-                          {canView ? (
-                            <button
-                              type="button"
-                              onClick={() => onView(c)}
-                              className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100"
-                            >
-                              View
-                            </button>
-                          ) : null}
-                          <button
-                            type="button"
-                            onClick={() => onProductPricing(c)}
-                            className="shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-[11px] font-medium text-violet-900 hover:bg-violet-200 dark:bg-violet-950/50 dark:text-violet-100"
-                            title="Subscription pricing"
-                          >
-                            Pricing
-                          </button>
-                          {canUpdate ? (
-                            <button
-                              type="button"
-                              onClick={() => onEdit(c)}
-                              className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-100"
-                            >
-                              Edit
-                            </button>
-                          ) : null}
-                          {canDelete ? (
-                            <button
-                              type="button"
-                              onClick={() => onDelete(c)}
-                              className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100"
-                            >
-                              Delete
-                            </button>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <TablePaginationControls
+      <UniversalDataTable
+        title={title}
+        rows={customers}
+        columns={columns}
+        getRowKey={(c, idx) => c.crm_company_id ?? c.id ?? idx}
+        emptyMessage="No customers match the current filters."
+        minTableWidthClassName="min-w-[48rem]"
         pagination={pagination}
         onPageChange={onPageChange}
+        limit={limit}
+        limitOptions={limitOptions}
+        onLimitChange={onLimitChange}
+        rawResponse={query.data ?? null}
+        actionsHeader="Actions"
+        actionsColumnClassName="min-w-[12rem] whitespace-nowrap px-3 py-2 text-right font-semibold text-zinc-700 dark:text-zinc-200"
+        renderActions={(c) => (
+          <>
+            {canView ? (
+              <button
+                type="button"
+                onClick={() => onView(c)}
+                className="shrink-0 rounded-lg bg-sky-100 px-2 py-1 text-[11px] font-medium text-sky-900 hover:bg-sky-200 dark:bg-sky-950/50 dark:text-sky-100"
+              >
+                View
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={() => onProductPricing(c)}
+              className="shrink-0 rounded-lg bg-violet-100 px-2 py-1 text-[11px] font-medium text-violet-900 hover:bg-violet-200 dark:bg-violet-950/50 dark:text-violet-100"
+              title="Subscription pricing"
+            >
+              Pricing
+            </button>
+            {canUpdate ? (
+              <button
+                type="button"
+                onClick={() => onEdit(c)}
+                className="shrink-0 rounded-lg bg-emerald-100 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-100"
+              >
+                Edit
+              </button>
+            ) : null}
+            {canDelete ? (
+              <button
+                type="button"
+                onClick={() => onDelete(c)}
+                className="shrink-0 rounded-lg bg-rose-100 px-2 py-1 text-[11px] font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100"
+              >
+                Delete
+              </button>
+            ) : null}
+          </>
+        )}
       />
-
-      <details className="rounded-2xl border border-zinc-200/70 dark:border-zinc-800/80">
-        <summary className="cursor-pointer px-4 py-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-          Raw API response
-        </summary>
-        <pre className="max-h-[min(40vh,320px)] overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-          {query.data === undefined || query.data === null
-            ? "—"
-            : JSON.stringify(query.data, null, 2)}
-        </pre>
-      </details>
     </div>
   );
 }

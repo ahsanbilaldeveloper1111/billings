@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SmoothCollapse } from "@/components/ui/SmoothCollapse";
 
 type JsonPanelProps = {
   title: string;
@@ -26,7 +27,8 @@ export function JsonPanel({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition hover:bg-zinc-50/90 dark:hover:bg-zinc-900/50"
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors hover:bg-zinc-50/90 dark:hover:bg-zinc-900/50"
       >
         <div className="min-w-0">
           <h3 className="font-mono text-xs font-semibold text-zinc-800 dark:text-zinc-100">
@@ -37,7 +39,7 @@ export function JsonPanel({
           ) : null}
         </div>
         <span
-          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-sm text-zinc-500 transition dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 ${
+          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-sm text-zinc-500 transition-transform duration-300 ease-in-out dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 ${
             open ? "rotate-180" : ""
           }`}
           aria-hidden
@@ -47,11 +49,11 @@ export function JsonPanel({
           </svg>
         </span>
       </button>
-      {open ? (
+      <SmoothCollapse open={open}>
         <pre className="max-h-80 overflow-auto border-t border-zinc-100 bg-zinc-50/90 p-4 font-mono text-[11px] leading-relaxed text-zinc-700 dark:border-zinc-800 dark:bg-black/30 dark:text-zinc-300">
           {text}
         </pre>
-      ) : null}
+      </SmoothCollapse>
     </div>
   );
 }
