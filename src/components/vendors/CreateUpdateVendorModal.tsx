@@ -21,6 +21,7 @@ import {
 } from "@/lib/toast/appToast";
 import type { Vendor, VendorBankAccount } from "@/models/Vendor";
 import { VendorStatus } from "@/models/Vendor";
+import { formControlClass, formFieldSurfaceClass } from "@/lib/uiFormClasses";
 
 const DELIVERY_METHODS = ["email", "sms", "portal"] as const;
 
@@ -352,7 +353,7 @@ export function CreateUpdateVendorModal({
                     </span>
                     <input
                       required
-                      className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                      className={`mt-1 ${formControlClass}`}
                       value={formData.name}
                       onChange={(e) => handleField("name", e.target.value)}
                       placeholder="Vendor name"
@@ -364,7 +365,7 @@ export function CreateUpdateVendorModal({
                     </span>
                     <input
                       type="email"
-                      className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                      className={`mt-1 ${formControlClass}`}
                       value={formData.email}
                       onChange={(e) => handleField("email", e.target.value)}
                     />
@@ -381,7 +382,7 @@ export function CreateUpdateVendorModal({
                     <input
                       type="tel"
                       maxLength={20}
-                      className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                      className={`mt-1 ${formControlClass}`}
                       value={formData.phone}
                       onChange={(e) =>
                         handleField("phone", e.target.value.slice(0, 20))
@@ -393,7 +394,7 @@ export function CreateUpdateVendorModal({
                       Status
                     </span>
                     <select
-                      className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                      className={`mt-1 ${formControlClass}`}
                       value={formData.status}
                       onChange={(e) =>
                         handleField("status", e.target.value as VendorStatus)
@@ -425,7 +426,7 @@ export function CreateUpdateVendorModal({
                             Address
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.address}
                             onChange={(e) =>
                               handleField("address", e.target.value)
@@ -437,7 +438,7 @@ export function CreateUpdateVendorModal({
                             Country
                           </span>
                           <select
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.country}
                             onChange={(e) =>
                               handleField("country", e.target.value)
@@ -456,7 +457,7 @@ export function CreateUpdateVendorModal({
                             State / region
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.state}
                             onChange={(e) =>
                               handleField("state", e.target.value)
@@ -468,7 +469,7 @@ export function CreateUpdateVendorModal({
                             Postal code
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.postal_code}
                             onChange={(e) =>
                               handleField("postal_code", e.target.value)
@@ -480,7 +481,7 @@ export function CreateUpdateVendorModal({
                             City
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.city}
                             onChange={(e) =>
                               handleField("city", e.target.value)
@@ -492,7 +493,7 @@ export function CreateUpdateVendorModal({
                             Tax ID
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.tax_id}
                             onChange={(e) =>
                               handleField("tax_id", e.target.value)
@@ -519,7 +520,7 @@ export function CreateUpdateVendorModal({
                           <input
                             type="number"
                             step="0.01"
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.vat_rate}
                             onChange={(e) =>
                               handleField(
@@ -535,7 +536,7 @@ export function CreateUpdateVendorModal({
                           </span>
                           <input
                             type="number"
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.payment_terms}
                             onChange={(e) =>
                               handleField(
@@ -550,7 +551,7 @@ export function CreateUpdateVendorModal({
                             Currency
                           </span>
                           <select
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={formData.currency}
                             onChange={(e) =>
                               handleField("currency", e.target.value)
@@ -611,7 +612,7 @@ export function CreateUpdateVendorModal({
                         </p>
                         <div className="grid gap-3 sm:grid-cols-3">
                           <input
-                            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={formFieldSurfaceClass}
                             placeholder="Name"
                             value={formData.contact_person_name}
                             onChange={(e) =>
@@ -620,7 +621,7 @@ export function CreateUpdateVendorModal({
                           />
                           <input
                             type="email"
-                            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={formFieldSurfaceClass}
                             placeholder="Email"
                             value={formData.contact_person_email}
                             onChange={(e) =>
@@ -633,7 +634,7 @@ export function CreateUpdateVendorModal({
                           <input
                             type="tel"
                             maxLength={20}
-                            className="rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={formFieldSurfaceClass}
                             placeholder="Phone"
                             value={formData.contact_person_phone}
                             onChange={(e) =>
@@ -900,7 +901,7 @@ export function CreateUpdateVendorModal({
                             Bank name *
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.bank_name}
                             onChange={(e) =>
                               setNewBankAccount((b) => ({
@@ -915,7 +916,7 @@ export function CreateUpdateVendorModal({
                             Account holder *
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.account_holder_name}
                             onChange={(e) =>
                               setNewBankAccount((b) => ({
@@ -931,7 +932,7 @@ export function CreateUpdateVendorModal({
                           </span>
                           <input
                             inputMode="numeric"
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.account_number}
                             maxLength={34}
                             onChange={(e) => {
@@ -951,7 +952,7 @@ export function CreateUpdateVendorModal({
                           </span>
                           <input
                             inputMode="numeric"
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.routing_number ?? ""}
                             maxLength={20}
                             onChange={(e) => {
@@ -970,7 +971,7 @@ export function CreateUpdateVendorModal({
                             SWIFT
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.swift_code ?? ""}
                             maxLength={11}
                             onChange={(e) =>
@@ -986,7 +987,7 @@ export function CreateUpdateVendorModal({
                             IBAN
                           </span>
                           <input
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.iban ?? ""}
                             onChange={(e) =>
                               setNewBankAccount((b) => ({
@@ -1001,7 +1002,7 @@ export function CreateUpdateVendorModal({
                             Currency
                           </span>
                           <select
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={
                               newBankAccount.currency || formData.currency
                             }
@@ -1024,7 +1025,7 @@ export function CreateUpdateVendorModal({
                             Account type
                           </span>
                           <select
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.account_type ?? ""}
                             onChange={(e) =>
                               setNewBankAccount((b) => ({
@@ -1060,7 +1061,7 @@ export function CreateUpdateVendorModal({
                           </span>
                           <textarea
                             rows={2}
-                            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                            className={`mt-1 ${formControlClass}`}
                             value={newBankAccount.notes ?? ""}
                             onChange={(e) =>
                               setNewBankAccount((b) => ({

@@ -16,6 +16,7 @@ import { useCustomers } from "@/hooks/customers/useCustomers";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { customerApiResourceKey } from "@/lib/customers/customerApiResourceKey";
 import {
   buildCustomerListSearchParams,
@@ -223,14 +224,14 @@ export function CustomerCrudView() {
         open={showFilters}
         onToggle={() => setShowFilters((v) => !v)}
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Search
             </label>
             <input
               type="search"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.search}
               onChange={(e) =>
                 setListState((s) => ({
@@ -243,11 +244,11 @@ export function CustomerCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Filter by vendor
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.vendor_id}
               onChange={(e) => {
                 const v = e.target.value;
@@ -269,7 +270,7 @@ export function CustomerCrudView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Tenant
             </label>
             <TenantSearchableDropdown
@@ -299,7 +300,7 @@ export function CustomerCrudView() {
             </p>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Customer
             </label>
             <CrmCustomerSearchableDropdown

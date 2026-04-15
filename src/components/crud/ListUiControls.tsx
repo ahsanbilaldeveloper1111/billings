@@ -4,6 +4,19 @@ import type { ReactNode } from "react";
 import type { ApiPagination } from "@/lib/api/types";
 import { SmoothCollapse } from "@/components/ui/SmoothCollapse";
 
+export {
+  formControlClass,
+  formControlClass as filterControlClass,
+  formControlFlex1Class,
+  formControlFlex1DisabledClass,
+  formControlGrowMinClass,
+  formFieldSurfaceClass,
+  formLabelClass,
+  formLabelClass as filterLabelClass,
+  formToggleRowClass,
+  formToggleRowClass as filterToggleRowClass,
+} from "@/lib/uiFormClasses";
+
 type CollapsibleFilterPanelProps = {
   title: string;
   subtitle?: string;
@@ -20,27 +33,59 @@ export function CollapsibleFilterPanel({
   children,
 }: CollapsibleFilterPanelProps) {
   return (
-    <div className="mb-4 rounded-2xl border border-zinc-200/80 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/40">
+    <div
+      className={`mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] transition-shadow dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 ${
+        open ? "ring-1 ring-emerald-500/20 dark:ring-emerald-500/25" : ""
+      }`}
+    >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 rounded-xl border border-zinc-200/80 bg-white/80 px-3 py-2 text-left transition-colors hover:bg-white dark:border-zinc-700 dark:bg-zinc-900/60 dark:hover:bg-zinc-900/80"
+        className={`flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors sm:px-5 ${
+          open
+            ? "bg-gradient-to-r from-emerald-50/90 via-white to-teal-50/50 dark:from-emerald-950/35 dark:via-zinc-950 dark:to-teal-950/20"
+            : "bg-gradient-to-r from-zinc-50/90 to-white hover:from-zinc-50 dark:from-zinc-900/50 dark:to-zinc-950 dark:hover:from-zinc-900/70"
+        }`}
       >
-        <div className="min-w-0">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+        <span
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-sm ${
+            open
+              ? "border-emerald-200/80 bg-emerald-100/90 text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/50 dark:text-emerald-200"
+              : "border-zinc-200/80 bg-white text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+          }`}
+          aria-hidden
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.75}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             {title}
           </p>
           {subtitle ? (
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">{subtitle}</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {subtitle}
+            </p>
           ) : null}
         </div>
         <span className="flex shrink-0 items-center gap-2">
-          <span className="text-xs font-semibold text-zinc-600 transition-colors dark:text-zinc-300">
-            {open ? "Hide" : "Show"}
+          <span className="hidden text-xs font-semibold text-emerald-700 sm:inline dark:text-emerald-300">
+            {open ? "Hide filters" : "Show filters"}
           </span>
           <span
-            className={`flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-500 transition-transform duration-300 ease-in-out dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 ${
+            className={`flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-200/90 bg-white text-zinc-600 shadow-sm transition-transform duration-300 ease-in-out dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 ${
               open ? "rotate-180" : "rotate-0"
             }`}
             aria-hidden
@@ -62,8 +107,61 @@ export function CollapsibleFilterPanel({
         </span>
       </button>
       <SmoothCollapse open={open}>
-        <div className="pt-3">{children}</div>
+        <div className="border-t border-zinc-200/70 bg-gradient-to-b from-zinc-50/50 to-white px-4 py-5 dark:border-zinc-800 dark:from-zinc-900/30 dark:to-zinc-950 sm:px-6">
+          {children}
+        </div>
       </SmoothCollapse>
+    </div>
+  );
+}
+
+type StaticFilterCardProps = {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+};
+
+/** Always-expanded filter chrome (same family as {@link CollapsibleFilterPanel}). */
+export function StaticFilterCard({
+  title,
+  subtitle,
+  children,
+}: StaticFilterCardProps) {
+  return (
+    <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-emerald-500/15 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 dark:ring-emerald-500/20">
+      <div className="flex items-center gap-4 border-b border-zinc-200/70 bg-gradient-to-r from-emerald-50/90 via-white to-teal-50/50 px-4 py-3.5 dark:border-zinc-800 dark:from-emerald-950/35 dark:via-zinc-950 dark:to-teal-950/20 sm:px-5">
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-200/80 bg-emerald-100/90 text-emerald-800 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/50 dark:text-emerald-200"
+          aria-hidden
+        >
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.75}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+            />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+            {title}
+          </p>
+          {subtitle ? (
+            <p className="mt-0.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
+      </div>
+      <div className="bg-gradient-to-b from-zinc-50/50 to-white px-4 py-5 dark:from-zinc-900/30 dark:to-zinc-950 sm:px-6">
+        {children}
+      </div>
     </div>
   );
 }

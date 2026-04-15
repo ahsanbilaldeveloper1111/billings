@@ -22,6 +22,7 @@ import {
 } from "@/lib/invoices/invoicePrintHtml";
 import { invoiceService } from "@/services/invoices.service";
 import type { Invoice } from "@/models/Invoice";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 const btnSecondary =
   "rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800";
@@ -641,7 +642,7 @@ export function InvoiceDetailModal({
                 </label>
                 <input
                   type="email"
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                   placeholder="recipient@example.com"
                   value={emailTo}
                   onChange={(e) => setEmailTo(e.target.value)}
@@ -653,7 +654,7 @@ export function InvoiceDetailModal({
                 </label>
                 <input
                   type="text"
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                   placeholder="cc1@example.com, cc2@example.com"
                   value={emailCc}
                   onChange={(e) => setEmailCc(e.target.value)}
@@ -668,7 +669,7 @@ export function InvoiceDetailModal({
                 </label>
                 <input
                   type="text"
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                   placeholder="bcc@example.com"
                   value={emailBcc}
                   onChange={(e) => setEmailBcc(e.target.value)}
@@ -680,7 +681,7 @@ export function InvoiceDetailModal({
                 </label>
                 <input
                   type="text"
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                   placeholder="Invoice #XXX - Payment Due"
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
@@ -692,7 +693,7 @@ export function InvoiceDetailModal({
                 </label>
                 <textarea
                   rows={8}
-                  className="min-h-[160px] w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={`${formControlClass} min-h-[160px]`}
                   placeholder="Optional message. PDF is always attached."
                   value={emailBody}
                   onChange={(e) => setEmailBody(e.target.value)}

@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLoginFormState } from "@/hooks/forms/useLoginFormState";
 import { appPaths } from "@/lib/navigation/appPaths";
 import { showBillingBackendErrorToast } from "@/lib/toast/appToast";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function LoginPage() {
           <div>
             <label
               htmlFor="samaccountname"
-              className="block text-xs font-medium text-zinc-600 dark:text-zinc-300"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-zinc-700 dark:text-zinc-200"
             >
               Username
             </label>
@@ -58,14 +59,14 @@ export default function LoginPage() {
               onChange={(e) =>
                 setValues((v) => ({ ...v, samaccountname: e.target.value }))
               }
-              className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none ring-emerald-500/0 transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className={formControlClass}
               required
             />
           </div>
           <div>
             <label
               htmlFor="password"
-              className="block text-xs font-medium text-zinc-600 dark:text-zinc-300"
+              className="mb-1.5 block text-xs font-semibold tracking-wide text-zinc-700 dark:text-zinc-200"
             >
               Password
             </label>
@@ -78,7 +79,7 @@ export default function LoginPage() {
               onChange={(e) =>
                 setValues((v) => ({ ...v, password: e.target.value }))
               }
-              className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+              className={formControlClass}
               required
             />
           </div>

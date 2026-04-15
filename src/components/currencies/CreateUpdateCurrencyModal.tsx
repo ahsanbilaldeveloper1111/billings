@@ -10,6 +10,7 @@ import {
   worldCurrencyDropdownRows,
 } from "@/lib/currencies/worldCurrencyMap";
 import type { Currency } from "@/models/Currency";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 function isBaseRow(c: Currency): boolean {
   return !!(c.is_base_currency ?? c.is_base);
@@ -193,7 +194,7 @@ export function CreateUpdateCurrencyModal({
           <FormField label="Name">
             <input
               required
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={form.name}
               onChange={(e) =>
                 setForm((p) => ({ ...p, name: e.target.value }))
@@ -209,7 +210,7 @@ export function CreateUpdateCurrencyModal({
           <FormField label="Symbol">
             <input
               required
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={form.symbol}
               onChange={(e) =>
                 setForm((p) => ({ ...p, symbol: e.target.value }))
@@ -226,7 +227,7 @@ export function CreateUpdateCurrencyModal({
               step="0.000001"
               min={0.000001}
               disabled={isBaseCurrency}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900"
+              className={`${formControlClass} disabled:cursor-not-allowed disabled:opacity-60`}
               value={isBaseCurrency ? 1 : form.exchange_rate}
               onChange={(e) =>
                 setForm((p) => ({

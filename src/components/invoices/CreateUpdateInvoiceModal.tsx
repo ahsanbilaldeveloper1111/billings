@@ -58,9 +58,7 @@ import type {
 } from "@/models/Invoice";
 import type { PaymentMode } from "@/models/Payment";
 import { invoiceService } from "@/services/invoices.service";
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 function emptyLine(): InvoiceLineFormRow {
   return {
@@ -684,11 +682,11 @@ export function CreateUpdateInvoiceModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Vendor
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         disabled={loading || isInvoicePaid || isEdit}
                         value={selectedVendorId ?? ""}
                         onChange={(ev) => {
@@ -713,7 +711,7 @@ export function CreateUpdateInvoiceModal({
                       </p>
                     </label>
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Tenant (company) {!isEdit ? "*" : ""}
                       </span>
                       <TenantSearchableDropdown
@@ -751,7 +749,7 @@ export function CreateUpdateInvoiceModal({
                     </label>
                     {isSuperAdmin ? (
                       <label className="block sm:col-span-2">
-                        <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                        <span className={formLabelClass}>
                           Customer (optional)
                         </span>
                         <CrmCustomerSearchableDropdown
@@ -791,11 +789,11 @@ export function CreateUpdateInvoiceModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         PO number
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.po_number}
                         disabled={loading}
                         onChange={(ev) =>
@@ -804,13 +802,13 @@ export function CreateUpdateInvoiceModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Invoice date *
                       </span>
                       <input
                         type="date"
                         required
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.invoice_date}
                         disabled={loading || isInvoicePaid}
                         onChange={(ev) =>
@@ -827,13 +825,13 @@ export function CreateUpdateInvoiceModal({
                       ) : null}
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Due date *
                       </span>
                       <input
                         type="date"
                         required
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.due_date}
                         disabled={loading || isInvoicePaid}
                         onChange={(ev) =>
@@ -847,12 +845,12 @@ export function CreateUpdateInvoiceModal({
                       ) : null}
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         End date
                       </span>
                       <input
                         type="date"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.end_date}
                         disabled={loading || isInvoicePaid}
                         onChange={(ev) =>
@@ -861,12 +859,12 @@ export function CreateUpdateInvoiceModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Payment mode *
                       </span>
                       <select
                         required
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.payment_mode}
                         disabled={loading || isInvoicePaid}
                         onChange={(ev) =>
@@ -882,11 +880,11 @@ export function CreateUpdateInvoiceModal({
                       </select>
                     </label>
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Currency
                       </span>
                       <input
-                        className={`${inputClass} bg-zinc-50 dark:bg-zinc-900/60`}
+                        className={`${formControlClass} bg-zinc-50 dark:bg-zinc-900/60`}
                         readOnly
                         value={displayCurrency}
                       />
@@ -972,7 +970,7 @@ export function CreateUpdateInvoiceModal({
                               </td>
                               <td className="py-2 pr-2 align-top">
                                 <select
-                                  className={inputClass}
+                                  className={formControlClass}
                                   disabled={loading || isInvoicePaid}
                                   value={row.product_id ?? ""}
                                   onChange={(ev) => {
@@ -995,7 +993,7 @@ export function CreateUpdateInvoiceModal({
                                   ))}
                                 </select>
                                 <textarea
-                                  className={`${inputClass} mt-2 min-h-[52px]`}
+                                  className={`${formControlClass} mt-2 min-h-[52px]`}
                                   disabled={loading || isInvoicePaid}
                                   placeholder="Description"
                                   value={row.description}
@@ -1010,7 +1008,7 @@ export function CreateUpdateInvoiceModal({
                                 <input
                                   type="number"
                                   min={0}
-                                  className={inputClass}
+                                  className={formControlClass}
                                   disabled={loading || isInvoicePaid}
                                   value={row.quantity}
                                   onChange={(ev) =>
@@ -1027,7 +1025,7 @@ export function CreateUpdateInvoiceModal({
                                   type="number"
                                   min={0}
                                   step="0.01"
-                                  className={inputClass}
+                                  className={formControlClass}
                                   disabled={loading || isInvoicePaid}
                                   value={row.unit_price}
                                   onChange={(ev) =>
@@ -1044,7 +1042,7 @@ export function CreateUpdateInvoiceModal({
                                   min={0}
                                   max={100}
                                   step="0.01"
-                                  className={inputClass}
+                                  className={formControlClass}
                                   disabled={
                                     loading ||
                                     isInvoicePaid ||
@@ -1171,11 +1169,11 @@ export function CreateUpdateInvoiceModal({
 
                 <section className="space-y-3">
                   <label className="block">
-                    <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                    <span className={formLabelClass}>
                       Notes
                     </span>
                     <textarea
-                      className={`${inputClass} min-h-[72px]`}
+                      className={`${formControlClass} min-h-[72px]`}
                       disabled={loading || isInvoicePaid}
                       value={form.notes}
                       onChange={(ev) =>
@@ -1184,11 +1182,11 @@ export function CreateUpdateInvoiceModal({
                     />
                   </label>
                   <label className="block">
-                    <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                    <span className={formLabelClass}>
                       Terms &amp; conditions
                     </span>
                     <textarea
-                      className={`${inputClass} min-h-[72px]`}
+                      className={`${formControlClass} min-h-[72px]`}
                       disabled={loading || isInvoicePaid}
                       value={form.terms_conditions}
                       onChange={(ev) =>

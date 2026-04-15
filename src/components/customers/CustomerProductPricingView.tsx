@@ -22,6 +22,7 @@ import {
   showAppToast,
   showBillingBackendErrorToast,
 } from "@/lib/toast/appToast";
+import { formControlGrowMinClass } from "@/lib/uiFormClasses";
 import type { ProductDiscountApplicability } from "@/models/Company";
 import type { Customer } from "@/models/Customer";
 import { ModuleName } from "@/models/Module";
@@ -429,7 +430,7 @@ export function CustomerProductPricingView({
             setSearch(e.target.value);
             setPage(1);
           }}
-          className="min-w-[12rem] flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlGrowMinClass}
         />
       </div>
       {!hasTenantId ? (

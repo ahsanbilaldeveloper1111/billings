@@ -17,6 +17,7 @@ import {
   type VendorListUrlState,
 } from "@/lib/vendors/vendorListUrl";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { resolveDeleteItemLabel } from "@/lib/crud/resolveDeleteItemLabel";
 import { showAppToast, showBillingBackendErrorToast } from "@/lib/toast/appToast";
 import type { IndexVendorParams, Vendor } from "@/models/Vendor";
@@ -174,14 +175,14 @@ export function VendorCrudView() {
         open={showFilters}
         onToggle={() => setShowFilters((v) => !v)}
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Search
             </label>
             <input
               type="search"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.search}
               onChange={(e) =>
                 setListState((s) => ({
@@ -194,12 +195,12 @@ export function VendorCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Email (exact)
             </label>
             <input
               type="text"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.filter_email}
               onChange={(e) =>
                 setListState((s) => ({
@@ -211,12 +212,12 @@ export function VendorCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Phone (exact)
             </label>
             <input
               type="text"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.filter_phone}
               onChange={(e) =>
                 setListState((s) => ({

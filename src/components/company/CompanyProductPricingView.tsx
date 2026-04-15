@@ -24,6 +24,7 @@ import {
   showAppToast,
   showBillingBackendErrorToast,
 } from "@/lib/toast/appToast";
+import { formControlGrowMinClass } from "@/lib/uiFormClasses";
 import type { Company, ProductDiscountApplicability } from "@/models/Company";
 import { ModuleName } from "@/models/Module";
 import type { Product } from "@/models/Product";
@@ -504,7 +505,7 @@ export function CompanyProductPricingView({
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              className="min-w-[12rem] flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlGrowMinClass}
             />
           </div>
 

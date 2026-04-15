@@ -4,6 +4,7 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { useStripeCustomerPaymentMutations } from "@/hooks/stripe/useStripeCustomerPaymentMutations";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 type Props = Readonly<{
   crmCompanyId: string;
@@ -140,7 +141,7 @@ export function CustomerAddCardForm({
         </label>
         <input
           type="text"
-          className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlClass}
           value={cardholderName}
           onChange={(e) => setCardholderName(e.target.value)}
           placeholder={customerName ? customerName : "Name on card"}

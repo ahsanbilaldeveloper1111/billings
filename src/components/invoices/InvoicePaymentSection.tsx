@@ -30,6 +30,7 @@ import {
 } from "@/lib/toast/appToast";
 import type { Invoice } from "@/models/Invoice";
 import type { CreatePaymentData } from "@/models/Payment";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 function unwrapPublishableKey(payload: unknown): string | null {
   const d = unwrapApiSuccessData<Record<string, unknown>>(payload);
@@ -40,9 +41,6 @@ function unwrapPublishableKey(payload: unknown): string | null {
 }
 
 type TabKey = "saved" | "direct" | "manual";
-
-const inputCls =
-  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
 
 function InvoiceAlreadyPaid({ invoice }: { invoice: Invoice }) {
   return (
@@ -455,11 +453,11 @@ function InvoicePaymentInner({
             </strong>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+            <label className={formLabelClass}>
               Method
             </label>
             <select
-              className={inputCls}
+              className={formControlClass}
               value={manualMethod}
               onChange={(e) => setManualMethod(e.target.value)}
             >
@@ -491,7 +489,7 @@ function InvoicePaymentInner({
               step="0.01"
               min={0.01}
               max={outstanding}
-              className={inputCls}
+              className={formControlClass}
               value={paymentAmount || ""}
               onChange={(e) =>
                 setPaymentAmount(Number.parseFloat(e.target.value) || 0)
@@ -544,47 +542,47 @@ function InvoicePaymentInner({
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+              <label className={formLabelClass}>
                 Payment date
               </label>
               <input
                 type="date"
-                className={inputCls}
+                className={formControlClass}
                 value={manualDate}
                 max={new Date().toISOString().slice(0, 10)}
                 onChange={(e) => setManualDate(e.target.value)}
               />
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+              <label className={formLabelClass}>
                 Reference (optional)
               </label>
               <input
-                className={inputCls}
+                className={formControlClass}
                 value={refNum}
                 onChange={(e) => setRefNum(e.target.value)}
               />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+            <label className={formLabelClass}>
               Notes
             </label>
             <input
-              className={inputCls}
+              className={formControlClass}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+            <label className={formLabelClass}>
               Evidence files (optional)
             </label>
             <input
               type="file"
               multiple
               accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,application/pdf,image/*"
-              className={inputCls}
+              className={formControlClass}
               onChange={onFile}
               disabled={busy || create.isPending}
             />

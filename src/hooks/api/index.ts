@@ -59,6 +59,7 @@ export * from "@/hooks/products/useProducts";
 export * from "@/hooks/public-api/usePublicInvoicePay";
 
 export * from "@/hooks/ranks/useRank";
+export * from "@/hooks/ranks/useRankModuleList";
 export * from "@/hooks/ranks/useRankMutations";
 export * from "@/hooks/ranks/useRanks";
 

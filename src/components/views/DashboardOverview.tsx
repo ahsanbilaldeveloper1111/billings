@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { StaticFilterCard } from "@/components/crud/ListUiControls";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { DashboardChartsSection } from "@/components/dashboard/DashboardChartsSection";
 import { DashboardCountersGrid } from "@/components/dashboard/DashboardCountersGrid";
 import { DashboardMoreAnalyticsSection } from "@/components/dashboard/DashboardMoreAnalyticsSection";
@@ -100,93 +102,95 @@ export function DashboardOverview() {
 
   return (
     <>
-      <section className="relative z-30 rounded-2xl border border-zinc-200/50 bg-white/45 p-4 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.07)] backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] sm:rounded-3xl sm:p-6">
-        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Filters — search is debounced before calling the API.
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Vendor
-            </label>
-            <SearchableSelect
-              value={vendorId || null}
-              onChange={(id) => {
-                setVendorId(id ?? "");
-                setTenantId("");
-                setCrmCompanyId("");
-              }}
-              options={vendorOptions}
-              placeholder="All vendors"
-              loading={vendorsQuery.isLoading}
-              isClearable
-              ariaLabel="Vendor"
-              loadingText="Loading vendors…"
-              emptyText="No vendors"
-            />
+      <div className="relative z-30">
+        <StaticFilterCard
+          title="Dashboard filters"
+          subtitle="Search is debounced before calling the API."
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+              <label className={formLabelClass}>
+                Vendor
+              </label>
+              <SearchableSelect
+                value={vendorId || null}
+                onChange={(id) => {
+                  setVendorId(id ?? "");
+                  setTenantId("");
+                  setCrmCompanyId("");
+                }}
+                options={vendorOptions}
+                placeholder="All vendors"
+                loading={vendorsQuery.isLoading}
+                isClearable
+                ariaLabel="Vendor"
+                loadingText="Loading vendors…"
+                emptyText="No vendors"
+              />
+            </div>
+            <div>
+              <label className={formLabelClass}>
+                Tenant (company)
+              </label>
+              <TenantSearchableDropdown
+                className="w-full"
+                disabled={!Number.isFinite(vendorIdNum)}
+                value={tenantId}
+                enabled={Number.isFinite(vendorIdNum)}
+                fetchParams={
+                  Number.isFinite(vendorIdNum) ? { vendor_id: vendorIdNum } : undefined
+                }
+                onChange={(id) => {
+                  setTenantId(id ?? "");
+                  setCrmCompanyId("");
+                }}
+                placeholder={
+                  Number.isFinite(vendorIdNum) ? "All tenants" : "Select vendor first…"
+                }
+              />
+            </div>
+            <div>
+              <label className={formLabelClass}>
+                Customer (CRM)
+              </label>
+              <CrmCustomerSearchableDropdown
+                className="w-full"
+                tenantId={tenantId}
+                disabled={!isSuperAdmin || !tenantId.trim()}
+                value={crmCompanyId}
+                onChange={(id) => setCrmCompanyId(id ?? "")}
+                placeholder={
+                  tenantId.trim() ? "All customers" : "Select tenant first…"
+                }
+              />
+            </div>
+            <div>
+              <label className={formLabelClass}>
+                Start date
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                max={endDate || undefined}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={formControlClass}
+              />
+            </div>
+            <div>
+              <label className={formLabelClass}>
+                End date
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                min={startDate || undefined}
+                onChange={(e) => setEndDate(e.target.value)}
+                className={formControlClass}
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Tenant (company)
-            </label>
-            <TenantSearchableDropdown
-              className="w-full"
-              disabled={!Number.isFinite(vendorIdNum)}
-              value={tenantId}
-              enabled={Number.isFinite(vendorIdNum)}
-              fetchParams={
-                Number.isFinite(vendorIdNum) ? { vendor_id: vendorIdNum } : undefined
-              }
-              onChange={(id) => {
-                setTenantId(id ?? "");
-                setCrmCompanyId("");
-              }}
-              placeholder={
-                Number.isFinite(vendorIdNum) ? "All tenants" : "Select vendor first…"
-              }
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Customer (CRM)
-            </label>
-            <CrmCustomerSearchableDropdown
-              className="w-full"
-              tenantId={tenantId}
-              disabled={!isSuperAdmin || !tenantId.trim()}
-              value={crmCompanyId}
-              onChange={(id) => setCrmCompanyId(id ?? "")}
-              placeholder={
-                tenantId.trim() ? "All customers" : "Select tenant first…"
-              }
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              Start date
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              max={endDate || undefined}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
-          <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-              End date
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              min={startDate || undefined}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
-        </div>
-      </section>
+        </StaticFilterCard>
+      </div>
 
       <DashboardAnalyticsCurrencyProvider
         tenantId={tenantId}

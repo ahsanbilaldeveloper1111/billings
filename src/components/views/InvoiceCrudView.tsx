@@ -15,6 +15,11 @@ import { useInvoices } from "@/hooks/invoices/useInvoices";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows } from "@/lib/api/extractApiData";
+import {
+  formControlClass,
+  formLabelClass,
+  formToggleRowClass,
+} from "@/lib/uiFormClasses";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import {
   buildInvoiceListSearchParams,
@@ -267,14 +272,14 @@ export function InvoiceCrudView() {
         open={showFilters}
         onToggle={() => setShowFilters((v) => !v)}
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Search
             </label>
             <input
               type="search"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.search}
               onChange={(ev) =>
                 setListState((s) => ({ ...s, search: ev.target.value, page: 1 }))
@@ -283,11 +288,11 @@ export function InvoiceCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Vendor
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.vendor_id}
               onChange={(ev) => {
                 const vendor_id = ev.target.value;
@@ -312,7 +317,7 @@ export function InvoiceCrudView() {
             </p>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Tenant (company)
             </label>
             <TenantSearchableDropdown
@@ -340,7 +345,7 @@ export function InvoiceCrudView() {
           </div>
           {isSuperAdmin ? (
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 Customer (CRM)
               </label>
               <CrmCustomerSearchableDropdown
@@ -364,11 +369,11 @@ export function InvoiceCrudView() {
             </div>
           ) : null}
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Status
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.status}
               onChange={(ev) =>
                 setListState((s) => ({
@@ -387,11 +392,11 @@ export function InvoiceCrudView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Payment status
             </label>
             <input
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.payment_status}
               onChange={(ev) =>
                 setListState((s) => ({
@@ -404,12 +409,12 @@ export function InvoiceCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date from
             </label>
             <input
               type="date"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.date_from}
               max={listState.date_to || undefined}
               onChange={(ev) =>
@@ -422,12 +427,12 @@ export function InvoiceCrudView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date to
             </label>
             <input
               type="date"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.date_to}
               min={listState.date_from || undefined}
               onChange={(ev) =>
@@ -458,11 +463,11 @@ export function InvoiceCrudView() {
             )}
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Sort
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={sortSelectValue}
               onChange={(ev) => {
                 const parsed = parseSortPreset(ev.target.value);
@@ -484,11 +489,11 @@ export function InvoiceCrudView() {
           </div>
           {!isSuperAdmin ? (
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 CRM company ID (raw)
               </label>
               <input
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className={formControlClass}
                 value={listState.crm_company_id}
                 onChange={(ev) =>
                   setListState((s) => ({
@@ -502,7 +507,7 @@ export function InvoiceCrudView() {
             </div>
           ) : null}
           <div className="flex items-end">
-            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <label className={formToggleRowClass}>
               <input
                 type="checkbox"
                 checked={listState.crm_company_not_null}
@@ -514,7 +519,7 @@ export function InvoiceCrudView() {
                   }))
                 }
               />
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
+              <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
                 CRM company not null
               </span>
             </label>

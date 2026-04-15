@@ -50,6 +50,7 @@ import type {
   CompanySavedPaymentMethod,
 } from "@/models/Company";
 import type { PaymentMode } from "@/models/Payment";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 /** Discount applicability tags (profile.discount_applicability). */
 const DISCOUNT_APPLICABILITY_OPTIONS = [
@@ -58,9 +59,6 @@ const DISCOUNT_APPLICABILITY_OPTIONS = [
   "portal",
   "invoice",
 ] as const;
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
 
 function fiscalInputFromApi(raw: string | undefined | null): string {
   if (raw == null || raw === "") return "";
@@ -513,12 +511,12 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Email
                       </span>
                       <input
                         type="email"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.email}
                         onChange={(e) =>
                           setForm((s) => ({ ...s, email: e.target.value }))
@@ -526,11 +524,11 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Phone
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.phone}
                         onChange={(e) =>
                           setForm((s) => ({
@@ -551,11 +549,11 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Vendor
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.vendor_id}
                         onChange={(e) =>
                           setForm((s) => ({ ...s, vendor_id: e.target.value }))
@@ -570,7 +568,7 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Tenant (main app) {!isEdit ? "*" : ""}
                       </span>
                       <MainAppResellerDropdown
@@ -602,12 +600,12 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Address
                       </span>
                       <textarea
                         rows={2}
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.address}
                         onChange={(e) =>
                           setProfile("address", e.target.value)
@@ -615,11 +613,11 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Country
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.country}
                         onChange={(e) =>
                           setProfile("country", e.target.value)
@@ -634,11 +632,11 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Postal code
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.postal_code}
                         onChange={(e) =>
                           setProfile("postal_code", e.target.value)
@@ -646,12 +644,12 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Fiscal year start
                       </span>
                       <input
                         type="date"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.fiscal_year_start}
                         onChange={(e) =>
                           setProfile("fiscal_year_start", e.target.value)
@@ -659,11 +657,11 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Accounting method
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.accounting_method}
                         onChange={(e) =>
                           setProfile("accounting_method", e.target.value)
@@ -676,11 +674,11 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Registration number
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.registration_number}
                         onChange={(e) =>
                           setProfile("registration_number", e.target.value)
@@ -688,11 +686,11 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Business type
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.business_type}
                         onChange={(e) =>
                           setProfile("business_type", e.target.value)
@@ -720,18 +718,18 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Currency
                       </span>
                       {isEdit ? (
                         <input
                           readOnly
-                          className={`${inputClass} bg-zinc-50 dark:bg-zinc-900/80`}
+                          className={`${formControlClass} bg-zinc-50 dark:bg-zinc-900/80`}
                           value={form.profile.currency}
                         />
                       ) : (
                         <select
-                          className={inputClass}
+                          className={formControlClass}
                           value={form.profile.currency}
                           onChange={(e) =>
                             setProfile("currency", e.target.value)
@@ -752,11 +750,11 @@ export function CreateUpdateCompanyModal({
                       ) : null}
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Payment mode
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.payment_mode}
                         onChange={(e) =>
                           setProfile(
@@ -771,7 +769,7 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         VAT rate (%)
                       </span>
                       <input
@@ -779,7 +777,7 @@ export function CreateUpdateCompanyModal({
                         step="0.01"
                         min="0"
                         max="100"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.vat_rate}
                         onChange={(e) =>
                           setProfile("vat_rate", e.target.value)
@@ -800,11 +798,11 @@ export function CreateUpdateCompanyModal({
                       </span>
                     </label>
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Tax ID
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.tax_id}
                         onChange={(e) =>
                           setProfile("tax_id", e.target.value)
@@ -822,11 +820,11 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Profile status
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.profile_status}
                         onChange={(e) =>
                           setProfile(
@@ -843,11 +841,11 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Logo path / URL
                       </span>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.logo}
                         onChange={(e) =>
                           setProfile("logo", e.target.value)
@@ -856,12 +854,12 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block sm:col-span-2">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Last refund date
                       </span>
                       <input
                         type="date"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.last_refund_date}
                         onChange={(e) =>
                           setProfile("last_refund_date", e.target.value)
@@ -887,14 +885,14 @@ export function CreateUpdateCompanyModal({
                   </div>
                   <div className="grid gap-3 p-4 sm:grid-cols-2">
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Credit limit
                       </span>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.credit_limit}
                         onChange={(e) =>
                           setProfile("credit_limit", e.target.value)
@@ -902,13 +900,13 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Payment terms (days)
                       </span>
                       <input
                         type="number"
                         min="1"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.payment_terms}
                         onChange={(e) =>
                           setProfile("payment_terms", e.target.value)
@@ -916,7 +914,7 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Early payment discount (%)
                       </span>
                       <input
@@ -924,7 +922,7 @@ export function CreateUpdateCompanyModal({
                         step="0.01"
                         min="0"
                         max="100"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.early_payment_discount}
                         onChange={(e) =>
                           setProfile("early_payment_discount", e.target.value)
@@ -932,23 +930,23 @@ export function CreateUpdateCompanyModal({
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Late fee rule (%)
                       </span>
                       <input
                         type="number"
                         step="0.01"
                         readOnly
-                        className={`${inputClass} bg-zinc-50 dark:bg-zinc-900/80`}
+                        className={`${formControlClass} bg-zinc-50 dark:bg-zinc-900/80`}
                         value={form.profile.late_fee_rule}
                       />
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Discount type
                       </span>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.discount_type}
                         onChange={(e) =>
                           setProfile("discount_type", e.target.value)
@@ -959,14 +957,14 @@ export function CreateUpdateCompanyModal({
                       </select>
                     </label>
                     <label className="block">
-                      <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                      <span className={formLabelClass}>
                         Discount limit
                       </span>
                       <input
                         type="number"
                         step="0.01"
                         min="0"
-                        className={inputClass}
+                        className={formControlClass}
                         value={form.profile.discount_limit}
                         onChange={(e) =>
                           setProfile("discount_limit", e.target.value)
@@ -1092,11 +1090,11 @@ export function CreateUpdateCompanyModal({
                     )}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <label className="block sm:col-span-2">
-                        <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                        <span className={formLabelClass}>
                           Bank name *
                         </span>
                         <input
-                          className={inputClass}
+                          className={formControlClass}
                           value={newBank.bank_name}
                           onChange={(e) =>
                             setNewBank((b) => ({
@@ -1107,11 +1105,11 @@ export function CreateUpdateCompanyModal({
                         />
                       </label>
                       <label className="block sm:col-span-2">
-                        <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                        <span className={formLabelClass}>
                           Account holder *
                         </span>
                         <input
-                          className={inputClass}
+                          className={formControlClass}
                           value={newBank.account_holder_name}
                           onChange={(e) =>
                             setNewBank((b) => ({
@@ -1122,11 +1120,11 @@ export function CreateUpdateCompanyModal({
                         />
                       </label>
                       <label className="block">
-                        <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                        <span className={formLabelClass}>
                           Account number *
                         </span>
                         <input
-                          className={inputClass}
+                          className={formControlClass}
                           inputMode="numeric"
                           value={newBank.account_number}
                           maxLength={34}
@@ -1141,11 +1139,11 @@ export function CreateUpdateCompanyModal({
                         />
                       </label>
                       <label className="block">
-                        <span className="mb-1 block text-[11px] font-medium text-zinc-500">
+                        <span className={formLabelClass}>
                           Currency
                         </span>
                         <select
-                          className={inputClass}
+                          className={formControlClass}
                           value={newBank.currency}
                           onChange={(e) =>
                             setNewBank((b) => ({

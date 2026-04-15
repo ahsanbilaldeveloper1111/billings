@@ -2,6 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { CrudEntityTable } from "@/components/crud/CrudEntityTable";
+import { StaticFilterCard } from "@/components/crud/ListUiControls";
+import {
+  formControlClass,
+  formLabelClass,
+  formToggleRowClass,
+} from "@/lib/uiFormClasses";
 import { RecordDetailModal } from "@/components/crud/RecordDetailModal";
 import { CrmCustomerSearchableDropdown } from "@/components/ui/CrmCustomerSearchableDropdown";
 import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
@@ -125,28 +131,28 @@ export function PaymentListView() {
 
   return (
     <>
-      <div className="mb-4 space-y-3 rounded-2xl border border-zinc-200/80 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/40">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          List filters (GET /payments)
-        </p>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <StaticFilterCard
+        title="Payment list filters"
+        subtitle="Parameters for GET /payments."
+      >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Search
             </label>
             <input
               type="search"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={search}
               onChange={(ev) => setSearch(ev.target.value)}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Status
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={status}
               onChange={(ev) =>
                 setStatus(ev.target.value as PaymentStatus | "")
@@ -161,11 +167,11 @@ export function PaymentListView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Payment method
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={paymentMethod}
               onChange={(ev) => setPaymentMethod(ev.target.value)}
             >
@@ -177,19 +183,19 @@ export function PaymentListView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Vendor ID
             </label>
             <input
               inputMode="numeric"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={vendorId}
               onChange={(ev) => setVendorId(ev.target.value)}
               placeholder="Optional"
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Tenant ID
             </label>
             <TenantSearchableDropdown
@@ -203,7 +209,7 @@ export function PaymentListView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               CRM company ID
             </label>
             <CrmCustomerSearchableDropdown
@@ -219,44 +225,44 @@ export function PaymentListView() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date from
             </label>
             <input
               type="date"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={dateFrom}
               onChange={(ev) => setDateFrom(ev.target.value)}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date to
             </label>
             <input
               type="date"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={dateTo}
               onChange={(ev) => setDateTo(ev.target.value)}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Sort field
             </label>
             <input
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm font-mono dark:border-zinc-700 dark:bg-zinc-900"
+              className={`${formControlClass} font-mono`}
               value={sortField}
               onChange={(ev) => setSortField(ev.target.value)}
               placeholder="payment_date"
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Sort direction
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={sortDir}
               onChange={(ev) =>
                 setSortDir(ev.target.value as "asc" | "desc")
@@ -267,19 +273,19 @@ export function PaymentListView() {
             </select>
           </div>
           <div className="flex items-end">
-            <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <label className={formToggleRowClass}>
               <input
                 type="checkbox"
                 checked={crmNotNull}
                 onChange={(ev) => setCrmNotNull(ev.target.checked)}
               />
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
+              <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
                 CRM company not null
               </span>
             </label>
           </div>
         </div>
-      </div>
+      </StaticFilterCard>
 
       <CrudEntityTable
         query={listQuery}

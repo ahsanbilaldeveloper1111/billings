@@ -14,6 +14,7 @@ import {
   showBillingBackendErrorToast,
 } from "@/lib/toast/appToast";
 import { reportService } from "@/services/reports.service";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 function ymdLocal(d: Date): string {
   const y = d.getFullYear();
@@ -660,7 +661,7 @@ export function StatementOfAccountView() {
           </p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <div className={isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3"}>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 Vendor
               </label>
               <SearchableSelect
@@ -681,7 +682,7 @@ export function StatementOfAccountView() {
               />
             </div>
             <div className={isSuperAdmin ? "lg:col-span-2" : "lg:col-span-3"}>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 Tenant (company)
               </label>
               <TenantSearchableDropdown
@@ -708,7 +709,7 @@ export function StatementOfAccountView() {
             </div>
             {isSuperAdmin ? (
               <div className="lg:col-span-2">
-                <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                <label className={formLabelClass}>
                   Customer (CRM)
                 </label>
                 <CrmCustomerSearchableDropdown
@@ -729,7 +730,7 @@ export function StatementOfAccountView() {
               </div>
             ) : null}
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 Date from
               </label>
               <input
@@ -740,11 +741,11 @@ export function StatementOfAccountView() {
                   setStartDate(e.target.value);
                   resetStatement();
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className={formControlClass}
               />
             </div>
             <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              <label className={formLabelClass}>
                 Date to
               </label>
               <input
@@ -755,7 +756,7 @@ export function StatementOfAccountView() {
                   setEndDate(e.target.value);
                   resetStatement();
                 }}
-                className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                className={formControlClass}
               />
             </div>
             <div className="flex items-end gap-2">

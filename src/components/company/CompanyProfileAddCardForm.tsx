@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useStripeProfileAddCardMutation } from "@/hooks/stripe/useStripeProfileAddCardMutation";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import { stripeService } from "@/services/stripe.service";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 type Props = Readonly<{
   /** Same id used for `GET …/stripe/payment-methods/{profileId}` (tenant_id or company id). */
@@ -143,7 +144,7 @@ export function CompanyProfileAddCardForm({
         </label>
         <input
           type="text"
-          className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlClass}
           value={cardholderName}
           onChange={(e) => setCardholderName(e.target.value)}
           placeholder={cardholderLabel ? cardholderLabel : "Name on card"}

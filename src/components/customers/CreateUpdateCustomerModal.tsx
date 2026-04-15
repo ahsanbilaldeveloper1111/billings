@@ -23,9 +23,7 @@ import type { Company } from "@/models/Company";
 import { customerApiResourceKey } from "@/lib/customers/customerApiResourceKey";
 import { customerStripeCrmId } from "@/lib/customers/customerStripeCrmId";
 import type { CreateCustomerData, Customer, CustomerProfile } from "@/models/Customer";
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 type ProfileForm = {
   address: string;
@@ -360,7 +358,7 @@ export function CreateUpdateCustomerModal({
                 <Section title="Basic information">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Tenant {!isEdit ? "*" : ""}
                       </label>
                       <TenantSearchableDropdown
@@ -380,11 +378,11 @@ export function CreateUpdateCustomerModal({
                       <FieldError message={errors.tenant_id} />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         CRM company *
                       </label>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         disabled={
                           !formData.tenant_id?.trim() || isEdit
                         }
@@ -414,23 +412,23 @@ export function CreateUpdateCustomerModal({
                       <FieldError message={errors.crm_company_id} />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Email
                       </label>
                       <input
                         type="email"
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.email}
                         onChange={(e) => handleChange("email", e.target.value)}
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Phone
                       </label>
                       <input
                         type="text"
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.phone}
                         onChange={(e) => handleChange("phone", e.target.value)}
                       />
@@ -441,12 +439,12 @@ export function CreateUpdateCustomerModal({
                 <Section title="Address">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Address
                       </label>
                       <textarea
                         rows={2}
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.address}
                         onChange={(e) =>
                           handleProfileChange("address", e.target.value)
@@ -454,11 +452,11 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         City
                       </label>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.city}
                         onChange={(e) =>
                           handleProfileChange("city", e.target.value)
@@ -466,11 +464,11 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Country
                       </label>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.country}
                         onChange={(e) =>
                           handleProfileChange("country", e.target.value)
@@ -478,11 +476,11 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Postal code
                       </label>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.postal_code}
                         onChange={(e) =>
                           handleProfileChange("postal_code", e.target.value)
@@ -495,7 +493,7 @@ export function CreateUpdateCustomerModal({
                 <Section title="Tax & billing">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Currency
                       </label>
                       {isEdit ? (
@@ -503,7 +501,7 @@ export function CreateUpdateCustomerModal({
                           <input
                             type="text"
                             readOnly
-                            className={`${inputClass} cursor-not-allowed bg-zinc-100 dark:bg-zinc-800/80`}
+                            className={`${formControlClass} cursor-not-allowed bg-zinc-100 dark:bg-zinc-800/80`}
                             value={formData.profile.currency || "USD"}
                           />
                           <p className="mt-1 text-[11px] text-zinc-500">
@@ -513,7 +511,7 @@ export function CreateUpdateCustomerModal({
                         </>
                       ) : (
                         <select
-                          className={inputClass}
+                          className={formControlClass}
                           value={formData.profile.currency}
                           onChange={(e) =>
                             handleProfileChange("currency", e.target.value)
@@ -539,7 +537,7 @@ export function CreateUpdateCustomerModal({
                       ) : null}
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         VAT rate (%)
                       </label>
                       <input
@@ -547,7 +545,7 @@ export function CreateUpdateCustomerModal({
                         min={0}
                         max={100}
                         step={0.01}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.vat_rate === ""
                             ? ""
@@ -580,11 +578,11 @@ export function CreateUpdateCustomerModal({
                       </label>
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Tax ID
                       </label>
                       <input
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.tax_id}
                         onChange={(e) =>
                           handleProfileChange("tax_id", e.target.value)
@@ -592,13 +590,13 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Payment terms (days)
                       </label>
                       <input
                         type="number"
                         min={0}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.payment_terms === ""
                             ? ""
@@ -615,14 +613,14 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Credit limit
                       </label>
                       <input
                         type="number"
                         min={0}
                         step={0.01}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.credit_limit === ""
                             ? ""
@@ -639,11 +637,11 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Discount type
                       </label>
                       <select
-                        className={inputClass}
+                        className={formControlClass}
                         value={formData.profile.discount_type || ""}
                         onChange={(e) =>
                           handleProfileChange("discount_type", e.target.value)
@@ -655,14 +653,14 @@ export function CreateUpdateCustomerModal({
                       </select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Discount limit
                       </label>
                       <input
                         type="number"
                         min={0}
                         step={0.01}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.discount_limit === ""
                             ? ""
@@ -679,7 +677,7 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Early payment discount (%)
                       </label>
                       <input
@@ -687,7 +685,7 @@ export function CreateUpdateCustomerModal({
                         min={0}
                         max={100}
                         step={0.01}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.early_payment_discount === ""
                             ? ""
@@ -704,7 +702,7 @@ export function CreateUpdateCustomerModal({
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                      <label className={formLabelClass}>
                         Late fee rule (%)
                       </label>
                       <input
@@ -712,7 +710,7 @@ export function CreateUpdateCustomerModal({
                         min={0}
                         max={100}
                         step={0.01}
-                        className={inputClass}
+                        className={formControlClass}
                         value={
                           formData.profile.late_fee_rule === ""
                             ? ""

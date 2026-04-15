@@ -2,6 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { CrudEntityTable } from "@/components/crud/CrudEntityTable";
+import { StaticFilterCard } from "@/components/crud/ListUiControls";
+import {
+  formControlClass,
+  formLabelClass,
+  formToggleRowClass,
+} from "@/lib/uiFormClasses";
 import { RecordDetailModal } from "@/components/crud/RecordDetailModal";
 import { useUser } from "@/hooks/users/useUser";
 import { useUsers } from "@/hooks/users/useUsers";
@@ -45,41 +51,46 @@ export function UserListView() {
 
   return (
     <>
-      <div className="mb-4 flex flex-col gap-3 rounded-2xl border border-zinc-200/80 bg-white/60 p-4 dark:border-zinc-800/80 dark:bg-zinc-950/40 sm:flex-row sm:flex-wrap sm:items-end">
-        <div className="min-w-[12rem] flex-1">
-          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Search
+      <StaticFilterCard
+        title="User list filters"
+        subtitle="Parameters for GET /users."
+      >
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="min-w-[12rem] flex-1">
+            <label className={formLabelClass}>
+              Search
+            </label>
+            <input
+              type="search"
+              className={formControlClass}
+              value={search}
+              onChange={(ev) => setSearch(ev.target.value)}
+            />
+          </div>
+          <div className="min-w-[8rem]">
+            <label className={formLabelClass}>
+              Company ID
+            </label>
+            <input
+              inputMode="numeric"
+              className={formControlClass}
+              value={companyId}
+              onChange={(ev) => setCompanyId(ev.target.value)}
+              placeholder="Optional"
+            />
+          </div>
+          <label className={formToggleRowClass}>
+            <input
+              type="checkbox"
+              checked={loadRanks}
+              onChange={(ev) => setLoadRanks(ev.target.checked)}
+            />
+            <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
+              Load ranks
+            </span>
           </label>
-          <input
-            type="search"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            value={search}
-            onChange={(ev) => setSearch(ev.target.value)}
-          />
         </div>
-        <div className="min-w-[8rem]">
-          <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Company ID
-          </label>
-          <input
-            inputMode="numeric"
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            value={companyId}
-            onChange={(ev) => setCompanyId(ev.target.value)}
-            placeholder="Optional"
-          />
-        </div>
-        <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900">
-          <input
-            type="checkbox"
-            checked={loadRanks}
-            onChange={(ev) => setLoadRanks(ev.target.checked)}
-          />
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
-            Load ranks
-          </span>
-        </label>
-      </div>
+      </StaticFilterCard>
 
       <CrudEntityTable
         query={listQuery}

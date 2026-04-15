@@ -9,6 +9,7 @@ import { extractListRows } from "@/lib/api/extractApiData";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { showAppToast, showBillingBackendErrorToast } from "@/lib/toast/appToast";
 import type { IndexProductCategoryParams, ProductCategory } from "@/models/ProductCategory";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 type Row = ProductCategory & Record<string, unknown>;
 
@@ -189,7 +190,7 @@ export function ProductCategoryManagementModal({
             </div>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
               <div className="min-w-0 flex-1">
-                <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                <label className={formLabelClass}>
                   Search
                 </label>
                 <input
@@ -200,15 +201,15 @@ export function ProductCategoryManagementModal({
                     setPage(1);
                   }}
                   placeholder="Search by name or description…"
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                 />
               </div>
               <div className="w-full sm:w-36">
-                <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+                <label className={formLabelClass}>
                   Page size
                 </label>
                 <select
-                  className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+                  className={formControlClass}
                   value={limit}
                   onChange={(e) => {
                     setLimit(Number(e.target.value));

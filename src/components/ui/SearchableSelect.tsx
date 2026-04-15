@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { formControlFlex1DisabledClass } from "@/lib/uiFormClasses";
 
 export type SearchableSelectOption = {
   value: string;
@@ -140,7 +141,7 @@ export function SearchableSelect({
           aria-expanded={showList}
           aria-haspopup="listbox"
           aria-controls={listboxId}
-          className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-60"
+          className={formControlFlex1DisabledClass}
           onChange={(e) => {
             setQuery(e.target.value);
             if (!open) setOpen(true);

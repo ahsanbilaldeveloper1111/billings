@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { WorldCurrencyMeta } from "@/lib/currencies/worldCurrencyMap";
+import { formControlFlex1Class } from "@/lib/uiFormClasses";
 
 type Row = { code: string; label: string };
 
@@ -96,7 +97,7 @@ export function CurrencyIsoCombobox({
           }}
           onFocus={() => setOpen(true)}
           placeholder="Search currency…"
-          className="min-w-0 flex-1 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlFlex1Class}
           aria-expanded={open}
           aria-haspopup="listbox"
           aria-controls="currency-iso-listbox"

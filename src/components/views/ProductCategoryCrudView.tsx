@@ -12,6 +12,7 @@ import { useProductCategories } from "@/hooks/product-categories/useProductCateg
 import { useProductCategoryMutations } from "@/hooks/product-categories/useProductCategoryMutations";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { resolveDeleteItemLabel } from "@/lib/crud/resolveDeleteItemLabel";
 import {
   buildProductCategoryListSearchParams,
@@ -167,14 +168,14 @@ export function ProductCategoryCrudView() {
         open={showFilters}
         onToggle={() => setShowFilters((v) => !v)}
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <div className="sm:col-span-2">
-            <label className="mb-1 block text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Search
             </label>
             <input
               type="search"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={listState.search}
               onChange={(e) =>
                 setListState((s) => ({

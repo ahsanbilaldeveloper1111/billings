@@ -17,6 +17,7 @@ import {
 import type { Company } from "@/models/Company";
 import type { ProductCategory } from "@/models/ProductCategory";
 import type { Vendor } from "@/models/Vendor";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 type ParentRow = { id: number; name?: string };
 
@@ -208,7 +209,7 @@ export function CreateUpdateProductCategoryModal({
         <input
           required
           name="name"
-          className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("name")}`}
+          className={`${formControlClass} ${inputErr("name")}`}
           value={form.name}
           onChange={(e) => {
             setForm((s) => ({ ...s, name: e.target.value }));
@@ -226,7 +227,7 @@ export function CreateUpdateProductCategoryModal({
 
       <FormField label="Vendor">
         <select
-          className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlClass}
           value={selectedVendorId ?? ""}
           onChange={(e) => handleVendorChange(e.target.value)}
         >
@@ -277,7 +278,7 @@ export function CreateUpdateProductCategoryModal({
         <textarea
           name="description"
           rows={3}
-          className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("description")}`}
+          className={`${formControlClass} ${inputErr("description")}`}
           value={form.description}
           onChange={(e) => {
             setForm((s) => ({ ...s, description: e.target.value }));
@@ -297,7 +298,7 @@ export function CreateUpdateProductCategoryModal({
       <FormField label="Parent category">
         <select
           name="parent_id"
-          className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("parent_id")}`}
+          className={`${formControlClass} ${inputErr("parent_id")}`}
           value={form.parent_id === "" ? "" : String(form.parent_id)}
           onChange={(e) => {
             setForm((s) => ({

@@ -4,6 +4,7 @@ import type { ProductPricingRow } from "@/lib/company/productPricingHelpers";
 import { validateRenewalDates } from "@/lib/company/productPricingHelpers";
 import type { Product } from "@/models/Product";
 import { useEffect, useMemo, useState } from "react";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 type BulkUpdateModalProps = {
   open: boolean;
@@ -49,7 +50,7 @@ export function BulkUpdateModal({
           step="0.01"
           min="0"
           max="100"
-          className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={`mt-1 ${formControlClass}`}
           value={discountPercent}
           onChange={(e) => onDiscountPercentChange(e.target.value)}
           placeholder="e.g. 10"
@@ -322,7 +323,7 @@ export function AddProductPricingModal({
             placeholder="Search products…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className={formControlClass}
           />
           <div className="mt-3 max-h-56 overflow-auto rounded-lg border border-zinc-200 dark:border-zinc-700">
             <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
@@ -642,7 +643,7 @@ export function AddDiscountModal({
           Product (optional)
         </label>
         <select
-          className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={`mt-1 ${formControlClass}`}
           value={productId}
           onChange={(e) => onProductIdChange(e.target.value)}
         >
@@ -657,7 +658,7 @@ export function AddDiscountModal({
           Type
         </label>
         <select
-          className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={`mt-1 ${formControlClass}`}
           value={discountType}
           onChange={(e) =>
             onDiscountTypeChange(
@@ -678,7 +679,7 @@ export function AddDiscountModal({
               step="0.01"
               min="0"
               max="100"
-              className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={`mt-1 ${formControlClass}`}
               value={percentage}
               onChange={(e) => onPercentageChange(e.target.value)}
             />
@@ -692,7 +693,7 @@ export function AddDiscountModal({
               type="number"
               step="0.01"
               min="0"
-              className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={`mt-1 ${formControlClass}`}
               value={amount}
               onChange={(e) => onAmountChange(e.target.value)}
             />

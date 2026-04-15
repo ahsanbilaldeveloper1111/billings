@@ -29,5 +29,17 @@ export function useRankMutations() {
     onSuccess: invalidate,
   });
 
-  return { create, update, remove };
+  const assignPermissions = useMutation({
+    mutationFn: ({
+      rankId,
+      permissionIds,
+    }: {
+      rankId: number | string;
+      permissionIds: number[];
+    }) =>
+      rankService.updatePermissions(rankId, { permissions: permissionIds }),
+    onSuccess: invalidate,
+  });
+
+  return { create, update, remove, assignPermissions };
 }

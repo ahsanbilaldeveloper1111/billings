@@ -29,6 +29,7 @@ import {
 import type { Company } from "@/models/Company";
 import type { Product } from "@/models/Product";
 import type { Vendor } from "@/models/Vendor";
+import { formControlClass } from "@/lib/uiFormClasses";
 
 type CatRow = { id: number; name?: string; tenant_id?: string | null };
 
@@ -249,7 +250,7 @@ export function CreateUpdateProductModal({
       <>
         <FormField label="Vendor">
           <select
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className={formControlClass}
             value={selectedVendorId ?? ""}
             onChange={(e) => handleVendorChange(e.target.value)}
           >
@@ -268,7 +269,7 @@ export function CreateUpdateProductModal({
 
         <FormField label="Company (tenant)">
           <select
-            className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("tenant_id")}`}
+            className={`${formControlClass} ${inputErr("tenant_id")}`}
             value={form.tenant_id}
             disabled={!selectedVendorId}
             onChange={(e) =>
@@ -296,7 +297,7 @@ export function CreateUpdateProductModal({
         <FormField label="Product name *">
           <input
             required
-            className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("name")}`}
+            className={`${formControlClass} ${inputErr("name")}`}
             value={form.name}
             onChange={(e) => {
               setForm((s) => ({ ...s, name: e.target.value }));
@@ -312,7 +313,7 @@ export function CreateUpdateProductModal({
         </FormField>
         <FormField label="SKU">
           <input
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className={formControlClass}
             value={form.sku}
             onChange={(e) => setForm((s) => ({ ...s, sku: e.target.value }))}
             placeholder="Stock keeping unit (optional)"
@@ -334,7 +335,7 @@ export function CreateUpdateProductModal({
           </button>
         </div>
         <select
-          className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("category_id")}`}
+          className={`${formControlClass} ${inputErr("category_id")}`}
           value={form.category_id === "" ? "" : String(form.category_id)}
           onChange={(e) => {
             const v = e.target.value;
@@ -363,7 +364,7 @@ export function CreateUpdateProductModal({
       <FormField label="Description">
         <textarea
           rows={3}
-          className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+          className={formControlClass}
           value={form.description}
           onChange={(e) =>
             setForm((s) => ({ ...s, description: e.target.value }))
@@ -378,7 +379,7 @@ export function CreateUpdateProductModal({
             type="number"
             step="any"
             min="0"
-            className={`w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900 ${inputErr("base_price")}`}
+            className={`${formControlClass} ${inputErr("base_price")}`}
             value={form.base_price}
             onChange={(e) => {
               setForm((s) => ({ ...s, base_price: e.target.value }));
@@ -395,7 +396,7 @@ export function CreateUpdateProductModal({
         </FormField>
         <FormField label="Currency">
           <select
-            className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            className={formControlClass}
             value={form.currency}
             onChange={(e) =>
               setForm((s) => ({ ...s, currency: e.target.value }))

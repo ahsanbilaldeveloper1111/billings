@@ -17,6 +17,7 @@ import {
   shortBrowserLabel,
 } from "@/lib/auditLogPresentation";
 import { AuditLogResourceType } from "@/models/AuditLog";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 const LIMIT_OPTIONS = [10, 20, 50, 100] as const;
 const RESOURCE_TYPE_OPTIONS = Object.values(AuditLogResourceType);
@@ -207,13 +208,13 @@ export function AuditLogsView() {
         open={showFilters}
         onToggle={() => setShowFilters((v) => !v)}
       >
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Action
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={action}
               onChange={(ev) => {
                 setAction(ev.target.value);
@@ -228,11 +229,11 @@ export function AuditLogsView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Resource type
             </label>
             <select
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
               value={resourceType}
               onChange={(ev) => {
                 setResourceType(ev.target.value as AuditLogResourceType | "");
@@ -248,7 +249,7 @@ export function AuditLogsView() {
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               User ID
             </label>
             <input
@@ -259,11 +260,11 @@ export function AuditLogsView() {
                 setPage(1);
               }}
               placeholder="e.g. 20954"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Company ID
             </label>
             <input
@@ -274,11 +275,11 @@ export function AuditLogsView() {
                 setPage(1);
               }}
               placeholder="Optional"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Vendor ID
             </label>
             <input
@@ -289,11 +290,11 @@ export function AuditLogsView() {
                 setPage(1);
               }}
               placeholder="Optional"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Tenant ID
             </label>
             <input
@@ -303,11 +304,11 @@ export function AuditLogsView() {
                 setPage(1);
               }}
               placeholder="Optional"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               CRM company ID
             </label>
             <input
@@ -317,11 +318,11 @@ export function AuditLogsView() {
                 setPage(1);
               }}
               placeholder="Optional"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date from
             </label>
             <input
@@ -331,11 +332,11 @@ export function AuditLogsView() {
                 setDateFrom(ev.target.value);
                 setPage(1);
               }}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <label className={formLabelClass}>
               Date to
             </label>
             <input
@@ -345,7 +346,7 @@ export function AuditLogsView() {
                 setDateTo(ev.target.value);
                 setPage(1);
               }}
-              className="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className={formControlClass}
             />
           </div>
         </div>

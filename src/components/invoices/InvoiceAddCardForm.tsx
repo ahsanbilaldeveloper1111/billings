@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useStripeCustomerPaymentMutations } from "@/hooks/stripe/useStripeCustomerPaymentMutations";
 import { useStripeProfileAddCardMutation } from "@/hooks/stripe/useStripeProfileAddCardMutation";
 import { showAppToast, showBillingBackendErrorToast } from "@/lib/toast/appToast";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 const cardElOpts = {
   style: {
@@ -17,9 +18,6 @@ const cardElOpts = {
   },
   hidePostalCode: true,
 } as const;
-
-const inputCls =
-  "w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
 
 type InvoiceAddCardFormProps = {
   companyProfileId: number;
@@ -128,7 +126,7 @@ export function InvoiceAddCardForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+        <label className={formLabelClass}>
           Card *
         </label>
         <div className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-900">
@@ -150,11 +148,11 @@ export function InvoiceAddCardForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-[11px] font-medium text-zinc-500">
+        <label className={formLabelClass}>
           Cardholder name *
         </label>
         <input
-          className={inputCls}
+          className={formControlClass}
           value={cardholderName}
           onChange={(e) => setCardholderName(e.target.value)}
           disabled={saving}
