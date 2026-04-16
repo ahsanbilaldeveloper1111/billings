@@ -61,7 +61,7 @@ export function UniversalDataTable<T>({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-zinc-900/[0.03] dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:shadow-black/45 dark:ring-white/[0.04]">
         {canShowLimit ? (
           <TableListHeaderControls
             title={title}
@@ -146,14 +146,13 @@ export function UniversalDataTable<T>({
             </tbody>
           </table>
         </div>
+        {pagination && onPageChange ? (
+          <TablePaginationControls
+            pagination={pagination}
+            onPageChange={onPageChange}
+          />
+        ) : null}
       </div>
-
-      {pagination && onPageChange ? (
-        <TablePaginationControls
-          pagination={pagination}
-          onPageChange={onPageChange}
-        />
-      ) : null}
 
       {rawResponse !== undefined ? (
         <RawResponseDisclosure

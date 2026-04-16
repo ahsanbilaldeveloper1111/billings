@@ -202,7 +202,7 @@ export function TableListHeaderControls({
       <label className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">
         Rows per page
         <select
-          className="rounded-lg border border-zinc-200 bg-white px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-900"
+          className="rounded-lg border border-zinc-200/90 bg-white px-2.5 py-1.5 text-xs shadow-sm shadow-zinc-900/[0.05] outline-none transition hover:border-zinc-300 hover:shadow-md hover:shadow-zinc-900/[0.08] focus-visible:ring-2 focus-visible:ring-emerald-500/35 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/25 dark:hover:border-zinc-500"
           value={limit}
           onChange={(ev) => onLimitChange(Number(ev.target.value))}
         >
@@ -221,6 +221,9 @@ type TablePaginationControlsProps = {
   pagination?: ApiPagination;
   onPageChange: (page: number) => void;
 };
+
+const pagerSurfaceBtn =
+  "rounded-lg border border-zinc-200/90 bg-white px-3 py-2 text-sm font-medium text-zinc-800 shadow-sm shadow-zinc-900/[0.07] outline-none transition-[box-shadow,border-color,transform,background-color] hover:border-zinc-300 hover:bg-zinc-50/80 hover:shadow-md hover:shadow-zinc-900/10 focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:shadow-black/35 dark:hover:border-zinc-500 dark:hover:bg-zinc-800/80 dark:hover:shadow-lg dark:hover:shadow-black/45 dark:focus-visible:ring-offset-zinc-950";
 
 export function TablePaginationControls({
   pagination,
@@ -255,15 +258,22 @@ export function TablePaginationControls({
       </p>
     );
 
+  const pageNumBase =
+    "min-w-[2.25rem] rounded-lg px-2.5 py-2 text-sm outline-none transition-[box-shadow,border-color,transform,background-color] focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] dark:focus-visible:ring-offset-zinc-950";
+
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/70 bg-zinc-50/50 px-4 py-3 dark:border-zinc-800/80 dark:bg-zinc-900/30 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <div
+      className="flex flex-col gap-3 border-t border-zinc-200/70 bg-gradient-to-b from-zinc-50/95 to-white px-4 py-3.5 dark:border-zinc-800 dark:from-zinc-900/55 dark:to-zinc-950/90 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between"
+      role="navigation"
+      aria-label="Table pagination"
+    >
       <div className="min-w-0 shrink-0">{showing}</div>
       <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
         <button
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(1)}
-          className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm font-medium text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={pagerSurfaceBtn}
         >
           First
         </button>
@@ -271,12 +281,16 @@ export function TablePaginationControls({
           type="button"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
-          className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm font-medium text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={pagerSurfaceBtn}
         >
           Prev
         </button>
         {lastPage <= 12 ? (
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
+          <div
+            className="flex flex-wrap items-center justify-center gap-1.5 rounded-xl border border-zinc-200/60 bg-white/60 p-1 shadow-inner shadow-zinc-900/[0.04] dark:border-zinc-700/80 dark:bg-zinc-900/40 dark:shadow-black/20"
+            role="group"
+            aria-label="Page numbers"
+          >
             {Array.from({ length: lastPage }, (_, i) => i + 1).map((pageNum) => (
               <button
                 key={pageNum}
@@ -284,8 +298,8 @@ export function TablePaginationControls({
                 onClick={() => onPageChange(pageNum)}
                 className={
                   pageNum === page
-                    ? "min-w-[2.25rem] rounded-lg bg-emerald-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm"
-                    : "min-w-[2.25rem] rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm font-medium text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+                    ? `${pageNumBase} bg-emerald-600 font-semibold text-white shadow-md shadow-emerald-900/25 ring-1 ring-emerald-400/35 dark:bg-emerald-600 dark:shadow-emerald-950/50 dark:ring-emerald-500/30`
+                    : `${pageNumBase} border border-transparent font-medium text-zinc-800 hover:border-zinc-200/90 hover:bg-white hover:shadow-sm hover:shadow-zinc-900/[0.08] dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90 dark:hover:shadow-black/30`
                 }
               >
                 {pageNum}
@@ -293,10 +307,10 @@ export function TablePaginationControls({
             ))}
           </div>
         ) : (
-          <label className="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-200/70 bg-white/80 px-2 py-1.5 text-sm text-zinc-600 shadow-sm shadow-zinc-900/[0.05] dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400 dark:shadow-black/25">
             Page
             <select
-              className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              className="rounded-md border border-zinc-200/90 bg-white px-2 py-1.5 text-sm shadow-sm shadow-zinc-900/[0.06] outline-none transition hover:border-zinc-300 focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/30"
               value={page}
               onChange={(ev) => onPageChange(Number(ev.target.value))}
             >
@@ -315,7 +329,7 @@ export function TablePaginationControls({
           type="button"
           disabled={page >= lastPage}
           onClick={() => onPageChange(page + 1)}
-          className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm font-medium text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={pagerSurfaceBtn}
         >
           Next
         </button>
@@ -323,7 +337,7 @@ export function TablePaginationControls({
           type="button"
           disabled={page >= lastPage}
           onClick={() => onPageChange(lastPage)}
-          className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm font-medium text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className={pagerSurfaceBtn}
         >
           Last
         </button>
