@@ -9,7 +9,7 @@ export default function DashboardPage() {
     <PageFrame>
       <PageHeader
         title="Dashboard"
-        description="Charts and key metrics for your billing workspace."
+        description="Workspace overview — charts and key metrics for your billing workspace."
       />
       <div className="mt-10 space-y-10">
         <DashboardOverview />

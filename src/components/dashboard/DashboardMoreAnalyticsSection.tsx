@@ -14,6 +14,11 @@ import type {
   ProfitLossSummary,
   RecentActivitySummary,
 } from "@/models/Analytics";
+import {
+  shellElevatedPanelClass,
+  shellSectionAccentBarClass,
+  shellSectionWrapClass,
+} from "@/lib/uiShellClasses";
 
 function ChartCard({
   title,
@@ -25,7 +30,7 @@ function ChartCard({
   empty?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-200/60 bg-gradient-to-br from-white to-zinc-50/90 p-5 shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_4px_20px_-8px_rgba(15,23,42,0.06)] ring-1 ring-zinc-900/[0.03] dark:border-zinc-800/70 dark:from-zinc-950 dark:to-zinc-950/85 dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_6px_24px_-8px_rgba(0,0,0,0.35)] dark:ring-white/[0.04]">
+    <div className={shellElevatedPanelClass}>
       <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         {title}
       </h3>
@@ -325,26 +330,28 @@ export function DashboardMoreAnalyticsSection({
 
   return (
     <section className="mt-10">
-      <div className="rounded-2xl border border-zinc-200/50 bg-white/45 p-6 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.07)] backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] sm:rounded-3xl sm:p-8">
-        <div className="mb-8">
-          <h3 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 shadow-sm shadow-sky-500/35"
-              aria-hidden
-            />
-            Profit, activity & comparisons
-          </h3>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Summary totals, recent activity, spend by company, and monthly series
-            from the analytics API.
-          </p>
+      <div className={`relative ${shellSectionWrapClass}`}>
+        <div className="pointer-events-none absolute right-0 top-0 h-36 w-36 rounded-full bg-gradient-to-bl from-violet-200/12 to-transparent blur-3xl dark:from-violet-500/8" aria-hidden />
+        <div className="relative mb-8">
+          <div className="flex gap-4">
+            <span className={shellSectionAccentBarClass} aria-hidden />
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                Profit, activity & comparisons
+              </h3>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                Summary totals, recent activity, spend by company, and monthly series
+                from the analytics API.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <ChartCard title="Profit & loss" empty={plEmpty}>
           {pl ? (
             <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-emerald-50/25 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-emerald-950/20">
+              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-teal-50/22 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-teal-950/18">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   Revenue
                 </p>
@@ -352,7 +359,7 @@ export function DashboardMoreAnalyticsSection({
                   {fmtMoney(toFiniteNumber(pl.total_revenue))}
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-emerald-50/25 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-emerald-950/20">
+              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-teal-50/22 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-teal-950/18">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   Expenses
                 </p>
@@ -360,7 +367,7 @@ export function DashboardMoreAnalyticsSection({
                   {fmtMoney(toFiniteNumber(pl.total_expenses))}
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-emerald-50/25 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-emerald-950/20">
+              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-teal-50/22 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-teal-950/18">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   Net profit
                 </p>
@@ -368,7 +375,7 @@ export function DashboardMoreAnalyticsSection({
                   {fmtMoney(toFiniteNumber(pl.net_profit))}
                 </p>
               </div>
-              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-emerald-50/25 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-emerald-950/20">
+              <div className="rounded-xl border border-zinc-100/80 bg-gradient-to-br from-zinc-50/95 to-teal-50/22 p-3 dark:border-zinc-800/60 dark:from-zinc-900/60 dark:to-teal-950/18">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
                   Margin
                 </p>

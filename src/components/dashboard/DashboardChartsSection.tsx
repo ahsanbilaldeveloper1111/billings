@@ -16,6 +16,11 @@ import type {
   RevenueTrendItem,
   TopSellingProduct,
 } from "@/models/Analytics";
+import {
+  shellElevatedPanelClass,
+  shellSectionAccentBarClass,
+  shellSectionWrapClass,
+} from "@/lib/uiShellClasses";
 
 function ChartCard({
   title,
@@ -27,7 +32,7 @@ function ChartCard({
   empty?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-zinc-200/60 bg-gradient-to-br from-white to-zinc-50/90 p-5 shadow-[0_1px_0_rgba(255,255,255,0.85)_inset,0_4px_20px_-8px_rgba(15,23,42,0.06)] ring-1 ring-zinc-900/[0.03] dark:border-zinc-800/70 dark:from-zinc-950 dark:to-zinc-950/85 dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_6px_24px_-8px_rgba(0,0,0,0.35)] dark:ring-white/[0.04]">
+    <div className={shellElevatedPanelClass}>
       <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         {title}
       </h3>
@@ -180,7 +185,7 @@ function HorizontalBars({
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-cyan-500"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -203,7 +208,7 @@ function InventoryStatusCard({ d }: { d: InventoryStatusDistribution }) {
     <ChartCard title="Inventory status" empty={empty}>
       <div className="flex h-3 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
         <div
-          className="bg-emerald-500"
+          className="bg-teal-500"
           style={{ width: `${(inStock / sum) * 100}%` }}
           title={`In stock: ${inStock}`}
         />
@@ -220,7 +225,7 @@ function InventoryStatusCard({ d }: { d: InventoryStatusDistribution }) {
       </div>
       <ul className="mt-3 flex flex-wrap gap-3 text-[11px] text-zinc-600 dark:text-zinc-400">
         <li>
-          <span className="inline-block h-2 w-2 rounded-sm bg-emerald-500 align-middle" />{" "}
+          <span className="inline-block h-2 w-2 rounded-sm bg-teal-500 align-middle" />{" "}
           In stock: <strong className="text-zinc-800 dark:text-zinc-200">{inStock}</strong>
         </li>
         <li>
@@ -257,14 +262,15 @@ export function DashboardChartsSection({
   if (isError) {
     return (
       <section id="analytics" className="mt-14 scroll-mt-24">
-        <div className="rounded-2xl border border-zinc-200/50 bg-white/45 p-6 backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 sm:rounded-3xl sm:p-8">
-          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm shadow-emerald-500/40"
-              aria-hidden
-            />
-            Analytics
-          </h2>
+        <div className={`${shellSectionWrapClass}`}>
+          <div className="flex gap-4">
+            <span className={shellSectionAccentBarClass} aria-hidden />
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                Analytics
+              </h2>
+            </div>
+          </div>
           <p className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm text-rose-900 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-100">
             Analytics could not load. {error?.message ?? "Unknown error"}
           </p>
@@ -276,19 +282,20 @@ export function DashboardChartsSection({
   if (isLoading) {
     return (
       <section id="analytics" className="mt-14 scroll-mt-24">
-        <div className="rounded-2xl border border-zinc-200/50 bg-white/45 p-6 backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 sm:rounded-3xl sm:p-8">
-          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm shadow-emerald-500/40"
-              aria-hidden
-            />
-            Analytics
-          </h2>
+        <div className={`${shellSectionWrapClass}`}>
+          <div className="flex gap-4">
+            <span className={shellSectionAccentBarClass} aria-hidden />
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                Analytics
+              </h2>
+            </div>
+          </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="h-48 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-white to-emerald-50/25 dark:from-zinc-800 dark:via-zinc-900 dark:to-emerald-950/20"
+                className="h-48 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-white to-teal-50/22 dark:from-zinc-800 dark:via-zinc-900 dark:to-teal-950/15"
               />
             ))}
           </div>
@@ -300,17 +307,18 @@ export function DashboardChartsSection({
   if (!data) {
     return (
       <section id="analytics" className="mt-14 scroll-mt-24">
-        <div className="rounded-2xl border border-zinc-200/50 bg-white/45 p-6 backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 sm:rounded-3xl sm:p-8">
-          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm shadow-emerald-500/40"
-              aria-hidden
-            />
-            Analytics
-          </h2>
-          <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-            No chart data is available yet.
-          </p>
+        <div className={`${shellSectionWrapClass}`}>
+          <div className="flex gap-4">
+            <span className={shellSectionAccentBarClass} aria-hidden />
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                Analytics
+              </h2>
+              <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                No chart data is available yet.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
     );
@@ -325,19 +333,21 @@ export function DashboardChartsSection({
 
   return (
     <section id="analytics" className="mt-14 scroll-mt-24">
-      <div className="rounded-2xl border border-zinc-200/50 bg-white/45 p-6 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.07)] backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] sm:rounded-3xl sm:p-8">
-        <div className="mb-8">
-          <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-            <span
-              className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm shadow-emerald-500/40"
-              aria-hidden
-            />
-            Analytics
-          </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Revenue and expense trends, inventory, expenses by category, and top
-            products.
-          </p>
+      <div className={`relative ${shellSectionWrapClass}`}>
+        <div className="pointer-events-none absolute -left-20 bottom-0 h-40 w-40 rounded-full bg-gradient-to-tr from-cyan-200/12 to-transparent blur-3xl dark:from-cyan-500/8" aria-hidden />
+        <div className="relative mb-8">
+          <div className="flex gap-4">
+            <span className={shellSectionAccentBarClass} aria-hidden />
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                Analytics
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                Revenue and expense trends, inventory, expenses by category, and top
+                products.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -345,7 +355,7 @@ export function DashboardChartsSection({
             title="Revenue trend"
             items={revenue}
             valueKey="revenue"
-            strokeClass="text-emerald-500"
+            strokeClass="text-teal-600"
             formatY={fmtMoney}
           />
           {/* <TrendBlock

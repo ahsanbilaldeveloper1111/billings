@@ -1,28 +1,29 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f4f7f5;
+  --background: #f5f7f8;
   --foreground: #0f172a;
   --muted: #64748b;
   --surface: #ffffff;
-  --surface-elevated: rgba(255, 255, 255, 0.78);
-  --accent: #059669;
-  --accent-muted: rgba(5, 150, 105, 0.14);
-  --ring-subtle: rgba(15, 23, 42, 0.06);
-  --glow-accent: rgba(16, 185, 129, 0.15);
+  --surface-elevated: rgba(255, 255, 255, 0.82);
+  /* Reference teal accent (~#00A099 family) */
+  --accent: #0d9488;
+  --accent-muted: rgba(13, 148, 136, 0.14);
+  --ring-subtle: rgba(15, 23, 42, 0.05);
+  --glow-accent: rgba(13, 148, 136, 0.12);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #090c0b;
+    --background: #0a0c0d;
     --foreground: #f1f5f9;
     --muted: #94a3b8;
     --surface: #0f1412;
     --surface-elevated: rgba(15, 20, 18, 0.88);
-    --accent: #34d399;
-    --accent-muted: rgba(52, 211, 153, 0.14);
+    --accent: #2dd4bf;
+    --accent-muted: rgba(45, 212, 191, 0.14);
     --ring-subtle: rgba(241, 245, 249, 0.06);
-    --glow-accent: rgba(52, 211, 153, 0.12);
+    --glow-accent: rgba(45, 212, 191, 0.12);
   }
 }
 
@@ -54,19 +55,19 @@ body {
   body {
     background-image:
       radial-gradient(
-        ellipse 140% 90% at 50% -25%,
-        rgba(5, 150, 105, 0.09),
+        ellipse 130% 85% at 50% -22%,
+        rgba(13, 148, 136, 0.07),
         transparent 52%
       ),
       radial-gradient(
-        ellipse 70% 50% at 100% 5%,
-        rgba(59, 130, 246, 0.055),
-        transparent 42%
+        ellipse 75% 55% at 100% 0%,
+        rgba(99, 102, 241, 0.045),
+        transparent 46%
       ),
       radial-gradient(
-        ellipse 50% 35% at 0% 80%,
-        rgba(20, 184, 166, 0.04),
-        transparent 45%
+        ellipse 55% 40% at 0% 85%,
+        rgba(244, 114, 182, 0.035),
+        transparent 48%
       );
     background-attachment: fixed;
   }

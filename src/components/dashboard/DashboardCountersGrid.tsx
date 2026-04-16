@@ -28,7 +28,7 @@ export function DashboardCountersGrid({
         {Array.from({ length: skeletonCount }, (_, i) => (
           <div
             key={i}
-            className="h-32 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-white to-emerald-50/30 dark:from-zinc-800 dark:via-zinc-900 dark:to-emerald-950/20"
+            className="h-32 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-white to-teal-50/25 dark:from-zinc-800 dark:via-zinc-900 dark:to-teal-950/15"
           />
         ))}
       </>
@@ -53,11 +53,12 @@ export function DashboardCountersGrid({
 
   return (
     <>
-      {rows.map((row) => (
+      {rows.map((row, index) => (
         <MetricCard
           key={row.key}
           label={row.label}
           value={formatCounterMetric(row)}
+          accentVariant={index}
         />
       ))}
     </>

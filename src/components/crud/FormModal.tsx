@@ -1,6 +1,18 @@
 "use client";
 
 import type { ReactNode } from "react";
+import {
+  modalBackdropClass,
+  modalBodyClass,
+  modalCloseButtonClass,
+  modalFooterClass,
+  modalHeaderClass,
+  modalHeaderGlowClass,
+  modalPanelBaseClass,
+  modalPrimaryButtonClass,
+  modalSecondaryButtonClass,
+  modalTitleClass,
+} from "@/lib/uiModalClasses";
 
 type FormModalProps = {
   open: boolean;
@@ -30,39 +42,32 @@ export function FormModal({
     <div className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center">
       <button
         type="button"
-        className="absolute inset-0 bg-zinc-900/50 backdrop-blur-sm dark:bg-black/60"
+        className={modalBackdropClass}
         aria-label="Close"
         onClick={onClose}
       />
       <div
-        className={`relative z-10 flex max-h-[90vh] w-full flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950 ${panelClassName ?? "max-w-lg"}`}
+        className={`${modalPanelBaseClass} max-h-[90vh] w-full ${panelClassName ?? "max-w-lg"}`}
       >
-        <div className="border-b border-zinc-200/70 px-5 py-3 dark:border-zinc-800">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">{title}</h2>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg px-2 py-1 text-sm text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            >
+        <div className={modalHeaderClass}>
+          <div className={modalHeaderGlowClass} aria-hidden />
+          <div className="relative flex items-center justify-between gap-3">
+            <h2 className={modalTitleClass}>{title}</h2>
+            <button type="button" onClick={onClose} className={modalCloseButtonClass}>
               Close
             </button>
           </div>
         </div>
-        <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-          <div className="space-y-4 px-5 py-4">{children}</div>
-          <div className="flex justify-end gap-2 border-t border-zinc-200/70 px-5 py-3 dark:border-zinc-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-zinc-200 px-4 py-2 text-sm font-medium dark:border-zinc-700"
-            >
+        <form onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className={`${modalBodyClass} space-y-4`}>{children}</div>
+          <div className={modalFooterClass}>
+            <button type="button" onClick={onClose} className={modalSecondaryButtonClass}>
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+              className={modalPrimaryButtonClass}
             >
               {loading ? "Saving…" : submitLabel}
             </button>
@@ -82,10 +87,10 @@ export function FormField({
 }) {
   return (
     <label className="block">
-      <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+      <span className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-zinc-500 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-teal-600 before:shadow-sm before:content-[''] dark:text-zinc-400 dark:before:bg-teal-400">
         {label}
       </span>
-      <div className="mt-1">{children}</div>
+      <div className="mt-2">{children}</div>
     </label>
   );
 }

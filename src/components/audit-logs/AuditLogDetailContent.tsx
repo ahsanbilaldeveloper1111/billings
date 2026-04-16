@@ -20,22 +20,22 @@ function JsonPanel({ title, value }: { title: string; value: unknown }) {
         ? value
         : JSON.stringify(value, null, 2);
   return (
-    <section className="overflow-hidden rounded-xl border border-zinc-200/60 bg-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/30">
+    <section className="overflow-hidden rounded-xl border border-zinc-200/55 bg-gradient-to-b from-white to-zinc-50/40 shadow-sm shadow-zinc-900/[0.05] ring-1 ring-teal-900/[0.03] dark:border-zinc-800/65 dark:from-zinc-950 dark:to-zinc-900/40 dark:shadow-black/25 dark:ring-white/[0.04]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-zinc-100/80 dark:hover:bg-zinc-800/40"
+        className="flex w-full items-center justify-between gap-3 border-b border-zinc-200/50 bg-gradient-to-r from-teal-50/50 via-white to-transparent px-4 py-3 text-left transition-colors hover:from-teal-50/80 dark:border-zinc-800/60 dark:from-teal-950/25 dark:via-zinc-950 dark:hover:from-teal-950/35"
       >
-        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-400">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-600 dark:text-zinc-300">
           {title}
         </span>
         <span className="flex shrink-0 items-center gap-2">
-          <span className="rounded-md bg-zinc-200/80 px-2 py-0.5 text-[10px] font-medium text-zinc-700 dark:bg-zinc-700 dark:text-zinc-200">
+          <span className="rounded-md border border-teal-200/60 bg-teal-50/90 px-2 py-0.5 text-[10px] font-semibold text-teal-800 dark:border-teal-800/50 dark:bg-teal-950/40 dark:text-teal-200">
             {open ? "Hide" : "Show"}
           </span>
           <span
-            className={`flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-200/80 bg-zinc-50 text-zinc-500 transition-transform duration-300 ease-in-out dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 ${
+            className={`flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-200/80 bg-white text-zinc-500 shadow-sm transition-transform duration-300 ease-in-out dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 ${
               open ? "rotate-180" : ""
             }`}
             aria-hidden
@@ -57,7 +57,7 @@ function JsonPanel({ title, value }: { title: string; value: unknown }) {
         </span>
       </button>
       <SmoothCollapse open={open}>
-        <pre className="max-h-[min(50vh,360px)] overflow-auto border-t border-zinc-200/60 p-4 font-mono text-[11px] leading-relaxed text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
+        <pre className="max-h-[min(50vh,360px)] overflow-auto border-t border-zinc-200/55 bg-zinc-950/[0.02] p-4 font-mono text-[11px] leading-relaxed text-zinc-800 dark:border-zinc-800/80 dark:bg-zinc-950/50 dark:text-zinc-200">
           {text}
         </pre>
       </SmoothCollapse>
@@ -68,8 +68,9 @@ function JsonPanel({ title, value }: { title: string; value: unknown }) {
 function ChangesList({ items }: { items: AuditLogChange[] }) {
   if (items.length === 0) return null;
   return (
-    <section className="overflow-hidden rounded-xl border border-zinc-200/60 bg-white/80 dark:border-zinc-800 dark:bg-zinc-950/40">
-      <h3 className="border-b border-zinc-200/60 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+    <section className="overflow-hidden rounded-xl border border-zinc-200/55 bg-white shadow-[0_8px_28px_-12px_rgba(15,23,42,0.08)] ring-1 ring-teal-900/[0.04] dark:border-zinc-800/65 dark:bg-zinc-950/45 dark:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.4)] dark:ring-white/[0.04]">
+      <h3 className="flex items-center gap-2 border-b border-zinc-200/55 bg-gradient-to-r from-teal-50/60 to-transparent px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-600 dark:border-zinc-800/70 dark:from-teal-950/30 dark:text-zinc-400">
+        <span className="h-1.5 w-1.5 rounded-full bg-teal-500 shadow-sm shadow-teal-500/40" aria-hidden />
         Field changes
       </h3>
       <ul className="divide-y divide-zinc-200/70 dark:divide-zinc-800">
@@ -87,7 +88,7 @@ function ChangesList({ items }: { items: AuditLogChange[] }) {
               </p>
             ) : null}
             {ch.new != null && ch.new !== "" ? (
-              <p className="mt-1 text-xs text-emerald-800 dark:text-emerald-300">
+              <p className="mt-1 text-xs text-teal-800 dark:text-teal-300">
                 <span className="font-semibold">To:</span> {ch.new}
               </p>
             ) : null}
@@ -123,7 +124,7 @@ export function AuditLogDetailContent({ row }: { row: Record<string, unknown> })
     : [];
 
   const kvRow =
-    "grid grid-cols-1 gap-1 border-b border-zinc-200/70 px-4 py-2.5 last:border-b-0 sm:grid-cols-[minmax(8rem,28%)_1fr] sm:items-center dark:border-zinc-800";
+    "grid grid-cols-1 gap-1 border-b border-zinc-200/60 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(8rem,28%)_1fr] sm:items-center dark:border-zinc-800/70";
 
   return (
     <div className="space-y-5">
@@ -136,12 +137,12 @@ export function AuditLogDetailContent({ row }: { row: Record<string, unknown> })
       </div>
 
       {summary ? (
-        <p className="rounded-xl border border-zinc-200/60 bg-emerald-50/40 px-4 py-3 text-sm leading-relaxed text-zinc-800 dark:border-zinc-800 dark:bg-emerald-950/20 dark:text-zinc-200">
+        <p className="rounded-xl border border-teal-200/60 bg-gradient-to-br from-teal-50/80 to-cyan-50/30 px-4 py-3 text-sm leading-relaxed text-zinc-800 shadow-sm shadow-teal-900/[0.06] dark:border-teal-800/40 dark:from-teal-950/35 dark:to-cyan-950/15 dark:text-zinc-200 dark:shadow-black/20">
           {summary}
         </p>
       ) : null}
 
-      <dl className="overflow-hidden rounded-xl border border-zinc-200/60 bg-white/70 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40">
+      <dl className="overflow-hidden rounded-xl border border-zinc-200/55 bg-white shadow-[0_8px_32px_-14px_rgba(15,23,42,0.08)] ring-1 ring-teal-900/[0.04] dark:border-zinc-800/65 dark:bg-zinc-950/50 dark:shadow-[0_8px_36px_-14px_rgba(0,0,0,0.4)] dark:ring-white/[0.04]">
         <div className={kvRow}>
           <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
             Actor

@@ -11,7 +11,9 @@ import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap
 import { customerApiResourceKey } from "@/lib/customers/customerApiResourceKey";
 import { customerStripeCrmId } from "@/lib/customers/customerStripeCrmId";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+import { ModalShell } from "@/components/ui/ModalShell";
 import { customerProductPricingPath } from "@/lib/navigation/appPaths";
+import { modalPrimaryButtonClass, modalSecondaryButtonClass } from "@/lib/uiModalClasses";
 import type { Customer } from "@/models/Customer";
 
 type ViewCustomerModalProps = {
@@ -103,45 +105,49 @@ export function ViewCustomerModal({
     ? customerProductPricingPath(String(customerApiResourceKey(customer)))
     : null;
 
-  if (!show) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="view-customer-title"
-    >
-      <button
-        type="button"
-        className="absolute inset-0 bg-zinc-900/50 backdrop-blur-sm transition-opacity dark:bg-black/60"
-        aria-label="Close"
-        onClick={onHide}
-      />
-      <div className="relative z-10 flex max-h-[min(92vh,900px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="flex-shrink-0 border-b border-zinc-200/70 bg-gradient-to-r from-sky-50/90 to-emerald-50/40 px-5 py-4 dark:border-zinc-800 dark:from-sky-950/40 dark:to-zinc-950">
-          <div className="flex items-start justify-between gap-3">
-            <h2
-              id="view-customer-title"
-              className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
-            >
-              Customer details
-            </h2>
+    <ModalShell
+      open={show}
+      onClose={onHide}
+      title="Customer details"
+      titleId="view-customer-title"
+      maxWidthClassName="max-w-4xl"
+      footer={
+        <>
+          <button type="button" onClick={onHide} className={modalSecondaryButtonClass}>
+            Close
+          </button>
+          {customer && pricingHref ? (
             <button
               type="button"
-              onClick={onHide}
-              className="rounded-lg px-2 py-1 text-sm font-medium text-zinc-600 hover:bg-white/80 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              onClick={() => {
+                onHide();
+                router.push(pricingHref);
+              }}
+              className="rounded-xl border border-teal-300 bg-teal-50 px-4 py-2 text-sm font-medium text-teal-950 shadow-sm hover:bg-teal-100 dark:border-teal-800 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-950/60"
             >
-              Close
+              Product pricing
             </button>
-          </div>
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          ) : null}
+          {customer && onEdit ? (
+            <button
+              type="button"
+              onClick={() => {
+                onEdit(customer);
+                onHide();
+              }}
+              className={modalPrimaryButtonClass}
+            >
+              Edit
+            </button>
+          ) : null}
+        </>
+      }
+    >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div
-                className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent dark:border-emerald-400"
+                className="h-10 w-10 animate-spin rounded-full border-2 border-teal-600 border-t-transparent dark:border-teal-400"
                 aria-hidden
               />
               <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
@@ -248,44 +254,8 @@ export function ViewCustomerModal({
               ) : null}
             </>
           ) : (
-            <p className="text-sm text-zinc-500">No data.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">No data.</p>
           )}
-        </div>
-
-        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2 border-t border-zinc-200/70 bg-zinc-50/80 px-5 py-3 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <button
-            type="button"
-            onClick={onHide}
-            className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
-          >
-            Close
-          </button>
-          {customer && pricingHref ? (
-            <button
-              type="button"
-              onClick={() => {
-                onHide();
-                router.push(pricingHref);
-              }}
-              className="rounded-xl border border-sky-300 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-900 hover:bg-sky-100 dark:border-sky-800 dark:bg-sky-950/40 dark:text-sky-100"
-            >
-              Product pricing
-            </button>
-          ) : null}
-          {customer && onEdit ? (
-            <button
-              type="button"
-              onClick={() => {
-                onEdit(customer);
-                onHide();
-              }}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500"
-            >
-              Edit
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

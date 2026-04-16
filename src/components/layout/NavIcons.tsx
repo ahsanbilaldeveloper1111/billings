@@ -14,7 +14,7 @@ function IconBox({
     <span
       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-600 dark:text-zinc-400 ${
         active
-          ? "bg-emerald-500/20 text-emerald-800 dark:bg-emerald-500/25 dark:text-emerald-200"
+          ? "bg-teal-500/20 text-teal-900 dark:bg-teal-500/25 dark:text-teal-100"
           : "bg-zinc-100/90 dark:bg-zinc-800/80"
       } ${className ?? ""}`}
     >

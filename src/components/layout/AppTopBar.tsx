@@ -31,7 +31,7 @@ export function AppTopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const sub = userQuery.isFetching ? "Syncing profile…" : " ";
 
   return (
-    <header className="sticky top-0 z-30 flex h-[3.25rem] shrink-0 items-center justify-between gap-3 border-b border-zinc-200/40 bg-white/70 px-3 shadow-[0_1px_0_rgba(255,255,255,0.65)_inset] backdrop-blur-xl dark:border-zinc-800/40 dark:bg-zinc-950/70 dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset] sm:h-14 sm:px-5">
+    <header className="sticky top-0 z-30 flex h-[3.25rem] shrink-0 items-center justify-between gap-3 border-b border-zinc-200/35 bg-white/75 px-3 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset,0_8px_32px_-20px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-zinc-800/40 dark:bg-zinc-950/72 dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_10px_40px_-20px_rgba(0,0,0,0.35)] sm:h-14 sm:px-5">
       <div className="flex min-w-0 flex-1 items-center gap-3">
         <button
           type="button"
@@ -56,7 +56,7 @@ export function AppTopBar({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
         <div className="flex min-w-0 items-center gap-3">
           <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-xs font-semibold text-white shadow-md shadow-emerald-500/20"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-teal-600 to-cyan-600 text-xs font-semibold text-white shadow-md shadow-teal-600/22"
             aria-hidden
           >
             {initials(displayName)}
@@ -74,14 +74,14 @@ export function AppTopBar({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         {token ? <HeaderCurrencySelect /> : null}
         {token ? (
-          <span className="hidden rounded-full bg-emerald-500/12 px-2.5 py-1 text-[11px] font-medium text-emerald-800 ring-1 ring-emerald-500/20 dark:text-emerald-200 dark:ring-emerald-500/25 sm:inline">
+          <span className="hidden rounded-full bg-teal-500/12 px-2.5 py-1 text-[11px] font-medium text-teal-900 ring-1 ring-teal-500/22 dark:text-teal-200 dark:ring-teal-400/25 sm:inline">
             Session
           </span>
         ) : null}
         <button
           type="button"
           onClick={() => logout()}
-          className="rounded-xl bg-zinc-900 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm shadow-zinc-900/10 transition hover:bg-zinc-800 dark:bg-emerald-600 dark:hover:bg-emerald-500"
+          className="rounded-xl bg-zinc-900 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm shadow-zinc-900/10 transition hover:bg-zinc-800 dark:bg-teal-600 dark:hover:bg-teal-500"
         >
           Sign out
         </button>

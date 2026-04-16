@@ -29,7 +29,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="relative flex min-h-0 flex-1 overflow-hidden">
       {/* Ambient mesh — depth behind content */}
       <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_85%_55%_at_50%_-18%,rgba(16,185,129,0.07),transparent_52%),radial-gradient(ellipse_50%_40%_at_100%_0%,rgba(59,130,246,0.04),transparent_45%)] dark:bg-[radial-gradient(ellipse_85%_55%_at_50%_-18%,rgba(52,211,153,0.09),transparent_52%),radial-gradient(ellipse_45%_35%_at_100%_0%,rgba(56,189,248,0.06),transparent_45%)]"
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_90%_58%_at_50%_-16%,rgba(13,148,136,0.065),transparent_54%),radial-gradient(ellipse_55%_42%_at_100%_0%,rgba(99,102,241,0.04),transparent_46%),radial-gradient(ellipse_45%_38%_at_0%_95%,rgba(244,114,182,0.03),transparent_48%)] dark:bg-[radial-gradient(ellipse_88%_55%_at_50%_-18%,rgba(45,212,191,0.08),transparent_52%),radial-gradient(ellipse_48%_38%_at_100%_0%,rgba(56,189,248,0.055),transparent_45%),radial-gradient(ellipse_40%_35%_at_0%_90%,rgba(167,139,250,0.04),transparent_50%)]"
         aria-hidden
       />
 

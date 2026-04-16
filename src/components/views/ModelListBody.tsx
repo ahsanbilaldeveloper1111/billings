@@ -84,7 +84,7 @@ export function ModelListBody({
   return (
     <>
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-sm dark:border-zinc-800/80 dark:bg-zinc-950/40">
+        <div className="overflow-hidden rounded-2xl border border-zinc-200/65 bg-white shadow-[0_10px_44px_-18px_rgba(15,23,42,0.07)] ring-1 ring-teal-900/[0.035] dark:border-zinc-800/75 dark:bg-zinc-950/42 dark:shadow-[0_14px_48px_-18px_rgba(0,0,0,0.45)] dark:ring-white/[0.04]">
           <div className="border-b border-zinc-200/60 bg-zinc-50/80 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900/50">
             <span className="text-xs font-semibold uppercase tracking-wide text-zinc-600 dark:text-zinc-300">
               {title}

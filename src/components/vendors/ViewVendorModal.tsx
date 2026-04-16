@@ -2,8 +2,10 @@
 
 import type { ReactNode } from "react";
 import { useVendor } from "@/hooks/vendors/useVendor";
+import { ModalShell } from "@/components/ui/ModalShell";
 import { formatNumber } from "@/lib/currency";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+import { modalPrimaryButtonClass, modalSecondaryButtonClass } from "@/lib/uiModalClasses";
 import type { Vendor, VendorBankAccount } from "@/models/Vendor";
 
 type ViewVendorModalProps = {
@@ -16,7 +18,7 @@ type ViewVendorModalProps = {
 function statusBadgeClass(status: string | undefined): string {
   switch (status) {
     case "active":
-      return "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100";
+      return "bg-teal-100 text-teal-900 dark:bg-teal-950/60 dark:text-teal-100";
     case "inactive":
       return "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100";
     case "pending":
@@ -95,45 +97,38 @@ export function ViewVendorModal({
   const isLoading = detailQuery.isPending && show && vendorId != null;
   const error = detailQuery.isError ? detailQuery.error : null;
 
-  if (!show) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="view-vendor-title"
-    >
-      <button
-        type="button"
-        className="absolute inset-0 bg-zinc-900/50 backdrop-blur-sm transition-opacity dark:bg-black/60"
-        aria-label="Close"
-        onClick={onHide}
-      />
-      <div className="relative z-10 flex max-h-[min(92vh,880px)] w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200/70 bg-gradient-to-r from-emerald-50/90 to-teal-50/40 px-5 py-4 dark:border-zinc-800 dark:from-emerald-950/40 dark:to-zinc-950">
-          <div className="flex items-start justify-between gap-3">
-            <h2
-              id="view-vendor-title"
-              className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
-            >
-              Vendor details
-            </h2>
+    <ModalShell
+      open={show}
+      onClose={onHide}
+      title="Vendor details"
+      titleId="view-vendor-title"
+      maxWidthClassName="max-w-5xl"
+      maxHeightClassName="max-h-[min(92vh,880px)]"
+      footer={
+        <>
+          <button type="button" onClick={onHide} className={modalSecondaryButtonClass}>
+            Close
+          </button>
+          {vendor && onEdit ? (
             <button
               type="button"
-              onClick={onHide}
-              className="rounded-lg px-2 py-1 text-sm font-medium text-zinc-600 hover:bg-white/80 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+              onClick={() => {
+                onEdit(vendor);
+                onHide();
+              }}
+              className={modalPrimaryButtonClass}
             >
-              Close
+              Edit
             </button>
-          </div>
-        </div>
-
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+          ) : null}
+        </>
+      }
+    >
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <div
-                className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent dark:border-emerald-400"
+                className="h-10 w-10 animate-spin rounded-full border-2 border-teal-600 border-t-transparent dark:border-teal-400"
                 aria-hidden
               />
               <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
@@ -242,7 +237,7 @@ export function ViewVendorModal({
                       <span
                         className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                           vendor.profile.vat_exemption
-                            ? "bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100"
+                            ? "bg-teal-100 text-teal-900 dark:bg-teal-950/60 dark:text-teal-100"
                             : "bg-zinc-200 text-zinc-800 dark:bg-zinc-700 dark:text-zinc-100"
                         }`}
                       >
@@ -397,7 +392,7 @@ export function ViewVendorModal({
                               </td>
                               <td className="px-2 py-2">
                                 {account.is_default ? (
-                                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-100">
+                                  <span className="rounded-full bg-teal-100 px-2 py-0.5 text-[11px] font-medium text-teal-900 dark:bg-teal-950/60 dark:text-teal-100">
                                     Yes
                                   </span>
                                 ) : (
@@ -416,32 +411,8 @@ export function ViewVendorModal({
               })()}
             </>
           ) : (
-            <p className="text-sm text-zinc-500">No data.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">No data.</p>
           )}
-        </div>
-
-        <div className="flex flex-shrink-0 flex-wrap items-center justify-end gap-2 border-t border-zinc-200/70 bg-zinc-50/80 px-5 py-3 dark:border-zinc-800 dark:bg-zinc-900/40">
-          <button
-            type="button"
-            onClick={onHide}
-            className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
-          >
-            Close
-          </button>
-          {vendor && onEdit ? (
-            <button
-              type="button"
-              onClick={() => {
-                onEdit(vendor);
-                onHide();
-              }}
-              className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-500"
-            >
-              Edit
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

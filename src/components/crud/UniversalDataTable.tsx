@@ -61,7 +61,7 @@ export function UniversalDataTable<T>({
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-zinc-200/70 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-zinc-900/[0.03] dark:border-zinc-800/80 dark:bg-zinc-950/40 dark:shadow-black/45 dark:ring-white/[0.04]">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200/65 bg-white shadow-[0_10px_44px_-18px_rgba(15,23,42,0.08)] ring-1 ring-teal-900/[0.04] dark:border-zinc-800/75 dark:bg-zinc-950/42 dark:shadow-[0_14px_48px_-18px_rgba(0,0,0,0.48)] dark:ring-white/[0.05]">
         {canShowLimit ? (
           <TableListHeaderControls
             title={title}

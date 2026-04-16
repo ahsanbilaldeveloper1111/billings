@@ -3,6 +3,16 @@
 import type { ReactNode } from "react";
 import { formatCellValue } from "@/lib/api/extractApiData";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+import {
+  modalBackdropClass,
+  modalBodyClass,
+  modalCloseButtonClass,
+  modalHeaderClass,
+  modalHeaderGlowClass,
+  modalPanelBaseClass,
+  modalSubtitleClass,
+  modalTitleClass,
+} from "@/lib/uiModalClasses";
 
 function humanizeKey(key: string) {
   return key.replace(/_/g, " ");
@@ -28,11 +38,11 @@ function DetailBlock({ data, depth = 0 }: { data: unknown; depth?: number }) {
       return <span className="text-sm text-zinc-400">No items</span>;
     }
     return (
-      <ul className="space-y-2">
+        <ul className="space-y-2">
         {data.map((item, i) => (
           <li
             key={i}
-            className="rounded-lg bg-zinc-100/80 px-3 py-2.5 dark:bg-zinc-900/60"
+            className="rounded-xl border border-zinc-200/50 bg-white/90 px-3 py-2.5 shadow-sm shadow-zinc-900/[0.04] dark:border-zinc-700/60 dark:bg-zinc-900/50 dark:shadow-black/20"
           >
             <DetailBlock data={item} depth={depth + 1} />
           </li>
@@ -58,15 +68,15 @@ function DetailBlock({ data, depth = 0 }: { data: unknown; depth?: number }) {
   }
 
   const rowBase =
-    "grid grid-cols-1 gap-1 border-b border-zinc-200/70 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(9rem,32%)_1fr] sm:items-start sm:gap-6 dark:border-zinc-800/80";
+    "grid grid-cols-1 gap-1 border-b border-zinc-200/60 px-4 py-3 last:border-b-0 sm:grid-cols-[minmax(9rem,32%)_1fr] sm:items-start sm:gap-6 dark:border-zinc-800/70";
 
   return (
     <div className={depth === 0 ? "space-y-6" : "space-y-4"}>
       {primitives.length > 0 ? (
-        <dl className="overflow-hidden rounded-xl border border-zinc-200/60 bg-white/70 shadow-sm dark:border-zinc-800/70 dark:bg-zinc-950/40">
+        <dl className="overflow-hidden rounded-xl border border-zinc-200/55 bg-white shadow-[0_8px_32px_-14px_rgba(15,23,42,0.08)] ring-1 ring-teal-900/[0.04] dark:border-zinc-800/65 dark:bg-zinc-950/50 dark:shadow-[0_8px_36px_-14px_rgba(0,0,0,0.4)] dark:ring-white/[0.04]">
           {primitives.map(([key, value]) => (
             <div key={key} className={rowBase}>
-              <dt className="text-xs font-medium capitalize text-zinc-500 dark:text-zinc-400">
+              <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-zinc-500 dark:text-zinc-400">
                 {humanizeKey(key)}
               </dt>
               <dd className="min-w-0 text-sm leading-relaxed text-zinc-900 dark:text-zinc-100">
@@ -84,9 +94,9 @@ function DetailBlock({ data, depth = 0 }: { data: unknown; depth?: number }) {
       {nested.map(([key, value]) => (
         <section
           key={key}
-          className="overflow-hidden rounded-xl border border-zinc-200/55 bg-gradient-to-b from-zinc-50/90 to-white dark:border-zinc-800/70 dark:from-zinc-900/35 dark:to-zinc-950/50"
+          className="overflow-hidden rounded-xl border border-zinc-200/50 bg-gradient-to-b from-teal-50/30 via-zinc-50/50 to-white shadow-sm shadow-zinc-900/[0.05] ring-1 ring-teal-900/[0.03] dark:border-zinc-800/65 dark:from-teal-950/20 dark:via-zinc-900/40 dark:to-zinc-950/60 dark:shadow-black/25 dark:ring-white/[0.04]"
         >
-          <h3 className="border-b border-zinc-200/60 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+          <h3 className="border-b border-zinc-200/55 bg-white/60 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-600 dark:border-zinc-800/80 dark:bg-zinc-950/30 dark:text-zinc-400">
             {humanizeKey(key)}
           </h3>
           <div className="p-4 sm:p-5">
@@ -141,48 +151,52 @@ export function RecordDetailModal({
     >
       <button
         type="button"
-        className="absolute inset-0 bg-zinc-900/50 backdrop-blur-sm transition-opacity dark:bg-black/60"
+        className={modalBackdropClass}
         aria-label="Close"
         onClick={onClose}
       />
-      <div className="relative z-10 flex max-h-[min(90vh,800px)] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
-        <div className="border-b border-zinc-200/70 bg-gradient-to-r from-emerald-50/90 to-teal-50/40 px-5 py-4 dark:border-zinc-800 dark:from-emerald-950/40 dark:to-zinc-950">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2
-                id="crud-detail-title"
-                className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                {title}
-              </h2>
-              {subtitle ? (
-                <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{subtitle}</p>
-              ) : null}
+      <div
+        className={`relative z-10 max-h-[min(90vh,800px)] w-full max-w-4xl ${modalPanelBaseClass}`}
+      >
+        <div className={modalHeaderClass}>
+          <div className={modalHeaderGlowClass} aria-hidden />
+          <div className="relative flex items-start justify-between gap-4">
+            <div className="flex min-w-0 gap-3">
+              <span
+                className="mt-0.5 hidden h-12 w-1 shrink-0 rounded-full bg-gradient-to-b from-teal-500 to-cyan-600 shadow-sm shadow-teal-500/30 sm:block dark:shadow-teal-400/20"
+                aria-hidden
+              />
+              <div className="min-w-0">
+                <h2 id="crud-detail-title" className={modalTitleClass}>
+                  {title}
+                </h2>
+                {subtitle ? (
+                  <p className={modalSubtitleClass}>{subtitle}</p>
+                ) : null}
+              </div>
             </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-lg px-2 py-1 text-sm font-medium text-zinc-600 hover:bg-white/80 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
-            >
+            <button type="button" onClick={onClose} className={modalCloseButtonClass}>
               Close
             </button>
           </div>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5 sm:px-8">
+        <div className={modalBodyClass}>
           {loading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
-                  className="h-10 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800"
+                  className="h-10 animate-pulse rounded-xl bg-gradient-to-r from-zinc-100 via-zinc-50 to-zinc-100 dark:from-zinc-800 dark:via-zinc-800/80 dark:to-zinc-800"
                   style={{ width: `${100 - i * 8}%` }}
                 />
               ))}
             </div>
           ) : error ? (
-            <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>
+            <p className="rounded-xl border border-rose-200/80 bg-rose-50/90 px-4 py-3 text-sm text-rose-800 dark:border-rose-900/50 dark:bg-rose-950/35 dark:text-rose-200">
+              {error}
+            </p>
           ) : inner == null ? (
-            <p className="text-sm text-zinc-500">No data.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">No data.</p>
           ) : (
             <>
               {renderData ? renderData(inner) : <DetailBlock data={inner} />}

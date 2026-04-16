@@ -11,6 +11,10 @@ import { CrmCustomerSearchableDropdown } from "@/components/ui/CrmCustomerSearch
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
 import { dashboardCounterMetricEntries } from "@/lib/dashboard/dashboardCountersMetrics";
+import {
+  shellSectionAccentBarClass,
+  shellSectionWrapClass,
+} from "@/lib/uiShellClasses";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import {
@@ -104,8 +108,8 @@ export function DashboardOverview() {
     <>
       <div className="relative z-30">
         <StaticFilterCard
-          title="Dashboard filters"
-          subtitle="Search is debounced before calling the API."
+          title="Scope your view"
+          subtitle="Optional filters — search is debounced before calling the API."
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div>
@@ -196,19 +200,21 @@ export function DashboardOverview() {
         tenantId={tenantId}
         vendorId={vendorId}
       >
-        <section className="relative z-10 rounded-2xl border border-zinc-200/50 bg-white/45 p-6 shadow-[0_4px_32px_-12px_rgba(15,23,42,0.07)] backdrop-blur-[2px] dark:border-zinc-800/50 dark:bg-zinc-950/40 dark:shadow-[0_8px_40px_-12px_rgba(0,0,0,0.45)] sm:rounded-3xl sm:p-8">
-          <div className="mb-8">
-            <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
-              <span
-                className="h-2 w-2 shrink-0 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 shadow-sm shadow-emerald-500/40"
-                aria-hidden
-              />
-              Counters
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Key totals from dashboard counters: companies, invoices, expenses,
-              inventory, and more.
-            </p>
+        <section className={`relative z-10 ${shellSectionWrapClass}`}>
+          <div className="pointer-events-none absolute -right-24 top-0 h-48 w-48 rounded-full bg-gradient-to-br from-teal-200/15 to-transparent blur-3xl dark:from-teal-500/10" aria-hidden />
+          <div className="relative mb-8">
+            <div className="flex gap-4">
+              <span className={shellSectionAccentBarClass} aria-hidden />
+              <div className="min-w-0">
+                <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl">
+                  Overview
+                </h2>
+                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  Key totals from dashboard counters: companies, invoices, expenses,
+                  inventory, and more.
+                </p>
+              </div>
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <DashboardCountersGrid
@@ -230,13 +236,14 @@ export function DashboardOverview() {
       {moreAnalyticsLoading ? (
         <section className="mt-10 rounded-2xl border border-zinc-200/40 bg-white/30 p-6 dark:border-zinc-800/40 dark:bg-zinc-950/30 sm:rounded-3xl sm:p-8">
           <div className="mb-8">
-            <h3 className="flex items-center gap-2 text-lg font-bold text-zinc-900 dark:text-zinc-50">
-              <span
-                className="h-2 w-2 rounded-full bg-gradient-to-br from-sky-500 to-indigo-500 shadow-sm shadow-sky-500/35"
-                aria-hidden
-              />
-              Profit, activity & comparisons
-            </h3>
+            <div className="flex gap-4">
+              <span className={shellSectionAccentBarClass} aria-hidden />
+              <div className="min-w-0">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Profit, activity & comparisons
+                </h3>
+              </div>
+            </div>
             <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
               Loading additional analytics…
             </p>

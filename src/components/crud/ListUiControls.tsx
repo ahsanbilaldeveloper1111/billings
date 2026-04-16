@@ -35,7 +35,7 @@ export function CollapsibleFilterPanel({
   return (
     <div
       className={`mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] transition-shadow dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 ${
-        open ? "ring-1 ring-emerald-500/20 dark:ring-emerald-500/25" : ""
+        open ? "ring-1 ring-teal-500/22 dark:ring-teal-400/25" : ""
       }`}
     >
       <button
@@ -44,14 +44,14 @@ export function CollapsibleFilterPanel({
         aria-expanded={open}
         className={`flex w-full items-center gap-4 px-4 py-3.5 text-left transition-colors sm:px-5 ${
           open
-            ? "bg-gradient-to-r from-emerald-50/90 via-white to-teal-50/50 dark:from-emerald-950/35 dark:via-zinc-950 dark:to-teal-950/20"
+            ? "bg-gradient-to-r from-teal-50/85 via-white to-cyan-50/40 dark:from-teal-950/30 dark:via-zinc-950 dark:to-cyan-950/18"
             : "bg-gradient-to-r from-zinc-50/90 to-white hover:from-zinc-50 dark:from-zinc-900/50 dark:to-zinc-950 dark:hover:from-zinc-900/70"
         }`}
       >
         <span
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-sm ${
             open
-              ? "border-emerald-200/80 bg-emerald-100/90 text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/50 dark:text-emerald-200"
+              ? "border-teal-200/85 bg-teal-100/90 text-teal-900 dark:border-teal-800/55 dark:bg-teal-950/45 dark:text-teal-100"
               : "border-zinc-200/80 bg-white text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
           }`}
           aria-hidden
@@ -81,7 +81,7 @@ export function CollapsibleFilterPanel({
           ) : null}
         </div>
         <span className="flex shrink-0 items-center gap-2">
-          <span className="hidden text-xs font-semibold text-emerald-700 sm:inline dark:text-emerald-300">
+          <span className="hidden text-xs font-semibold text-teal-700 sm:inline dark:text-teal-300">
             {open ? "Hide filters" : "Show filters"}
           </span>
           <span
@@ -128,10 +128,10 @@ export function StaticFilterCard({
   children,
 }: StaticFilterCardProps) {
   return (
-    <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-emerald-500/15 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 dark:ring-emerald-500/20">
-      <div className="flex items-center gap-4 border-b border-zinc-200/70 bg-gradient-to-r from-emerald-50/90 via-white to-teal-50/50 px-4 py-3.5 dark:border-zinc-800 dark:from-emerald-950/35 dark:via-zinc-950 dark:to-teal-950/20 sm:px-5">
+    <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-teal-500/14 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 dark:ring-teal-400/18">
+      <div className="flex items-center gap-4 border-b border-zinc-200/70 bg-gradient-to-r from-teal-50/80 via-white to-cyan-50/35 px-4 py-3.5 dark:border-zinc-800 dark:from-teal-950/28 dark:via-zinc-950 dark:to-cyan-950/15 sm:px-5">
         <span
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-200/80 bg-emerald-100/90 text-emerald-800 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/50 dark:text-emerald-200"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-teal-200/85 bg-teal-100/90 text-teal-900 shadow-sm dark:border-teal-800/55 dark:bg-teal-950/45 dark:text-teal-100"
           aria-hidden
         >
           <svg
@@ -202,7 +202,7 @@ export function TableListHeaderControls({
       <label className="inline-flex items-center gap-2 text-xs font-medium text-zinc-600 dark:text-zinc-300">
         Rows per page
         <select
-          className="rounded-lg border border-zinc-200/90 bg-white px-2.5 py-1.5 text-xs shadow-sm shadow-zinc-900/[0.05] outline-none transition hover:border-zinc-300 hover:shadow-md hover:shadow-zinc-900/[0.08] focus-visible:ring-2 focus-visible:ring-emerald-500/35 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/25 dark:hover:border-zinc-500"
+          className="rounded-lg border border-zinc-200/90 bg-white px-2.5 py-1.5 text-xs shadow-sm shadow-zinc-900/[0.05] outline-none transition hover:border-zinc-300 hover:shadow-md hover:shadow-zinc-900/[0.08] focus-visible:ring-2 focus-visible:ring-teal-500/35 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/25 dark:hover:border-zinc-500"
           value={limit}
           onChange={(ev) => onLimitChange(Number(ev.target.value))}
         >
@@ -223,7 +223,7 @@ type TablePaginationControlsProps = {
 };
 
 const pagerSurfaceBtn =
-  "rounded-lg border border-zinc-200/90 bg-white px-3 py-2 text-sm font-medium text-zinc-800 shadow-sm shadow-zinc-900/[0.07] outline-none transition-[box-shadow,border-color,transform,background-color] hover:border-zinc-300 hover:bg-zinc-50/80 hover:shadow-md hover:shadow-zinc-900/10 focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:shadow-black/35 dark:hover:border-zinc-500 dark:hover:bg-zinc-800/80 dark:hover:shadow-lg dark:hover:shadow-black/45 dark:focus-visible:ring-offset-zinc-950";
+  "rounded-lg border border-zinc-200/90 bg-white px-3 py-2 text-sm font-medium text-zinc-800 shadow-sm shadow-zinc-900/[0.07] outline-none transition-[box-shadow,border-color,transform,background-color] hover:border-zinc-300 hover:bg-zinc-50/80 hover:shadow-md hover:shadow-zinc-900/10 focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:shadow-black/35 dark:hover:border-zinc-500 dark:hover:bg-zinc-800/80 dark:hover:shadow-lg dark:hover:shadow-black/45 dark:focus-visible:ring-offset-zinc-950";
 
 export function TablePaginationControls({
   pagination,
@@ -259,7 +259,7 @@ export function TablePaginationControls({
     );
 
   const pageNumBase =
-    "min-w-[2.25rem] rounded-lg px-2.5 py-2 text-sm outline-none transition-[box-shadow,border-color,transform,background-color] focus-visible:ring-2 focus-visible:ring-emerald-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] dark:focus-visible:ring-offset-zinc-950";
+    "min-w-[2.25rem] rounded-lg px-2.5 py-2 text-sm outline-none transition-[box-shadow,border-color,transform,background-color] focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 active:scale-[0.98] dark:focus-visible:ring-offset-zinc-950";
 
   return (
     <div
@@ -298,7 +298,7 @@ export function TablePaginationControls({
                 onClick={() => onPageChange(pageNum)}
                 className={
                   pageNum === page
-                    ? `${pageNumBase} bg-emerald-600 font-semibold text-white shadow-md shadow-emerald-900/25 ring-1 ring-emerald-400/35 dark:bg-emerald-600 dark:shadow-emerald-950/50 dark:ring-emerald-500/30`
+                    ? `${pageNumBase} bg-teal-600 font-semibold text-white shadow-md shadow-teal-900/25 ring-1 ring-teal-400/35 dark:bg-teal-600 dark:shadow-teal-950/45 dark:ring-teal-400/35`
                     : `${pageNumBase} border border-transparent font-medium text-zinc-800 hover:border-zinc-200/90 hover:bg-white hover:shadow-sm hover:shadow-zinc-900/[0.08] dark:text-zinc-100 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/90 dark:hover:shadow-black/30`
                 }
               >
@@ -310,7 +310,7 @@ export function TablePaginationControls({
           <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-200/70 bg-white/80 px-2 py-1.5 text-sm text-zinc-600 shadow-sm shadow-zinc-900/[0.05] dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400 dark:shadow-black/25">
             Page
             <select
-              className="rounded-md border border-zinc-200/90 bg-white px-2 py-1.5 text-sm shadow-sm shadow-zinc-900/[0.06] outline-none transition hover:border-zinc-300 focus-visible:ring-2 focus-visible:ring-emerald-500/40 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/30"
+              className="rounded-md border border-zinc-200/90 bg-white px-2 py-1.5 text-sm shadow-sm shadow-zinc-900/[0.06] outline-none transition hover:border-zinc-300 focus-visible:ring-2 focus-visible:ring-teal-500/40 dark:border-zinc-600 dark:bg-zinc-900 dark:shadow-black/30"
               value={page}
               onChange={(ev) => onPageChange(Number(ev.target.value))}
             >

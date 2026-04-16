@@ -33,7 +33,7 @@ export function auditActionBadgeClass(action: string): string {
   const base =
     "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide";
   if (a === "create" || a === "created")
-    return `${base} bg-emerald-600 text-white shadow-sm`;
+    return `${base} bg-teal-600 text-white shadow-sm shadow-teal-900/20`;
   if (a === "update" || a === "updated")
     return `${base} bg-sky-600 text-white shadow-sm`;
   if (a === "delete" || a === "deleted" || a === "destroy")
@@ -42,7 +42,7 @@ export function auditActionBadgeClass(action: string): string {
 }
 
 export function auditResourceBadgeClass(): string {
-  return "inline-flex max-w-[10rem] truncate rounded-md border border-zinc-200/90 bg-zinc-100/90 px-2 py-0.5 text-[11px] font-medium capitalize text-zinc-800 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-100";
+  return "inline-flex max-w-[10rem] truncate rounded-md border border-teal-200/80 bg-teal-50/90 px-2 py-0.5 text-[11px] font-medium capitalize text-teal-900 shadow-sm shadow-teal-900/[0.06] dark:border-teal-800/60 dark:bg-teal-950/40 dark:text-teal-100 dark:shadow-black/20";
 }
 
 export function formatAuditLogWhen(iso: unknown): string {
