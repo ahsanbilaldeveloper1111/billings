@@ -3,9 +3,19 @@ type MetricCardProps = {
   value: string | number;
   hint?: string;
   trend?: "up" | "down" | "neutral";
-  /** Rotates pastel corner glow (reference dashboard mesh) */
+  /** Rotates pastel surface + corner glow */
   accentVariant?: number;
 };
+
+/** Subtle card-face gradients (mesh-style, reference dashboard). */
+const CARD_SURFACE: readonly string[] = [
+  "bg-gradient-to-br from-white via-teal-50/70 to-cyan-50/55 dark:from-zinc-950 dark:via-teal-950/35 dark:to-cyan-950/25",
+  "bg-gradient-to-br from-white via-violet-50/60 to-fuchsia-50/45 dark:from-zinc-950 dark:via-violet-950/30 dark:to-fuchsia-950/20",
+  "bg-gradient-to-br from-white via-orange-50/55 to-rose-50/45 dark:from-zinc-950 dark:via-orange-950/25 dark:to-rose-950/22",
+  "bg-gradient-to-br from-white via-sky-50/60 to-blue-50/40 dark:from-zinc-950 dark:via-sky-950/28 dark:to-blue-950/20",
+  "bg-gradient-to-br from-white via-pink-50/50 to-purple-50/40 dark:from-zinc-950 dark:via-pink-950/22 dark:to-purple-950/20",
+  "bg-gradient-to-br from-white via-emerald-50/55 to-teal-50/50 dark:from-zinc-950 dark:via-emerald-950/28 dark:to-teal-950/25",
+];
 
 const ACCENT_BLOBS: readonly { blob: string; hover: string }[] = [
   {
@@ -56,23 +66,34 @@ export function MetricCard({
 
   const vi = ((accentVariant % ACCENT_BLOBS.length) + ACCENT_BLOBS.length) % ACCENT_BLOBS.length;
   const { blob, hover } = ACCENT_BLOBS[vi]!;
+  const surface = CARD_SURFACE[vi]!;
 
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border border-zinc-200/55 bg-white p-5 shadow-[0_8px_36px_-16px_rgba(15,23,42,0.07)] ring-1 ring-zinc-900/[0.025] transition duration-300 hover:-translate-y-0.5 dark:border-zinc-800/65 dark:bg-zinc-950 dark:shadow-[0_10px_40px_-18px_rgba(0,0,0,0.45)] dark:ring-white/[0.04] ${hover}`}
+      className={`group relative overflow-hidden rounded-2xl border border-zinc-200/50 shadow-[0_8px_36px_-16px_rgba(15,23,42,0.08)] ring-1 ring-zinc-900/[0.04] transition duration-300 hover:-translate-y-0.5 dark:border-zinc-800/60 dark:shadow-[0_10px_40px_-18px_rgba(0,0,0,0.45)] dark:ring-white/[0.05] ${hover}`}
     >
+      <div
+        className={`pointer-events-none absolute inset-0 ${surface}`}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_100%_0%,rgba(255,255,255,0.65),transparent_55%)] dark:bg-[radial-gradient(ellipse_90%_80%_at_100%_0%,rgba(255,255,255,0.04),transparent_50%)]"
+        aria-hidden
+      />
       <div className={blob} />
-      <p className="relative text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
-        {label}
-      </p>
-      <p className="relative mt-3 tabular-nums text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-        {value}
-      </p>
-      {hint ? (
-        <p className={`relative mt-2 text-xs ${trend ? trendColor : "text-zinc-500 dark:text-zinc-400"}`}>
-          {hint}
+      <div className="relative z-[1] p-5">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+          {label}
         </p>
-      ) : null}
+        <p className="mt-3 tabular-nums text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          {value}
+        </p>
+        {hint ? (
+          <p className={`mt-2 text-xs ${trend ? trendColor : "text-zinc-500 dark:text-zinc-400"}`}>
+            {hint}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

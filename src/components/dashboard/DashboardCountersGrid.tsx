@@ -28,7 +28,7 @@ export function DashboardCountersGrid({
         {Array.from({ length: skeletonCount }, (_, i) => (
           <div
             key={i}
-            className="h-32 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-white to-teal-50/25 dark:from-zinc-800 dark:via-zinc-900 dark:to-teal-950/15"
+            className="h-32 animate-pulse rounded-2xl bg-gradient-to-br from-zinc-100/90 via-teal-50/30 to-cyan-50/25 ring-1 ring-zinc-900/[0.04] dark:from-zinc-800 dark:via-teal-950/20 dark:to-cyan-950/15 dark:ring-white/[0.05]"
           />
         ))}
       </>
