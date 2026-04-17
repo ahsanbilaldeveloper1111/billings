@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import type { Stripe } from "@stripe/stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -30,11 +30,18 @@ import {
 import { downloadCompanyDocumentFile } from "@/lib/company/downloadCompanyDocumentFile";
 import {
   bankAccountsFromApi,
+  buildCompanyCreateUpdateFormData,
   buildCompanyCreateUpdatePayload,
   emptyBankAccountDraft,
   emptyCompanyForm,
   type CompanyFormState,
 } from "@/lib/company/buildCompanyCreateUpdatePayload";
+import {
+  firstLogoField,
+  logoDisplaySrc,
+  logoPreviewSource,
+  shouldHideLogoTextValue,
+} from "@/lib/logoDisplaySrc";
 import { queryKeys } from "@/lib/queryKeys";
 import { companyService } from "@/services/company.service";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
@@ -91,6 +98,59 @@ function unwrapPublishableKey(payload: unknown): string | null {
   return null;
 }
 
+function companyProfileHadAnyLogo(
+  profile: CompanyProfile | null | undefined,
+): boolean {
+  return Boolean(firstLogoField(profile?.logo, profile?.logo_url));
+}
+
+/** Align logo fields / `remove_logo` on create-update body (same rules as vendor). */
+function finalizeCompanyLogoOnBody(
+  body: Record<string, unknown>,
+  options: {
+    hasLogoFile: boolean;
+    isEdit: boolean;
+    logoRemoved: boolean;
+    rowProfile: CompanyProfile | null | undefined;
+  },
+): void {
+  const raw = body.profile;
+  const prof =
+    typeof raw === "object" && raw !== null && !Array.isArray(raw)
+      ? (raw as Record<string, unknown>)
+      : null;
+  if (!prof) return;
+
+  if (options.hasLogoFile) {
+    delete body.remove_logo;
+    return;
+  }
+
+  const had = companyProfileHadAnyLogo(options.rowProfile);
+  if (options.isEdit) {
+    if (options.logoRemoved && had) {
+      prof.logo = null;
+      prof.logo_url = null;
+      body.remove_logo = true;
+    } else if (!options.logoRemoved) {
+      const ol = String(options.rowProfile?.logo ?? "").trim();
+      const ou = String(options.rowProfile?.logo_url ?? "").trim();
+      if (ol) prof.logo = ol;
+      else delete prof.logo;
+      if (ou) prof.logo_url = ou;
+      else delete prof.logo_url;
+    } else {
+      delete prof.logo;
+      delete prof.logo_url;
+    }
+    if (!(options.logoRemoved && had)) {
+      delete body.remove_logo;
+    }
+  } else {
+    delete body.remove_logo;
+  }
+}
+
 function profileToFormSlice(
   company: Company,
   p: CompanyProfile | undefined | null,
@@ -137,12 +197,12 @@ function profileToFormSlice(
     discounts_applied_ytd: p.discounts_applied_ytd ?? "",
     vat_collected: p.vat_collected ?? "",
     active_subscriptions: p.active_subscriptions ?? "",
-    last_refund_date: fiscalInputFromApi(p.last_refund_date),
     profile_status: p.profile_status ?? "incomplete",
     selected_products: Array.isArray(p.selected_products)
       ? [...p.selected_products]
       : [],
     logo: p.logo ?? "",
+    logo_url: p.logo_url ?? "",
   };
 }
 
@@ -169,6 +229,12 @@ export function CreateUpdateCompanyModal({
   );
   const [editingBankIndex, setEditingBankIndex] = useState<number | null>(null);
   const [documentFiles, setDocumentFiles] = useState<File[]>([]);
+  const companyLogoFileRef = useRef<HTMLInputElement>(null);
+  const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
+  const [companyLogoBlobUrl, setCompanyLogoBlobUrl] = useState<string | null>(
+    null,
+  );
+  const [logoRemoved, setLogoRemoved] = useState(false);
   const queryClient = useQueryClient();
 
   const detailQuery = useCompany(open && isEdit ? companyId : null, {
@@ -214,6 +280,13 @@ export function CreateUpdateCompanyModal({
   useEffect(() => {
     if (!open) return;
     if (!isEdit) {
+      setCompanyLogoBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setCompanyLogoFile(null);
+      if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+      setLogoRemoved(false);
       setForm(emptyCompanyForm());
       setNewBank(emptyBankAccountDraft("USD"));
       setEditingBankIndex(null);
@@ -233,7 +306,20 @@ export function CreateUpdateCompanyModal({
     });
     setNewBank(emptyBankAccountDraft(p?.currency ?? "USD"));
     setEditingBankIndex(null);
+    setLogoRemoved(false);
+    if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
   }, [open, isEdit, row]);
+
+  useEffect(() => {
+    if (open) return;
+    setCompanyLogoBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setCompanyLogoFile(null);
+    if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+    setLogoRemoved(false);
+  }, [open]);
 
   const loadingRow = isEdit && detailQuery.isPending;
 
@@ -253,6 +339,31 @@ export function CreateUpdateCompanyModal({
     }
     return "";
   }, [form.tenant_id, row?.tenant_id]);
+
+  const companyLogoPreviewSrc = useMemo(() => {
+    if (companyLogoBlobUrl) return companyLogoBlobUrl;
+    if (isEdit && logoRemoved && !companyLogoFile) return "";
+    if (isEdit && row?.profile) {
+      return (
+        logoDisplaySrc(
+          logoPreviewSource(row.profile.logo, row.profile.logo_url),
+        ) ?? ""
+      );
+    }
+    return (
+      logoDisplaySrc(
+        logoPreviewSource(form.profile.logo, form.profile.logo_url),
+      ) ?? ""
+    );
+  }, [
+    companyLogoBlobUrl,
+    companyLogoFile,
+    isEdit,
+    logoRemoved,
+    row?.profile,
+    form.profile.logo,
+    form.profile.logo_url,
+  ]);
 
   const documentsQuery = useCompanyDocuments(
     open && isEdit && tenantIdForDocs ? tenantIdForDocs : null,
@@ -450,9 +561,40 @@ export function CreateUpdateCompanyModal({
     const body = buildCompanyCreateUpdatePayload(form, {
       isEdit,
       companyId: numericCompanyId,
+    }) as Record<string, unknown>;
+    finalizeCompanyLogoOnBody(body, {
+      hasLogoFile: Boolean(companyLogoFile),
+      isEdit,
+      logoRemoved,
+      rowProfile: row?.profile,
     });
     try {
-      await mutations.createUpdate.mutateAsync(body);
+      if (companyLogoFile) {
+        const payload = structuredClone(body) as Record<string, unknown>;
+        const prof = { ...(payload.profile as Record<string, unknown>) };
+        if (typeof prof.logo_url === "string") {
+          if (
+            prof.logo_url.startsWith("data:") ||
+            shouldHideLogoTextValue(prof.logo_url)
+          ) {
+            delete prof.logo_url;
+          }
+        }
+        if (typeof prof.logo === "string") {
+          if (
+            prof.logo.startsWith("data:") ||
+            shouldHideLogoTextValue(prof.logo)
+          ) {
+            delete prof.logo;
+          }
+        }
+        payload.profile = prof;
+        await mutations.createUpdate.mutateAsync(
+          buildCompanyCreateUpdateFormData(payload, companyLogoFile),
+        );
+      } else {
+        await mutations.createUpdate.mutateAsync(body);
+      }
       showAppToast(isEdit ? "Company saved." : "Company created.", "success");
       onSuccess?.();
       onClose();
@@ -840,32 +982,103 @@ export function CreateUpdateCompanyModal({
                         </option>
                       </select>
                     </label>
-                    <label className="block">
-                      <span className={formLabelClass}>
-                        Logo path / URL
-                      </span>
-                      <input
-                        className={formControlClass}
-                        value={form.profile.logo}
-                        onChange={(e) =>
-                          setProfile("logo", e.target.value)
-                        }
-                        placeholder="storage/… or https://…"
-                      />
-                    </label>
-                    <label className="block sm:col-span-2">
-                      <span className={formLabelClass}>
-                        Last refund date
-                      </span>
-                      <input
-                        type="date"
-                        className={formControlClass}
-                        value={form.profile.last_refund_date}
-                        onChange={(e) =>
-                          setProfile("last_refund_date", e.target.value)
-                        }
-                      />
-                    </label>
+                    <div className="sm:col-span-2">
+                      <div className="rounded-xl border border-zinc-200/70 bg-gradient-to-br from-white to-teal-50/30 p-3.5 shadow-sm shadow-zinc-900/[0.04] dark:border-zinc-800/80 dark:from-zinc-950 dark:to-teal-950/20 dark:shadow-black/20">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                          Company logo
+                        </span>
+                        <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Upload PNG or JPEG (or WebP / GIF). Large saved images
+                          show only in the preview below.
+                        </p>
+                        <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Shown on invoices and profile pages when supported.
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            className="rounded-xl border border-teal-300/80 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-900 shadow-sm hover:bg-teal-100 dark:border-teal-800/60 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-950/55"
+                            onClick={() => companyLogoFileRef.current?.click()}
+                          >
+                            Upload image
+                          </button>
+                          <input
+                            ref={companyLogoFileRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/gif,image/webp"
+                            className="sr-only"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setCompanyLogoFile(file);
+                              setLogoRemoved(false);
+                              setCompanyLogoBlobUrl((prev) => {
+                                if (prev) URL.revokeObjectURL(prev);
+                                return URL.createObjectURL(file);
+                              });
+                              e.target.value = "";
+                            }}
+                          />
+                          {companyLogoPreviewSrc ? (
+                            <button
+                              type="button"
+                              className="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100"
+                              onClick={() => {
+                                setLogoRemoved(true);
+                                setCompanyLogoFile(null);
+                                setCompanyLogoBlobUrl((prev) => {
+                                  if (prev) URL.revokeObjectURL(prev);
+                                  return null;
+                                });
+                                if (companyLogoFileRef.current) {
+                                  companyLogoFileRef.current.value = "";
+                                }
+                              }}
+                            >
+                              Remove logo
+                            </button>
+                          ) : null}
+                        </div>
+                        {companyLogoPreviewSrc ? (
+                          <div className="mt-3 rounded-lg border border-zinc-200/70 bg-white/80 p-3 dark:border-zinc-700/80 dark:bg-zinc-900/40">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={companyLogoPreviewSrc}
+                              alt="Company logo preview"
+                              className="mx-auto max-h-32 max-w-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                              }}
+                            />
+                          </div>
+                        ) : null}
+                        {logoRemoved &&
+                        isEdit &&
+                        companyProfileHadAnyLogo(row?.profile) ? (
+                          <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">
+                            Logo will be removed when you save.
+                            <button
+                              type="button"
+                              className="ml-2 underline"
+                              onClick={() => {
+                                setLogoRemoved(false);
+                                setCompanyLogoFile(null);
+                                setCompanyLogoBlobUrl((prev) => {
+                                  if (prev) URL.revokeObjectURL(prev);
+                                  return null;
+                                });
+                                if (companyLogoFileRef.current) {
+                                  companyLogoFileRef.current.value = "";
+                                }
+                              }}
+                            >
+                              Undo
+                            </button>
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
                     <p className="sm:col-span-2 text-[11px] text-zinc-500">
                       Saved payment methods on file:{" "}
                       <span className="font-medium text-zinc-700 dark:text-zinc-300">

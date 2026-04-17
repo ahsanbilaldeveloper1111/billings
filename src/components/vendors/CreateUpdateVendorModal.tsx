@@ -19,26 +19,26 @@ import {
   showAppToast,
   showBillingBackendErrorToast,
 } from "@/lib/toast/appToast";
-import type { Vendor, VendorBankAccount } from "@/models/Vendor";
+import type { Vendor, VendorBankAccount, VendorProfile } from "@/models/Vendor";
 import { VendorStatus } from "@/models/Vendor";
+import {
+  firstLogoField,
+  logoDisplaySrc,
+  logoPreviewSource,
+  shouldHideLogoTextValue,
+} from "@/lib/logoDisplaySrc";
 import { formControlClass, formFieldSurfaceClass } from "@/lib/uiFormClasses";
 
 const DELIVERY_METHODS = ["email", "sms", "portal"] as const;
 
 type BankDraft = VendorBankAccount & { id?: number };
 
-function getLogoUrl(logoPath: string | null | undefined): string | null {
-  if (!logoPath) return null;
-  if (logoPath.startsWith("http") || logoPath.startsWith("data:image")) {
-    return logoPath;
-  }
-  if (logoPath.startsWith("storage/") || logoPath.startsWith("images/")) {
-    return `/${logoPath}`;
-  }
-  if (!logoPath.startsWith("/")) {
-    return `/storage/${logoPath}`;
-  }
-  return logoPath;
+function vendorProfileHadAnyLogo(
+  profile: VendorProfile | null | undefined,
+): boolean {
+  return Boolean(
+    firstLogoField(profile?.logo, profile?.logo_url),
+  );
 }
 
 function emptyBank(currency: string): BankDraft {
@@ -94,8 +94,6 @@ export function CreateUpdateVendorModal({
 }: CreateUpdateVendorModalProps) {
   const isEdit = vendorId != null;
   const mutations = useVendorMutations();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [formData, setFormData] = useState(INITIAL);
   const [errors] = useState<Record<string, string>>({});
   const [profileOpen, setProfileOpen] = useState(true);
@@ -105,9 +103,12 @@ export function CreateUpdateVendorModal({
     emptyBank("USD"),
   );
   const [editingBankIndex, setEditingBankIndex] = useState<number | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [logoRemoved, setLogoRemoved] = useState(false);
+  const vendorLogoFileRef = useRef<HTMLInputElement>(null);
+  const [vendorLogoFile, setVendorLogoFile] = useState<File | null>(null);
+  const [vendorLogoBlobUrl, setVendorLogoBlobUrl] = useState<string | null>(
+    null,
+  );
 
   const detailQuery = useVendor(open && isEdit ? vendorId : null, {
     load_profile: true,
@@ -146,6 +147,27 @@ export function CreateUpdateVendorModal({
   );
 
   useEffect(() => {
+    if (!open || isEdit) return;
+    setLogoRemoved(false);
+    setVendorLogoFile(null);
+    setVendorLogoBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
+  }, [open, isEdit]);
+
+  useEffect(() => {
+    if (open) return;
+    setVendorLogoFile(null);
+    setVendorLogoBlobUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
+  }, [open]);
+
+  useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect -- hydrate controlled form when GET vendor returns */
     if (!open || !isEdit) return;
     if (loadingVendor || !fetchedVendor?.id) return;
@@ -175,14 +197,8 @@ export function CreateUpdateVendorModal({
       contact_person_phone: profile?.contact_person_phone ?? "",
       main_app_visibility: profile?.main_app_visibility ?? true,
     });
-    if (profile?.logo) {
-      setLogoPreview(getLogoUrl(profile.logo));
-    } else {
-      setLogoPreview(null);
-    }
-    setLogoFile(null);
     setLogoRemoved(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
 
     const rawBanks = v.bank_accounts ?? [];
     setBankAccounts(Array.isArray(rawBanks) ? (rawBanks as BankDraft[]) : []);
@@ -218,9 +234,29 @@ export function CreateUpdateVendorModal({
 
   const currentVendor = fetchedVendor;
 
+  const vendorLogoPreviewSrc = useMemo(() => {
+    if (vendorLogoBlobUrl) return vendorLogoBlobUrl;
+    if (isEdit && logoRemoved && !vendorLogoFile) return "";
+    const p = currentVendor?.profile;
+    if (!p) return "";
+    return (
+      logoDisplaySrc(logoPreviewSource(p.logo, p.logo_url)) ?? ""
+    );
+  }, [
+    vendorLogoBlobUrl,
+    vendorLogoFile,
+    isEdit,
+    logoRemoved,
+    currentVendor?.profile,
+  ]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (isEdit && !currentVendor?.id) return;
+
+    const hadLogoFromApi = vendorProfileHadAnyLogo(currentVendor?.profile);
+    const origLogo = String(currentVendor?.profile?.logo ?? "").trim();
+    const origUrl = String(currentVendor?.profile?.logo_url ?? "").trim();
 
     const profileFields: VendorProfileSubmitFields = {
       address: formData.address.trim() || undefined,
@@ -240,14 +276,17 @@ export function CreateUpdateVendorModal({
       contact_person_email: formData.contact_person_email.trim() || undefined,
       contact_person_phone: formData.contact_person_phone.trim() || undefined,
       main_app_visibility: formData.main_app_visibility,
-      logo: logoFile
-        ? undefined
-        : logoRemoved && isEdit
-          ? null
-          : currentVendor?.profile?.logo && !logoRemoved
-            ? String(currentVendor.profile.logo)
-            : undefined,
     };
+
+    if (!vendorLogoFile) {
+      if (isEdit && logoRemoved && hadLogoFromApi) {
+        profileFields.logo = null;
+        profileFields.logo_url = null;
+      } else if (isEdit && !logoRemoved) {
+        if (origLogo) profileFields.logo = origLogo;
+        if (origUrl) profileFields.logo_url = origUrl;
+      }
+    }
 
     const payload: VendorSubmitPayload = {
       name: formData.name.trim(),
@@ -256,13 +295,37 @@ export function CreateUpdateVendorModal({
       status: formData.status,
       profile: profileFields,
       bank_accounts: bankAccounts as VendorBankAccount[],
-      remove_logo: Boolean(logoRemoved && isEdit && !logoFile),
+      remove_logo: Boolean(
+        isEdit && logoRemoved && hadLogoFromApi && !vendorLogoFile,
+      ),
     };
 
-    const body =
-      logoFile != null
-        ? vendorPayloadToFormData(payload, logoFile)
-        : vendorPayloadToJson(payload);
+    let body: FormData | Record<string, unknown>;
+    if (vendorLogoFile) {
+      const pf: VendorProfileSubmitFields = { ...profileFields };
+      if (typeof pf.logo_url === "string") {
+        if (
+          pf.logo_url.startsWith("data:") ||
+          shouldHideLogoTextValue(pf.logo_url)
+        ) {
+          delete pf.logo_url;
+        }
+      }
+      if (typeof pf.logo === "string") {
+        if (
+          pf.logo.startsWith("data:") ||
+          shouldHideLogoTextValue(pf.logo)
+        ) {
+          delete pf.logo;
+        }
+      }
+      body = vendorPayloadToFormData(
+        { ...payload, profile: pf },
+        vendorLogoFile,
+      );
+    } else {
+      body = vendorPayloadToJson(payload);
+    }
 
     try {
       if (isEdit && vendorId != null) {
@@ -647,81 +710,79 @@ export function CreateUpdateVendorModal({
                         </div>
                       </div>
 
-                      <div>
+                      <div className="rounded-xl border border-zinc-200/70 bg-gradient-to-br from-white to-teal-50/30 p-3.5 shadow-sm shadow-zinc-900/[0.04] dark:border-zinc-800/80 dark:from-zinc-950 dark:to-teal-950/20 dark:shadow-black/20">
                         <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-                          Logo
+                          Vendor logo
                         </span>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          className="mt-1 block w-full text-sm"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              setLogoFile(file);
-                              setLogoRemoved(false);
-                              const reader = new FileReader();
-                              reader.onloadend = () => {
-                                setLogoPreview(reader.result as string);
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                        />
-                        <p className="mt-1 text-[11px] text-zinc-500">
-                          JPG, PNG, or GIF. Shown on invoices when supported.
+                        <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Upload PNG or JPEG (or WebP / GIF). Large saved images
+                          show only in the preview.
                         </p>
-                        {(logoPreview ||
-                          logoFile ||
-                          (isEdit &&
-                            currentVendor?.profile?.logo &&
-                            !logoRemoved)) && (
-                          <div className="mt-3">
-                            {logoPreview ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={logoPreview}
-                                alt="Logo preview"
-                                className="max-h-24 max-w-[200px] object-contain"
-                              />
-                            ) : null}
-                            {!logoPreview &&
-                            !logoFile &&
-                            isEdit &&
-                            currentVendor?.profile?.logo &&
-                            !logoRemoved ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img
-                                src={
-                                  getLogoUrl(currentVendor.profile.logo) ?? ""
+                        <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+                          Shown on invoices and profile pages when supported.
+                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            className="rounded-xl border border-teal-300/80 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-900 shadow-sm hover:bg-teal-100 dark:border-teal-800/60 dark:bg-teal-950/40 dark:text-teal-100 dark:hover:bg-teal-950/55"
+                            onClick={() => vendorLogoFileRef.current?.click()}
+                          >
+                            Upload image
+                          </button>
+                          <input
+                            ref={vendorLogoFileRef}
+                            type="file"
+                            accept="image/png,image/jpeg,image/gif,image/webp"
+                            className="sr-only"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setVendorLogoFile(file);
+                              setVendorLogoBlobUrl((prev) => {
+                                if (prev) URL.revokeObjectURL(prev);
+                                return URL.createObjectURL(file);
+                              });
+                              setLogoRemoved(false);
+                              e.target.value = "";
+                            }}
+                          />
+                          {vendorLogoPreviewSrc ? (
+                            <button
+                              type="button"
+                              className="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100"
+                              onClick={() => {
+                                setLogoRemoved(true);
+                                setVendorLogoFile(null);
+                                setVendorLogoBlobUrl((prev) => {
+                                  if (prev) URL.revokeObjectURL(prev);
+                                  return null;
+                                });
+                                if (vendorLogoFileRef.current) {
+                                  vendorLogoFileRef.current.value = "";
                                 }
-                                alt="Current logo"
-                                className="max-h-24 max-w-[200px] object-contain"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display =
-                                    "none";
-                                }}
-                              />
-                            ) : null}
-                            <div className="mt-2">
-                              <button
-                                type="button"
-                                className="rounded-lg bg-rose-100 px-3 py-1.5 text-xs font-medium text-rose-900 hover:bg-rose-200 dark:bg-rose-950/50 dark:text-rose-100"
-                                onClick={() => {
-                                  setLogoFile(null);
-                                  setLogoPreview(null);
-                                  setLogoRemoved(true);
-                                  if (fileInputRef.current)
-                                    fileInputRef.current.value = "";
-                                }}
-                              >
-                                Remove logo
-                              </button>
-                            </div>
+                              }}
+                            >
+                              Remove logo
+                            </button>
+                          ) : null}
+                        </div>
+                        {vendorLogoPreviewSrc ? (
+                          <div className="mt-3 rounded-lg border border-zinc-200/70 bg-white/80 p-3 dark:border-zinc-700/80 dark:bg-zinc-900/40">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={vendorLogoPreviewSrc}
+                              alt="Logo preview"
+                              className="mx-auto max-h-32 max-w-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                              }}
+                            />
                           </div>
-                        )}
-                        {logoRemoved && !logoPreview && !logoFile ? (
+                        ) : null}
+                        {logoRemoved &&
+                        isEdit &&
+                        vendorProfileHadAnyLogo(currentVendor?.profile) ? (
                           <p className="mt-2 text-xs text-amber-800 dark:text-amber-200">
                             Logo will be removed when you save.
                             <button
@@ -729,10 +790,13 @@ export function CreateUpdateVendorModal({
                               className="ml-2 underline"
                               onClick={() => {
                                 setLogoRemoved(false);
-                                if (isEdit && currentVendor?.profile?.logo) {
-                                  setLogoPreview(
-                                    getLogoUrl(currentVendor.profile.logo),
-                                  );
+                                setVendorLogoFile(null);
+                                setVendorLogoBlobUrl((prev) => {
+                                  if (prev) URL.revokeObjectURL(prev);
+                                  return null;
+                                });
+                                if (vendorLogoFileRef.current) {
+                                  vendorLogoFileRef.current.value = "";
                                 }
                               }}
                             >

@@ -10,6 +10,7 @@ import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { getCompanyDocumentsList } from "@/lib/company/companyDocuments";
 import { downloadCompanyDocumentFile } from "@/lib/company/downloadCompanyDocumentFile";
 import { formatCurrency } from "@/lib/currency";
+import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import { parseStripePaymentMethods } from "@/lib/stripe/parseStripePaymentMethods";
 import { showAppToast } from "@/lib/toast/appToast";
@@ -132,6 +133,8 @@ export function CompanyProfileView({ profile, onEdit }: CompanyProfileViewProps)
   );
 
   const p = profile.profile;
+  const logoPreviewRaw = logoPreviewSource(p?.logo, p?.logo_url);
+  const logoImgSrc = logoDisplaySrc(logoPreviewRaw);
   const currency = p?.currency || "USD";
   const outstanding =
     (profile as Company & { outstanding_amount?: number })
@@ -167,28 +170,43 @@ export function CompanyProfileView({ profile, onEdit }: CompanyProfileViewProps)
     <div className="space-y-4">
       <div className="rounded-2xl border border-zinc-200/80 bg-gradient-to-r from-emerald-50/90 to-teal-50/50 px-4 py-4 dark:border-zinc-800 dark:from-emerald-950/30 dark:to-zinc-950">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-              Tenant: {profile.name ?? "—"}
-            </h2>
-            <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
-              <span>{profile.email ?? "—"}</span>
-              <span aria-hidden>·</span>
-              <span>
-                {profile.phone != null
-                  ? String(profile.phone)
-                  : profile.phone_no != null
-                    ? String(profile.phone_no)
-                    : "No phone"}
-              </span>
-              <span aria-hidden>·</span>
-              <span>
-                {profile.country ?? "—"} | Currency: {currency}
-              </span>
-              <span aria-hidden>·</span>
-              <span>Net {p?.payment_terms ?? 30} days</span>
-            </p>
-            <div className="mt-2">{profileStatusPill(p?.profile_status)}</div>
+          <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                Tenant: {profile.name ?? "—"}
+              </h2>
+              <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+                <span>{profile.email ?? "—"}</span>
+                <span aria-hidden>·</span>
+                <span>
+                  {profile.phone != null
+                    ? String(profile.phone)
+                    : profile.phone_no != null
+                      ? String(profile.phone_no)
+                      : "No phone"}
+                </span>
+                <span aria-hidden>·</span>
+                <span>
+                  {profile.country ?? "—"} | Currency: {currency}
+                </span>
+                <span aria-hidden>·</span>
+                <span>Net {p?.payment_terms ?? 30} days</span>
+              </p>
+              <div className="mt-2">{profileStatusPill(p?.profile_status)}</div>
+            </div>
+            {logoImgSrc ? (
+              <div className="shrink-0 rounded-xl border border-zinc-200/80 bg-white/90 p-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/60">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={logoImgSrc}
+                  alt=""
+                  className="max-h-20 max-w-[10rem] object-contain"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
           {onEdit ? (
             <button
@@ -232,14 +250,6 @@ export function CompanyProfileView({ profile, onEdit }: CompanyProfileViewProps)
           </p>
           <p className="mt-2 text-lg font-semibold">
             {p?.active_subscriptions ?? "—"}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-zinc-200/80 bg-white p-4 text-center dark:border-zinc-800 dark:bg-zinc-950">
-          <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-            Last refund
-          </p>
-          <p className="mt-2 text-sm font-medium">
-            {formatProfileDate(p?.last_refund_date)}
           </p>
         </div>
       </div>

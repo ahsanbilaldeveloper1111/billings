@@ -5,6 +5,7 @@ import { useVendor } from "@/hooks/vendors/useVendor";
 import { ModalShell } from "@/components/ui/ModalShell";
 import { formatNumber } from "@/lib/currency";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
+import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
 import { modalPrimaryButtonClass, modalSecondaryButtonClass } from "@/lib/uiModalClasses";
 import type { Vendor, VendorBankAccount } from "@/models/Vendor";
 
@@ -97,6 +98,16 @@ export function ViewVendorModal({
   const isLoading = detailQuery.isPending && show && vendorId != null;
   const error = detailQuery.isError ? detailQuery.error : null;
 
+  const vendorProfileLogoImg =
+    vendor?.profile != null
+      ? logoDisplaySrc(
+          logoPreviewSource(
+            vendor.profile.logo,
+            vendor.profile.logo_url,
+          ),
+        )
+      : null;
+
   return (
     <ModalShell
       open={show}
@@ -180,6 +191,20 @@ export function ViewVendorModal({
 
               {vendor.profile ? (
                 <SectionCard title="Profile information">
+                  {vendorProfileLogoImg ? (
+                    <div className="mb-4 flex justify-center rounded-xl border border-zinc-200/70 bg-zinc-50/80 p-4 dark:border-zinc-700 dark:bg-zinc-900/40">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={vendorProfileLogoImg}
+                        alt=""
+                        className="max-h-24 max-w-[12rem] object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display =
+                            "none";
+                        }}
+                      />
+                    </div>
+                  ) : null}
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Business type">
                       {vendor.profile.business_type?.trim()

@@ -102,10 +102,10 @@ export type CompanyProfileFormSlice = {
   discounts_applied_ytd: string | number;
   vat_collected: string | number;
   active_subscriptions: string | number;
-  last_refund_date: string;
   profile_status: "incomplete" | "complete" | "pending_verification";
   selected_products: unknown[];
   logo: string;
+  logo_url: string;
 };
 
 export type CompanyFormState = {
@@ -149,10 +149,10 @@ export function emptyCompanyProfileForm(): CompanyProfileFormSlice {
     discounts_applied_ytd: "",
     vat_collected: "",
     active_subscriptions: "",
-    last_refund_date: "",
     profile_status: "incomplete",
     selected_products: [],
     logo: "",
+    logo_url: "",
   };
 }
 
@@ -219,12 +219,10 @@ export function buildCompanyCreateUpdatePayload(
   profile.vat_collected = optNum(p.vat_collected) ?? 0;
   profile.active_subscriptions = optNum(p.active_subscriptions) ?? 0;
 
-  if (p.last_refund_date.trim()) {
-    profile.last_refund_date = p.last_refund_date.trim();
-  }
   profile.profile_status = p.profile_status;
   profile.selected_products = [...p.selected_products];
   if (p.logo.trim()) profile.logo = p.logo.trim();
+  if (p.logo_url.trim()) profile.logo_url = p.logo_url.trim();
 
   profile.bank_accounts = form.bank_accounts.map(serializeBankAccount);
 
@@ -246,4 +244,69 @@ export function buildCompanyCreateUpdatePayload(
   }
 
   return body;
+}
+
+function appendFormDataValue(
+  fd: FormData,
+  fieldKey: string,
+  value: unknown,
+): void {
+  if (value === undefined || value === null) return;
+  if (typeof value === "boolean") {
+    fd.append(fieldKey, value ? "1" : "0");
+    return;
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    fd.append(fieldKey, String(value));
+    return;
+  }
+  if (typeof value === "string") {
+    fd.append(fieldKey, value);
+    return;
+  }
+  if (Array.isArray(value)) {
+    if (value.length === 0) return;
+    const first = value[0];
+    if (
+      first !== null &&
+      typeof first === "object" &&
+      !Array.isArray(first)
+    ) {
+      value.forEach((item, i) => {
+        if (item == null || typeof item !== "object" || Array.isArray(item)) {
+          return;
+        }
+        for (const [sk, sv] of Object.entries(item as Record<string, unknown>)) {
+          appendFormDataValue(fd, `${fieldKey}[${i}][${sk}]`, sv);
+        }
+      });
+      return;
+    }
+    for (const item of value) {
+      if (item === undefined || item === null) continue;
+      fd.append(`${fieldKey}[]`, String(item));
+    }
+    return;
+  }
+  if (typeof value === "object") {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      appendFormDataValue(fd, `${fieldKey}[${k}]`, v);
+    }
+  }
+}
+
+/**
+ * Multipart POST `/company/create-update` with top-level `logo_file` (binary)
+ * plus the same fields as JSON, using Laravel-style bracket keys (`profile[address]`, …).
+ */
+export function buildCompanyCreateUpdateFormData(
+  body: Record<string, unknown>,
+  logoFile: File | null,
+): FormData {
+  const fd = new FormData();
+  for (const [k, v] of Object.entries(body)) {
+    appendFormDataValue(fd, k, v);
+  }
+  if (logoFile) fd.append("logo_file", logoFile);
+  return fd;
 }

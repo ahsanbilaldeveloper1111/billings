@@ -20,7 +20,9 @@ export function SmoothCollapse({ open, children, className = "" }: SmoothCollaps
         open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
       } ${className}`}
     >
-      <div className="min-h-0 overflow-hidden">{children}</div>
+      <div className={`min-h-0 ${open ? "overflow-visible" : "overflow-hidden"}`}>
+        {children}
+      </div>
     </div>
   );
 }

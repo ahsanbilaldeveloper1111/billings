@@ -39,7 +39,9 @@ export const companyService = {
     apiPost<ApiSuccessResponse<unknown>>(r.createUpdateProfile(), body),
 
   createUpdate: (body: unknown) =>
-    apiPost<ApiSuccessResponse<unknown>>(r.createUpdate(), body),
+    body instanceof FormData
+      ? apiPostForm<ApiSuccessResponse<unknown>>(r.createUpdate(), body)
+      : apiPost<ApiSuccessResponse<unknown>>(r.createUpdate(), body),
 
   deleteCompany: (id: number | string) =>
     apiDelete<ApiSuccessResponse<unknown>>(r.delete(id)),

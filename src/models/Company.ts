@@ -148,13 +148,13 @@ export interface CompanyProfile {
   discounts_applied_ytd: number;
   vat_collected: number;
   active_subscriptions: number;
-  last_refund_date?: string;
   profile_status: "incomplete" | "complete" | "pending_verification";
   selected_products?: unknown[];
   fiscal_year_start?: string;
   accounting_method?: string;
   postal_code?: string;
   logo?: string;
+  logo_url?: string;
   registration_number?: string;
   business_type?: string;
   created_at?: string;
@@ -211,7 +211,6 @@ export interface CompanyProfileForm {
   discounts_applied_ytd: number;
   vat_collected: number;
   active_subscriptions: number;
-  last_refund_date?: string;
   profile_status: "incomplete" | "complete" | "pending_verification";
   selected_products?: unknown[];
   fiscal_year_start?: string;
@@ -221,6 +220,7 @@ export interface CompanyProfileForm {
   business_type?: string;
   bank_accounts?: CompanyBankAccount[];
   logo?: string | null;
+  logo_url?: string | null;
 }
 
 /** Telephony / directory profile (distinct from billing `CompanyProfile`). */

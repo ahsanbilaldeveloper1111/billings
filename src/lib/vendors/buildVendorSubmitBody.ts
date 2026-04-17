@@ -16,8 +16,10 @@ export type VendorProfileSubmitFields = {
   contact_person_email?: string;
   contact_person_phone?: string;
   main_app_visibility: boolean;
-  /** Omit when uploading a new file; `null` clears on edit. */
+  /** Inline / storage path / base64; omit when unset; `null` clears on edit. */
   logo?: string | null;
+  /** Public or CDN URL; omit when unset; `null` clears on edit. */
+  logo_url?: string | null;
 };
 
 export type VendorSubmitPayload = {
@@ -65,6 +67,13 @@ function appendProfile(fd: FormData, p: VendorProfileSubmitFields): void {
   ) {
     fd.append("profile[logo]", String(p.logo));
   }
+  if (
+    p.logo_url !== undefined &&
+    p.logo_url !== null &&
+    String(p.logo_url).trim() !== ""
+  ) {
+    fd.append("profile[logo_url]", String(p.logo_url));
+  }
 }
 
 function appendBankAccounts(fd: FormData, accounts: VendorBankAccount[]): void {
@@ -81,7 +90,7 @@ function appendBankAccounts(fd: FormData, accounts: VendorBankAccount[]): void {
   });
 }
 
-/** Multipart vendor create/update (logo upload). */
+/** Multipart vendor create/update; binary logo as top-level `logo_file`. */
 export function vendorPayloadToFormData(
   payload: VendorSubmitPayload,
   logoFile: File | null,

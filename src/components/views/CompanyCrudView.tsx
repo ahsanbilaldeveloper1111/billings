@@ -8,6 +8,7 @@ import { CompanyListTable } from "@/components/company/CompanyListTable";
 import { DeleteConfirmationDialog } from "@/components/crud/DeleteConfirmationDialog";
 import { ViewCompanyModal } from "@/components/company/ViewCompanyModal";
 import { CollapsibleFilterPanel } from "@/components/crud/ListUiControls";
+import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
 import { useCompanyMutations } from "@/hooks/company/useCompanyMutations";
 import { useCompanies } from "@/hooks/company/useCompanies";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
@@ -117,23 +118,6 @@ export function CompanyCrudView() {
 
   const listQuery = useCompanies(listParams, { enabled: allowView });
   const { pagination } = extractListRows(listQuery.data);
-
-  const tenantPickerParams = useMemo((): IndexCompanyParams => {
-    const vendorRaw = listState.vendor_id.trim();
-    const vendorNum = vendorRaw ? Number.parseInt(vendorRaw, 10) : NaN;
-    return {
-      limit: 800,
-      page: 1,
-      ...(Number.isFinite(vendorNum) ? { vendor_id: vendorNum } : {}),
-    };
-  }, [listState.vendor_id]);
-
-  const tenantsForPicker = useCompanies(tenantPickerParams, {
-    enabled: allowView,
-  });
-  const tenantRows = extractListRows<Company & Record<string, unknown>>(
-    tenantsForPicker.data,
-  ).rows;
 
   const vendorsForPicker = useVendors(
     {
@@ -326,37 +310,24 @@ export function CompanyCrudView() {
             <label className={formLabelClass}>
               Filter by tenant
             </label>
-            <select
-              className={formControlClass}
-              value={listState.tenant_id}
-              onChange={(e) =>
+            <TenantSearchableDropdown
+              className="w-full"
+              value={listState.tenant_id || null}
+              onChange={(tenantId) =>
                 setListState((s) => ({
                   ...s,
-                  tenant_id: e.target.value,
+                  tenant_id: tenantId ?? "",
                   page: 1,
                 }))
               }
-            >
-              <option value="">All tenants</option>
-              {tenantRows.map((t) => {
-                const tid =
-                  t.tenant_id != null ? String(t.tenant_id) : "";
-                const label =
-                  (t.name && String(t.name)) ||
-                  tid ||
-                  (t.id != null ? `ID ${t.id}` : "—");
-                if (!tid && t.id == null) return null;
-                return (
-                  <option
-                    key={`${tid || t.id}`}
-                    value={tid || String(t.id)}
-                  >
-                    {label}
-                    {tid ? ` (${tid})` : ""}
-                  </option>
-                );
-              })}
-            </select>
+              placeholder="All tenants"
+              fetchParams={
+                listState.vendor_id.trim()
+                  ? { vendor_id: Number.parseInt(listState.vendor_id.trim(), 10) }
+                  : undefined
+              }
+              enabled={allowView}
+            />
           </div>
           <div>
             <label className={formLabelClass}>

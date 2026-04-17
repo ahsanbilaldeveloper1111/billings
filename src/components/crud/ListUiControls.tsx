@@ -34,8 +34,10 @@ export function CollapsibleFilterPanel({
 }: CollapsibleFilterPanelProps) {
   return (
     <div
-      className={`mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] transition-shadow dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 ${
-        open ? "ring-1 ring-teal-500/22 dark:ring-teal-400/25" : ""
+      className={`mb-6 rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] transition-shadow dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 ${
+        open
+          ? "relative z-20 ring-1 ring-teal-500/22 dark:ring-teal-400/25"
+          : ""
       }`}
     >
       <button
@@ -128,7 +130,7 @@ export function StaticFilterCard({
   children,
 }: StaticFilterCardProps) {
   return (
-    <div className="mb-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-teal-500/14 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 dark:ring-teal-400/18">
+    <div className="relative z-20 mb-6 rounded-2xl border border-zinc-200/80 bg-white shadow-md shadow-zinc-900/[0.06] ring-1 ring-teal-500/14 dark:border-zinc-800 dark:bg-zinc-950 dark:shadow-black/40 dark:ring-teal-400/18">
       <div className="flex items-center gap-4 border-b border-zinc-200/70 bg-gradient-to-r from-teal-50/80 via-white to-cyan-50/35 px-4 py-3.5 dark:border-zinc-800 dark:from-teal-950/28 dark:via-zinc-950 dark:to-cyan-950/15 sm:px-5">
         <span
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-teal-200/85 bg-teal-100/90 text-teal-900 shadow-sm dark:border-teal-800/55 dark:bg-teal-950/45 dark:text-teal-100"

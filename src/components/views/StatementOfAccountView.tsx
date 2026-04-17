@@ -9,6 +9,7 @@ import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows, getApiData } from "@/lib/api/extractApiData";
 import type { ApiSuccessResponse } from "@/lib/api/types";
 import { formatCurrency } from "@/lib/currency";
+import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
 import {
   showAppToast,
   showBillingBackendErrorToast,
@@ -79,6 +80,7 @@ type StatementData = {
     id?: number;
     name?: string;
     logo?: string | null;
+    logo_url?: string | null;
   };
   period: { start_date: string; end_date: string };
   summary: {
@@ -103,6 +105,10 @@ function StatementDocument({
 }) {
   const statementCurrency =
     data.summary?.currency || data.customer?.currency || "USD";
+  const vendorLogoRaw = logoPreviewSource(
+    data.vendor?.logo,
+    data.vendor?.logo_url,
+  );
   const hasNoActivity =
     (!data.transactions || data.transactions.length === 0) &&
     (!data.outstanding_invoices || data.outstanding_invoices.length === 0) &&
@@ -111,12 +117,12 @@ function StatementDocument({
 
   return (
     <div className="space-y-6">
-      {(data.vendor?.name || data.vendor?.logo) && (
+      {(data.vendor?.name || vendorLogoRaw) && (
         <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-zinc-200/80 bg-gradient-to-r from-zinc-50/90 to-white px-4 py-4 dark:border-zinc-800/80 dark:from-zinc-900/50 dark:to-zinc-950/40">
-          {data.vendor?.logo ? (
+          {vendorLogoRaw ? (
             // eslint-disable-next-line @next/next/no-img-element -- vendor logo URL from API
             <img
-              src={data.vendor.logo}
+              src={logoDisplaySrc(vendorLogoRaw) ?? ""}
               alt=""
               className="max-h-14 max-w-[10rem] rounded-lg object-contain"
             />
