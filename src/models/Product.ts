@@ -33,6 +33,8 @@ export interface Product {
   is_service?: boolean;
   currency?: string | null;
   is_active: boolean;
+  /** Image URL, `data:` URL, or raw/base64 payload (API may store base64 here). */
+  logo_url?: string | null;
   created_at?: string;
   updated_at?: string;
   /**

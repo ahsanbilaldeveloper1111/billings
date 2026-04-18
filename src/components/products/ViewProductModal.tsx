@@ -12,6 +12,10 @@ import {
   productCategoryLine,
   productPricingCompanyCell,
 } from "@/lib/products/viewProductDisplay";
+import {
+  logoDisplaySrc,
+  logoPreviewSource,
+} from "@/lib/logoDisplaySrc";
 import type { Product } from "@/models/Product";
 
 export type ViewProductModalProps = {
@@ -46,6 +50,10 @@ export function ViewProductModal({
   const pricings = p ? pickProductShowPricings(p) : [];
   const discounts = p ? pickProductShowDiscounts(p) : [];
   const typeService = Boolean(p?.is_service);
+
+  const logoImgSrc = p
+    ? logoDisplaySrc(logoPreviewSource(undefined, p.logo_url)) ?? null
+    : null;
 
   if (!show) return null;
 
@@ -134,6 +142,16 @@ export function ViewProductModal({
                     {formatCurrency(p.base_price, cur)}
                   </span>
                 </ProductDetailField>
+                {logoImgSrc ? (
+                  <ProductDetailField label="Logo" className="sm:col-span-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={logoImgSrc}
+                      alt=""
+                      className="max-h-28 max-w-full rounded-lg border border-zinc-200/80 bg-white object-contain p-2 dark:border-zinc-700 dark:bg-zinc-900/40"
+                    />
+                  </ProductDetailField>
+                ) : null}
               </div>
 
               {p.description ? (

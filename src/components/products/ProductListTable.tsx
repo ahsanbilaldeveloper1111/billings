@@ -5,6 +5,10 @@ import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { extractListRows } from "@/lib/api/extractApiData";
 import { formatCurrency } from "@/lib/currency";
+import {
+  logoDisplaySrc,
+  logoPreviewSource,
+} from "@/lib/logoDisplaySrc";
 import type { Product } from "@/models/Product";
 
 type ProductRow = Product & Record<string, unknown>;
@@ -127,6 +131,33 @@ export function ProductListTable({
   );
   const columns = [
     {
+      key: "logo",
+      header: "Logo",
+      headerClassName: "w-14 whitespace-nowrap px-2 py-2 text-center",
+      cellClassName: "px-2 py-2 align-middle",
+      render: (p: ProductRow) => {
+        const raw = p.logo_url as string | undefined;
+        const src = logoDisplaySrc(logoPreviewSource(undefined, raw));
+        if (!src) {
+          return (
+            <span className="text-zinc-400 dark:text-zinc-500" aria-hidden>
+              —
+            </span>
+          );
+        }
+        return (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt=""
+              className="mx-auto h-9 w-9 rounded-md border border-zinc-200/80 bg-white object-contain dark:border-zinc-700 dark:bg-zinc-900/60"
+            />
+          </>
+        );
+      },
+    },
+    {
       key: "name",
       header: sortHeader("name", "name"),
       headerClassName: "whitespace-nowrap px-3 py-2",
@@ -214,7 +245,7 @@ export function ProductListTable({
         columns={columns}
         getRowKey={(p) => p.id}
         emptyMessage="No products match these filters."
-        minTableWidthClassName="min-w-[44rem]"
+        minTableWidthClassName="min-w-[48rem]"
         pagination={pagination}
         onPageChange={onPageChange}
         limit={limit}
