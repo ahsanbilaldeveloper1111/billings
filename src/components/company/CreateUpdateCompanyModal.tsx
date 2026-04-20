@@ -206,6 +206,22 @@ function profileToFormSlice(
   };
 }
 
+function companyBankAccountsFromAny(
+  company: Company,
+): unknown[] {
+  const p = company.profile as Record<string, unknown> | undefined;
+  const root = company as Company & {
+    bank_accounts?: unknown[];
+    bankAccounts?: unknown[];
+  };
+  const raw =
+    root.bank_accounts ??
+    root.bankAccounts ??
+    p?.bank_accounts ??
+    company.profile?.bank_accounts;
+  return Array.isArray(raw) ? raw : [];
+}
+
 type CreateUpdateCompanyModalProps = {
   open: boolean;
   onClose: () => void;
@@ -302,7 +318,7 @@ export function CreateUpdateCompanyModal({
       tenant_id: v.tenant_id != null ? String(v.tenant_id) : "",
       vendor_id: v.vendor_id != null ? String(v.vendor_id) : "",
       profile: profileToFormSlice(v, p),
-      bank_accounts: bankAccountsFromApi(p?.bank_accounts),
+      bank_accounts: bankAccountsFromApi(companyBankAccountsFromAny(v)),
     });
     setNewBank(emptyBankAccountDraft(p?.currency ?? "USD"));
     setEditingBankIndex(null);

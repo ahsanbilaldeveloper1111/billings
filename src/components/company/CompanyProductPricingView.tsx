@@ -141,6 +141,7 @@ export function CompanyProductPricingView({
   const productsQuery = useProducts({
     page: 1,
     limit: 500,
+    global_product: true,
   });
   const catalogRows = extractListRows<Product & Record<string, unknown>>(
     productsQuery.data,

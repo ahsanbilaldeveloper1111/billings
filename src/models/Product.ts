@@ -75,6 +75,7 @@ export interface IndexProductParams {
   page?: number;
   limit?: number;
   search?: string;
+  global_product?: boolean;
   category_id?: number;
   "order[column]"?: string;
   "order[dir]"?: "asc" | "desc";

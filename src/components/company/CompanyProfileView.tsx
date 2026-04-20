@@ -90,8 +90,12 @@ function Field({
 
 function bankAccountsFromCompany(c: Company): unknown[] {
   const p = c.profile as Record<string, unknown> | undefined;
-  const camel = c as Company & { bankAccounts?: unknown[] };
+  const camel = c as Company & {
+    bank_accounts?: unknown[];
+    bankAccounts?: unknown[];
+  };
   const raw =
+    camel.bank_accounts ??
     camel.bankAccounts ??
     p?.bank_accounts ??
     c.profile?.bank_accounts;
