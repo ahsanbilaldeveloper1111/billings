@@ -954,7 +954,7 @@ export function CreateUpdateInvoiceModal({
                             <th className="py-2 pr-2">#</th>
                             <th className="py-2 pr-2">Product</th>
                             <th className="py-2 pr-2">Qty</th>
-                            <th className="py-2 pr-2">Unit</th>
+                            <th className="py-2 pr-2">Unit Price</th>
                             <th className="py-2 pr-2">Tax %</th>
                             <th className="py-2 pr-2">Line</th>
                             <th className="py-2 text-right">Actions</th>
