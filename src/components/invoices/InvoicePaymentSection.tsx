@@ -30,6 +30,7 @@ import {
 } from "@/lib/toast/appToast";
 import type { Invoice } from "@/models/Invoice";
 import type { CreatePaymentData } from "@/models/Payment";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 
 function unwrapPublishableKey(payload: unknown): string | null {
@@ -492,7 +493,11 @@ function InvoicePaymentInner({
               className={formControlClass}
               value={paymentAmount || ""}
               onChange={(e) =>
-                setPaymentAmount(Number.parseFloat(e.target.value) || 0)
+                setPaymentAmount(
+                  Number.parseFloat(
+                    stripNumericLeadingZerosForControlledInput(e.target.value),
+                  ) || 0,
+                )
               }
             />
             <div className="mt-1 flex flex-wrap items-center gap-2">

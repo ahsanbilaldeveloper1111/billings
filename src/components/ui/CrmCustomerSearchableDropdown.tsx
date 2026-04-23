@@ -64,7 +64,7 @@ export function CrmCustomerSearchableDropdown({
 
       const crmName = crmNameMap[crmId]?.trim() ?? "";
       const customerName = c.name ? String(c.name).trim() : "";
-      const displayName = crmName || customerName || crmId;
+      const displayName = customerName || crmName || crmId;
       list.push({
         value: crmId,
         label: displayName === crmId ? crmId : `${displayName} (${crmId})`,

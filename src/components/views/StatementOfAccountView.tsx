@@ -4,9 +4,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CrmCustomerSearchableDropdown } from "@/components/ui/CrmCustomerSearchableDropdown";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows, getApiData } from "@/lib/api/extractApiData";
+import { resolveTenantDisplayLabel } from "@/lib/company/tenantDisplayLabel";
 import type { ApiSuccessResponse } from "@/lib/api/types";
 import { formatCurrency } from "@/lib/currency";
 import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
@@ -453,6 +456,9 @@ export function StatementOfAccountView() {
     useState<StatementCustomer | null>(null);
   const [downloading, setDownloading] = useState(false);
 
+  const tenantDisplayNameMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+
   useEffect(() => {
     const now = new Date();
     const first = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -514,10 +520,22 @@ export function StatementOfAccountView() {
               body.tenant_id ??
               prev?.id ??
               "";
-            return {
-              id,
-              name: inner.customer.name || String(id),
-            };
+            const idStr = String(id);
+            const apiName =
+              inner.customer.name != null &&
+              String(inner.customer.name).trim() !== ""
+                ? String(inner.customer.name).trim()
+                : "";
+            let name = apiName;
+            if (!name && body.tenant_id) {
+              name = resolveTenantDisplayLabel(
+                idStr,
+                tenantDisplayNameMap,
+                resellerNameMap,
+              );
+            }
+            if (!name) name = idStr;
+            return { id, name };
           });
         } else {
           const msg =
@@ -536,7 +554,7 @@ export function StatementOfAccountView() {
         setLoadingStatement(false);
       }
     },
-    [],
+    [tenantDisplayNameMap, resellerNameMap],
   );
 
   const handleView = useCallback(async () => {
@@ -562,9 +580,10 @@ export function StatementOfAccountView() {
       return;
     }
     setStatementByCustomerId(false);
+    const tid = tenantId.trim();
     setSelectedCustomer({
-      id: tenantId.trim(),
-      name: tenantId.trim(),
+      id: tid,
+      name: resolveTenantDisplayLabel(tid, tenantDisplayNameMap, resellerNameMap),
     });
     await loadStatement({
       tenant_id: tenantId.trim(),
@@ -578,6 +597,8 @@ export function StatementOfAccountView() {
     crmCompanyId,
     isSuperAdmin,
     loadStatement,
+    tenantDisplayNameMap,
+    resellerNameMap,
   ]);
 
   const handleDownloadPdf = useCallback(async () => {

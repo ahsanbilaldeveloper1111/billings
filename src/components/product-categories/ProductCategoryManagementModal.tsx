@@ -1,11 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { ProductCategoryCompanyCell } from "@/components/product-categories/ProductCategoryListTable";
 import { CreateUpdateProductCategoryModal } from "@/components/product-categories/CreateUpdateProductCategoryModal";
 import { DeleteConfirmationDialog } from "@/components/crud/DeleteConfirmationDialog";
 import { useProductCategories } from "@/hooks/product-categories/useProductCategories";
 import { useProductCategoryMutations } from "@/hooks/product-categories/useProductCategoryMutations";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import { showAppToast, showBillingBackendErrorToast } from "@/lib/toast/appToast";
 import type { IndexProductCategoryParams, ProductCategory } from "@/models/ProductCategory";
@@ -87,6 +90,23 @@ export function ProductCategoryManagementModal({
       ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
     };
   }, [page, limit, sortField, sortDir, debouncedSearch]);
+
+  const companyTenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const tenantNameMap = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const k of new Set([
+      ...Object.keys(companyTenantDisplayMap),
+      ...Object.keys(resellerNameMap),
+    ])) {
+      const v =
+        companyTenantDisplayMap[k]?.trim() ||
+        resellerNameMap[k]?.trim() ||
+        "";
+      if (v) out[k] = v;
+    }
+    return out;
+  }, [companyTenantDisplayMap, resellerNameMap]);
 
   const listQ = useProductCategories(listParams, { enabled: open });
   const mutations = useProductCategoryMutations();
@@ -266,6 +286,9 @@ export function ProductCategoryManagementModal({
                           Parent
                         </th>
                         <th className="whitespace-nowrap px-3 py-2.5 font-semibold text-zinc-700 dark:text-zinc-200">
+                          Company
+                        </th>
+                        <th className="whitespace-nowrap px-3 py-2.5 font-semibold text-zinc-700 dark:text-zinc-200">
                           Status
                         </th>
                         <th className="min-w-[12rem] whitespace-nowrap px-3 py-2.5 text-right font-semibold text-zinc-700 dark:text-zinc-200">
@@ -277,7 +300,7 @@ export function ProductCategoryManagementModal({
                       {rows.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={6}
+                            colSpan={7}
                             className="px-3 py-10 text-center text-sm text-zinc-500"
                           >
                             {debouncedSearch.trim()
@@ -308,6 +331,9 @@ export function ProductCategoryManagementModal({
                             </td>
                             <td className="max-w-[8rem] truncate px-3 py-2.5 text-zinc-600 dark:text-zinc-400">
                               {parentLabel(row)}
+                            </td>
+                            <td className="max-w-[10rem] px-3 py-2.5 text-zinc-600 dark:text-zinc-400">
+                              {ProductCategoryCompanyCell(row, tenantNameMap)}
                             </td>
                             <td className="px-3 py-2.5">
                               <span

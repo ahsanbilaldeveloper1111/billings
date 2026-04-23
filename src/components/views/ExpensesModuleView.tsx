@@ -19,6 +19,10 @@ import {
 } from "@/hooks/expenses/useExpenseMutations";
 import { useExpenses } from "@/hooks/expenses/useExpenses";
 import { resolveDeleteItemLabel } from "@/lib/crud/resolveDeleteItemLabel";
+import {
+  stripLeadingZerosDigitOnly,
+  stripNumericLeadingZerosForControlledInput,
+} from "@/lib/forms/stripNumericLeadingZeros";
 
 type ExpenseFormFields = {
   expense_date: string;
@@ -240,7 +244,12 @@ export function ExpensesModuleView() {
                 className={inputClass}
                 value={form.amount}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, amount: e.target.value }))
+                  setForm((f) => ({
+                    ...f,
+                    amount: stripNumericLeadingZerosForControlledInput(
+                      e.target.value,
+                    ),
+                  }))
                 }
               />
             </div>
@@ -273,7 +282,10 @@ export function ExpensesModuleView() {
                 className={inputClass}
                 value={form.company_id}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, company_id: e.target.value }))
+                  setForm((f) => ({
+                    ...f,
+                    company_id: stripLeadingZerosDigitOnly(e.target.value),
+                  }))
                 }
               />
             </div>
@@ -343,7 +355,12 @@ export function ExpensesModuleView() {
                 className={inputClass}
                 value={form.tax_amount}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, tax_amount: e.target.value }))
+                  setForm((f) => ({
+                    ...f,
+                    tax_amount: stripNumericLeadingZerosForControlledInput(
+                      e.target.value,
+                    ),
+                  }))
                 }
               />
             </div>
@@ -358,7 +375,12 @@ export function ExpensesModuleView() {
                 className={inputClass}
                 value={form.exchange_rate}
                 onChange={(e) =>
-                  setForm((f) => ({ ...f, exchange_rate: e.target.value }))
+                  setForm((f) => ({
+                    ...f,
+                    exchange_rate: stripNumericLeadingZerosForControlledInput(
+                      e.target.value,
+                    ),
+                  }))
                 }
               />
             </div>

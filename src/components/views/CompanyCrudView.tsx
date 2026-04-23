@@ -12,8 +12,10 @@ import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdo
 import { useCompanyMutations } from "@/hooks/company/useCompanyMutations";
 import { useCompanies } from "@/hooks/company/useCompanies";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { companyTenantDisplayLabel } from "@/lib/company/tenantDisplayLabel";
 import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { resolveDeleteItemLabel } from "@/lib/crud/resolveDeleteItemLabel";
 import { downloadCompanyImportTemplate } from "@/lib/company/downloadCompanyImportTemplate";
@@ -118,6 +120,7 @@ export function CompanyCrudView() {
 
   const listQuery = useCompanies(listParams, { enabled: allowView });
   const { pagination } = extractListRows(listQuery.data);
+  const resellerNameMap = useMainAppResellerNameMap();
 
   const vendorsForPicker = useVendors(
     {
@@ -141,13 +144,19 @@ export function CompanyCrudView() {
   const [templateLoading, setTemplateLoading] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  const deleteItemLabel = useMemo(
-    () =>
-      resolveDeleteItemLabel(listQuery.data, deleteId, {
-        labelKeys: ["name", "tenant_id", "email"],
-      }),
-    [listQuery.data, deleteId],
-  );
+  const deleteItemLabel = useMemo(() => {
+    if (deleteId == null) return undefined;
+    const { rows } = extractListRows<Company & Record<string, unknown>>(
+      listQuery.data,
+    );
+    const row = rows.find(
+      (r) => r.id != null && String(r.id) === String(deleteId),
+    );
+    if (row) return companyTenantDisplayLabel(row, resellerNameMap);
+    return resolveDeleteItemLabel(listQuery.data, deleteId, {
+      labelKeys: ["name", "tenant_id", "email"],
+    });
+  }, [listQuery.data, deleteId, resellerNameMap]);
 
   const openCreate = () => {
     setEditId(null);

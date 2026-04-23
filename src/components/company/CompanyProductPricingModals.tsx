@@ -4,6 +4,7 @@ import type { ProductPricingRow } from "@/lib/company/productPricingHelpers";
 import { validateRenewalDates } from "@/lib/company/productPricingHelpers";
 import type { Product } from "@/models/Product";
 import { useEffect, useMemo, useState } from "react";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import { formControlClass } from "@/lib/uiFormClasses";
 
 type BulkUpdateModalProps = {
@@ -52,7 +53,11 @@ export function BulkUpdateModal({
           max="100"
           className={`mt-1 ${formControlClass}`}
           value={discountPercent}
-          onChange={(e) => onDiscountPercentChange(e.target.value)}
+          onChange={(e) =>
+            onDiscountPercentChange(
+              stripNumericLeadingZerosForControlledInput(e.target.value),
+            )
+          }
           placeholder="e.g. 10"
         />
         <div className="mt-5 flex justify-end gap-2">
@@ -417,7 +422,11 @@ export function AddProductPricingModal({
                               patchPricing(
                                 product.id,
                                 "selling_price",
-                                Number.parseFloat(e.target.value) || 0,
+                                Number.parseFloat(
+                                  stripNumericLeadingZerosForControlledInput(
+                                    e.target.value,
+                                  ),
+                                ) || 0,
                               )
                             }
                             className="w-24 rounded-lg border border-zinc-200 px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-900"
@@ -542,7 +551,12 @@ export function AddProductPricingModal({
                               patchPricing(
                                 product.id,
                                 "subscriptions",
-                                Number.parseInt(e.target.value, 10) || 0,
+                                Number.parseInt(
+                                  stripNumericLeadingZerosForControlledInput(
+                                    e.target.value,
+                                  ),
+                                  10,
+                                ) || 0,
                               )
                             }
                             className="w-16 rounded-lg border border-zinc-200 px-2 py-1 text-xs dark:border-zinc-700 dark:bg-zinc-900"
@@ -681,7 +695,11 @@ export function AddDiscountModal({
               max="100"
               className={`mt-1 ${formControlClass}`}
               value={percentage}
-              onChange={(e) => onPercentageChange(e.target.value)}
+              onChange={(e) =>
+                onPercentageChange(
+                  stripNumericLeadingZerosForControlledInput(e.target.value),
+                )
+              }
             />
           </>
         ) : (
@@ -695,7 +713,11 @@ export function AddDiscountModal({
               min="0"
               className={`mt-1 ${formControlClass}`}
               value={amount}
-              onChange={(e) => onAmountChange(e.target.value)}
+              onChange={(e) =>
+                onAmountChange(
+                  stripNumericLeadingZerosForControlledInput(e.target.value),
+                )
+              }
             />
           </>
         )}

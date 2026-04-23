@@ -5,6 +5,10 @@ import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { useDisplayCurrency } from "@/contexts/currency-display-context";
 import { extractListRows } from "@/lib/api/extractApiData";
+import {
+  companyTenantDisplayLabel,
+  vendorColumnLabel,
+} from "@/lib/company/tenantDisplayLabel";
 import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import type { Company } from "@/models/Company";
 
@@ -51,30 +55,6 @@ function SortChevron({
       {dir === "asc" ? "↑" : "↓"}
     </span>
   );
-}
-
-function displayName(
-  c: CompanyRow,
-  resellerNameByTenantId: Record<string, string>,
-): string {
-  const direct = c.name && String(c.name).trim();
-  if (direct) return direct;
-  const tid =
-    c.tenant_id != null && String(c.tenant_id).trim() !== ""
-      ? String(c.tenant_id).trim()
-      : "";
-  if (tid && resellerNameByTenantId[tid]) {
-    return resellerNameByTenantId[tid];
-  }
-  return tid || "—";
-}
-
-function vendorLabel(c: CompanyRow): string {
-  if (c.vendor?.name) return String(c.vendor.name);
-  if (c.reseller?.name) return String(c.reseller.name);
-  if (c.reseller?.tenant_id)
-    return String(c.reseller.tenant_id);
-  return "—";
 }
 
 export function CompanyListTable({
@@ -156,7 +136,7 @@ export function CompanyListTable({
         return (
           <>
             <div className="font-medium text-zinc-900 dark:text-zinc-100">
-              {displayName(c, mainAppResellerNameMap)}
+              {companyTenantDisplayLabel(c, mainAppResellerNameMap)}
             </div>
             {phone ? (
               <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
@@ -212,7 +192,8 @@ export function CompanyListTable({
     {
       key: "vendor",
       header: "Vendor",
-      render: (c: CompanyRow) => vendorLabel(c),
+      render: (c: CompanyRow) =>
+        vendorColumnLabel(c, mainAppResellerNameMap),
     },
   ];
 

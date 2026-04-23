@@ -18,6 +18,10 @@ export type ProductCategoryListUrlState = {
   search: string;
   sort_field: string;
   sort_direction: "asc" | "desc";
+  /** Vendor for tenant dropdown (same pattern as invoices / customers). */
+  vendor_id: string;
+  /** When set, list is scoped to this billing `tenant_id`; when empty, all categories. */
+  tenant_id: string;
 };
 
 export function defaultProductCategoryListUrlState(): ProductCategoryListUrlState {
@@ -27,6 +31,8 @@ export function defaultProductCategoryListUrlState(): ProductCategoryListUrlStat
     search: "",
     sort_field: "name",
     sort_direction: "asc",
+    vendor_id: "",
+    tenant_id: "",
   };
 }
 
@@ -47,6 +53,8 @@ export function parseProductCategoryListSearchParams(
     search: sp.get("search") ?? "",
     sort_field: normalizeSortField(sp.get("sort_field") ?? ""),
     sort_direction,
+    vendor_id: sp.get("vendor_id") ?? "",
+    tenant_id: sp.get("tenant_id") ?? "",
   };
 }
 
@@ -61,5 +69,7 @@ export function buildProductCategoryListSearchParams(
   if (s.limit !== 10) q.set("per_page", String(s.limit));
   if (s.sort_field !== "name") q.set("sort_field", s.sort_field);
   if (s.sort_direction !== "asc") q.set("sort_direction", s.sort_direction);
+  if (s.vendor_id.trim()) q.set("vendor_id", s.vendor_id.trim());
+  if (s.tenant_id.trim()) q.set("tenant_id", s.tenant_id.trim());
   return q;
 }

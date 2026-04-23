@@ -25,6 +25,7 @@ import { useProducts } from "@/hooks/products/useProducts";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import {
   addDaysISODate,
   computeCreditLimitSummary,
@@ -1013,9 +1014,12 @@ export function CreateUpdateInvoiceModal({
                                   value={row.quantity}
                                   onChange={(ev) =>
                                     updateLine(index, {
-                                      quantity: Number.parseFloat(
-                                        ev.target.value,
-                                      ) || 0,
+                                      quantity:
+                                        Number.parseFloat(
+                                          stripNumericLeadingZerosForControlledInput(
+                                            ev.target.value,
+                                          ),
+                                        ) || 0,
                                     })
                                   }
                                 />
@@ -1031,7 +1035,11 @@ export function CreateUpdateInvoiceModal({
                                   onChange={(ev) =>
                                     updateLine(index, {
                                       unit_price:
-                                        Number.parseFloat(ev.target.value) || 0,
+                                        Number.parseFloat(
+                                          stripNumericLeadingZerosForControlledInput(
+                                            ev.target.value,
+                                          ),
+                                        ) || 0,
                                     })
                                   }
                                 />
@@ -1052,7 +1060,11 @@ export function CreateUpdateInvoiceModal({
                                   onChange={(ev) =>
                                     updateLine(index, {
                                       tax_rate:
-                                        Number.parseFloat(ev.target.value) || 0,
+                                        Number.parseFloat(
+                                          stripNumericLeadingZerosForControlledInput(
+                                            ev.target.value,
+                                          ),
+                                        ) || 0,
                                     })
                                   }
                                 />

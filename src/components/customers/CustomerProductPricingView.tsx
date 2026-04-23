@@ -8,6 +8,7 @@ import { useCustomerProductPricingMutations } from "@/hooks/customers/useCustome
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useProducts } from "@/hooks/products/useProducts";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import type { ApiSuccessResponse } from "@/lib/api/types";
 import {
   formatPricingDateShort,
@@ -270,7 +271,9 @@ export function CustomerProductPricingView({
   };
 
   const runBulkDiscountFromModal = async () => {
-    const pct = Number.parseFloat(bulkPct);
+    const pct = Number.parseFloat(
+      stripNumericLeadingZerosForControlledInput(bulkPct),
+    );
     if (!Number.isFinite(pct) || pct <= 0) {
       showAppToast("Enter a valid discount percentage.", "warning");
       return;
@@ -554,7 +557,11 @@ export function CustomerProductPricingView({
                                 patchEdit(
                                   row.product_id,
                                   "selling_price",
-                                  Number.parseFloat(e.target.value) || 0,
+                                  Number.parseFloat(
+                                    stripNumericLeadingZerosForControlledInput(
+                                      e.target.value,
+                                    ),
+                                  ) || 0,
                                 )
                               }
                             />
@@ -693,7 +700,12 @@ export function CustomerProductPricingView({
                                 patchEdit(
                                   row.product_id,
                                   "subscriptions",
-                                  Number.parseInt(e.target.value, 10) || 0,
+                                  Number.parseInt(
+                                    stripNumericLeadingZerosForControlledInput(
+                                      e.target.value,
+                                    ),
+                                    10,
+                                  ) || 0,
                                 )
                               }
                             />

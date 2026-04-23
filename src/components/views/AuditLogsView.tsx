@@ -8,6 +8,7 @@ import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import { AuditLogDetailContent } from "@/components/audit-logs/AuditLogDetailContent";
 import { useAuditLogs } from "@/hooks/audit-logs/useAuditLogs";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { stripLeadingZerosDigitOnly } from "@/lib/forms/stripNumericLeadingZeros";
 import {
   auditActionBadgeClass,
   auditResourceBadgeClass,
@@ -256,7 +257,7 @@ export function AuditLogsView() {
               inputMode="numeric"
               value={userId}
               onChange={(ev) => {
-                setUserId(ev.target.value);
+                setUserId(stripLeadingZerosDigitOnly(ev.target.value));
                 setPage(1);
               }}
               placeholder="e.g. 20954"
@@ -271,7 +272,7 @@ export function AuditLogsView() {
               inputMode="numeric"
               value={companyId}
               onChange={(ev) => {
-                setCompanyId(ev.target.value);
+                setCompanyId(stripLeadingZerosDigitOnly(ev.target.value));
                 setPage(1);
               }}
               placeholder="Optional"
@@ -286,7 +287,7 @@ export function AuditLogsView() {
               inputMode="numeric"
               value={vendorId}
               onChange={(ev) => {
-                setVendorId(ev.target.value);
+                setVendorId(stripLeadingZerosDigitOnly(ev.target.value));
                 setPage(1);
               }}
               placeholder="Optional"

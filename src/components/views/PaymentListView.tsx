@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CrudEntityTable } from "@/components/crud/CrudEntityTable";
 import { StaticFilterCard } from "@/components/crud/ListUiControls";
+import { stripLeadingZerosDigitOnly } from "@/lib/forms/stripNumericLeadingZeros";
 import {
   formControlClass,
   formLabelClass,
@@ -190,7 +191,9 @@ export function PaymentListView() {
               inputMode="numeric"
               className={formControlClass}
               value={vendorId}
-              onChange={(ev) => setVendorId(ev.target.value)}
+              onChange={(ev) =>
+                setVendorId(stripLeadingZerosDigitOnly(ev.target.value))
+              }
               placeholder="Optional"
             />
           </div>

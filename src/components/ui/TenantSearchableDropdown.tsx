@@ -5,6 +5,7 @@ import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { useCompanies } from "@/hooks/company/useCompanies";
 import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { formatTenantListLabel } from "@/lib/company/tenantDisplayLabel";
 import type { Company, IndexCompanyParams } from "@/models/Company";
 
 export type TenantSearchableDropdownProps = {
@@ -52,14 +53,18 @@ export function TenantSearchableDropdown({
       if (!tenantId || seen.has(tenantId)) continue;
       seen.add(tenantId);
 
+      const companyName = co.name ? String(co.name).trim() : "";
+      const resellerNested =
+        co.reseller?.name != null ? String(co.reseller.name).trim() : "";
       const displayName =
+        companyName ||
+        resellerNested ||
         resellerNameMap[tenantId] ||
-        (co.name ? String(co.name).trim() : "") ||
         tenantId;
 
       list.push({
         value: tenantId,
-        label: displayName === tenantId ? tenantId : `${displayName} (${tenantId})`,
+        label: formatTenantListLabel(tenantId, displayName),
       });
     }
 

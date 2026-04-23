@@ -21,6 +21,7 @@ import {
 } from "@/lib/toast/appToast";
 import type { Vendor, VendorBankAccount, VendorProfile } from "@/models/Vendor";
 import { VendorStatus } from "@/models/Vendor";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import {
   firstLogoField,
   logoDisplaySrc,
@@ -588,7 +589,11 @@ export function CreateUpdateVendorModal({
                             onChange={(e) =>
                               handleField(
                                 "vat_rate",
-                                Number.parseFloat(e.target.value) || 0,
+                                Number.parseFloat(
+                                  stripNumericLeadingZerosForControlledInput(
+                                    e.target.value,
+                                  ),
+                                ) || 0,
                               )
                             }
                           />
@@ -604,7 +609,12 @@ export function CreateUpdateVendorModal({
                             onChange={(e) =>
                               handleField(
                                 "payment_terms",
-                                Number.parseInt(e.target.value, 10) || 0,
+                                Number.parseInt(
+                                  stripNumericLeadingZerosForControlledInput(
+                                    e.target.value,
+                                  ),
+                                  10,
+                                ) || 0,
                               )
                             }
                           />

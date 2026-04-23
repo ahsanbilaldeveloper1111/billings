@@ -48,8 +48,40 @@ function parentLabel(c: Row): string {
   return "Root category";
 }
 
+/** Shared with {@link ProductCategoryManagementModal} for the company / tenant column. */
+export function ProductCategoryCompanyCell(
+  c: ProductCategory & Record<string, unknown>,
+  tenantNameMap: Readonly<Record<string, string>>,
+) {
+  const tid =
+    c.tenant_id != null && String(c.tenant_id).trim() !== ""
+      ? String(c.tenant_id).trim()
+      : "";
+  if (!tid) {
+    return (
+      <span className="text-zinc-500 dark:text-zinc-400">
+        Global (no company)
+      </span>
+    );
+  }
+  const label = tenantNameMap[tid]?.trim() ?? "";
+  const primary = label && label !== tid ? label : tid;
+  return (
+    <div>
+      <p className="text-zinc-900 dark:text-zinc-100">{primary}</p>
+      {label && label !== tid ? (
+        <p className="break-all font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+          {tid}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 type ProductCategoryListTableProps = {
   query: UseQueryResult<ApiSuccessResponse<unknown>>;
+  /** `tenant_id` → display name (company list + main-app reseller map merged). */
+  tenantNameMap?: Readonly<Record<string, string>>;
   title?: string;
   sortField: string;
   sortDir: "asc" | "desc";
@@ -71,6 +103,7 @@ type ProductCategoryListTableProps = {
 
 export function ProductCategoryListTable({
   query,
+  tenantNameMap = {},
   title = "Product categories",
   sortField,
   sortDir,
@@ -159,6 +192,12 @@ export function ProductCategoryListTable({
       render: (c: Row) =>
         c.description?.trim() ? String(c.description) : <span className="text-zinc-400">No description</span>,
     },
+    {
+      key: "company",
+      header: "Company",
+      cellClassName: "max-w-[12rem] px-3 py-2",
+      render: (c: Row) => ProductCategoryCompanyCell(c, tenantNameMap),
+    },
     { key: "parent", header: "Parent", render: (c: Row) => parentLabel(c) },
   ];
 
@@ -184,7 +223,7 @@ export function ProductCategoryListTable({
         columns={columns}
         getRowKey={(c) => c.id}
         emptyMessage="No categories match these filters."
-        minTableWidthClassName="min-w-[44rem]"
+        minTableWidthClassName="min-w-[52rem]"
         pagination={pagination}
         onPageChange={onPageChange}
         limit={limit}

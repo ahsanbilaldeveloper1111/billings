@@ -17,9 +17,13 @@ export function useTenantDisplayNameMap() {
     );
     for (const c of rows) {
       const tid = c.tenant_id;
-      if (tid != null && String(tid).trim() !== "" && c.name) {
-        map[String(tid)] = String(c.name).trim();
-      }
+      if (tid == null || String(tid).trim() === "") continue;
+      const key = String(tid).trim();
+      const rootName = c.name ? String(c.name).trim() : "";
+      const nested =
+        c.reseller?.name != null ? String(c.reseller.name).trim() : "";
+      const label = rootName || nested;
+      if (label) map[key] = label;
     }
     return map;
   }, [q.data]);

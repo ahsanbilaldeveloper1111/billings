@@ -36,6 +36,7 @@ import {
   emptyCompanyForm,
   type CompanyFormState,
 } from "@/lib/company/buildCompanyCreateUpdatePayload";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import {
   firstLogoField,
   logoDisplaySrc,
@@ -938,7 +939,12 @@ export function CreateUpdateCompanyModal({
                         className={formControlClass}
                         value={form.profile.vat_rate}
                         onChange={(e) =>
-                          setProfile("vat_rate", e.target.value)
+                          setProfile(
+                            "vat_rate",
+                            stripNumericLeadingZerosForControlledInput(
+                              e.target.value,
+                            ),
+                          )
                         }
                       />
                     </label>
@@ -1124,7 +1130,12 @@ export function CreateUpdateCompanyModal({
                         className={formControlClass}
                         value={form.profile.credit_limit}
                         onChange={(e) =>
-                          setProfile("credit_limit", e.target.value)
+                          setProfile(
+                            "credit_limit",
+                            stripNumericLeadingZerosForControlledInput(
+                              e.target.value,
+                            ),
+                          )
                         }
                       />
                     </label>
@@ -1138,7 +1149,12 @@ export function CreateUpdateCompanyModal({
                         className={formControlClass}
                         value={form.profile.payment_terms}
                         onChange={(e) =>
-                          setProfile("payment_terms", e.target.value)
+                          setProfile(
+                            "payment_terms",
+                            stripNumericLeadingZerosForControlledInput(
+                              e.target.value,
+                            ),
+                          )
                         }
                       />
                     </label>
@@ -1154,7 +1170,12 @@ export function CreateUpdateCompanyModal({
                         className={formControlClass}
                         value={form.profile.early_payment_discount}
                         onChange={(e) =>
-                          setProfile("early_payment_discount", e.target.value)
+                          setProfile(
+                            "early_payment_discount",
+                            stripNumericLeadingZerosForControlledInput(
+                              e.target.value,
+                            ),
+                          )
                         }
                       />
                     </label>
@@ -1196,7 +1217,12 @@ export function CreateUpdateCompanyModal({
                         className={formControlClass}
                         value={form.profile.discount_limit}
                         onChange={(e) =>
-                          setProfile("discount_limit", e.target.value)
+                          setProfile(
+                            "discount_limit",
+                            stripNumericLeadingZerosForControlledInput(
+                              e.target.value,
+                            ),
+                          )
                         }
                       />
                     </label>

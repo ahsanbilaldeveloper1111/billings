@@ -11,6 +11,7 @@ import { CrmCustomerSearchableDropdown } from "@/components/ui/CrmCustomerSearch
 import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
 import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
 import { useCrmCompanyNameMap } from "@/hooks/crm/useCrmCompanyNameMap";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useCustomerMutations } from "@/hooks/customers/useCustomerMutations";
 import { useCustomers } from "@/hooks/customers/useCustomers";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
@@ -77,7 +78,22 @@ export function CustomerCrudView() {
     router.replace(appPaths.invoices, { scroll: false });
   }, [isUserLoading, isSuperAdmin, router]);
 
-  const tenantNameMap = useTenantDisplayNameMap();
+  const companyTenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const tenantNameMap = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const k of new Set([
+      ...Object.keys(companyTenantDisplayMap),
+      ...Object.keys(resellerNameMap),
+    ])) {
+      const v =
+        companyTenantDisplayMap[k]?.trim() ||
+        resellerNameMap[k]?.trim() ||
+        "";
+      if (v) out[k] = v;
+    }
+    return out;
+  }, [companyTenantDisplayMap, resellerNameMap]);
   const crmCompanyNameMap = useCrmCompanyNameMap();
 
   const listParams = useMemo((): IndexCustomerParams => {

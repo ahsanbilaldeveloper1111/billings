@@ -32,6 +32,7 @@ import {
   showBillingBackendErrorToast,
 } from "@/lib/toast/appToast";
 import type { IndexInvoiceParams, InvoiceStatus } from "@/models/Invoice";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
 import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 
 const INVOICE_STATUS_OPTIONS: InvoiceStatus[] = [
@@ -175,9 +176,21 @@ export function InvoiceCrudView() {
   const vendorIdNum = listState.vendor_id.trim()
     ? Number.parseInt(listState.vendor_id, 10)
     : NaN;
-  const tenantDisplayNameById = useMainAppResellerNameMap();
+  const companyTenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const tenantDisplayNameById = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const k of new Set([
+      ...Object.keys(companyTenantDisplayMap),
+      ...Object.keys(resellerNameMap),
+    ])) {
+      const v =
+        companyTenantDisplayMap[k]?.trim() || resellerNameMap[k]?.trim() || "";
+      if (v) out[k] = v;
+    }
+    return out;
+  }, [companyTenantDisplayMap, resellerNameMap]);
   const crmCompanyNameById = useCrmCompanyNameMap();
-
 
   const listParams = useMemo((): IndexInvoiceParams => {
     const vendorParsed = listState.vendor_id.trim()
@@ -202,9 +215,7 @@ export function InvoiceCrudView() {
       ...(listState.crm_company_id.trim()
         ? { crm_company_id: listState.crm_company_id.trim() }
         : {}),
-      ...(listState.crm_company_not_null
-        ? { crm_company_not_null: true }
-        : {}),
+      ...(listState.crm_company_not_null ? { crm_company_not_null: true } : {}),
     };
   }, [
     listState.page,
@@ -239,8 +250,6 @@ export function InvoiceCrudView() {
     [listQuery.data, deleteId],
   );
 
-  
-
   const openCreate = () => {
     setEditId(null);
     setInvoiceFormOpen(true);
@@ -258,8 +267,7 @@ export function InvoiceCrudView() {
   }
 
   const sortSelectValue = SORT_PRESETS.some(
-    (p) =>
-      p.value === sortPresetValue(listState.column, listState.dir),
+    (p) => p.value === sortPresetValue(listState.column, listState.dir),
   )
     ? sortPresetValue(listState.column, listState.dir)
     : SORT_PRESETS[0].value;
@@ -274,23 +282,23 @@ export function InvoiceCrudView() {
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <label className={formLabelClass}>
-              Search
-            </label>
+            <label className={formLabelClass}>Search</label>
             <input
               type="search"
               className={formControlClass}
               value={listState.search}
               onChange={(ev) =>
-                setListState((s) => ({ ...s, search: ev.target.value, page: 1 }))
+                setListState((s) => ({
+                  ...s,
+                  search: ev.target.value,
+                  page: 1,
+                }))
               }
               placeholder="Invoice #, customer…"
             />
           </div>
           <div>
-            <label className={formLabelClass}>
-              Vendor
-            </label>
+            <label className={formLabelClass}>Vendor</label>
             <select
               className={formControlClass}
               value={listState.vendor_id}
@@ -317,16 +325,16 @@ export function InvoiceCrudView() {
             </p>
           </div>
           <div>
-            <label className={formLabelClass}>
-              Tenant (company)
-            </label>
+            <label className={formLabelClass}>Tenant (company)</label>
             <TenantSearchableDropdown
               className="w-full"
               disabled={!Number.isFinite(vendorIdNum)}
               value={listState.tenant_id}
               enabled={Number.isFinite(vendorIdNum)}
               fetchParams={
-                Number.isFinite(vendorIdNum) ? { vendor_id: vendorIdNum } : undefined
+                Number.isFinite(vendorIdNum)
+                  ? { vendor_id: vendorIdNum }
+                  : undefined
               }
               onChange={(tenant_id) => {
                 setListState((s) => ({
@@ -345,9 +353,7 @@ export function InvoiceCrudView() {
           </div>
           {isSuperAdmin ? (
             <div>
-              <label className={formLabelClass}>
-                Customer (CRM)
-              </label>
+              <label className={formLabelClass}>Customer (CRM)</label>
               <CrmCustomerSearchableDropdown
                 className="w-full"
                 tenantId={listState.tenant_id}
@@ -369,9 +375,7 @@ export function InvoiceCrudView() {
             </div>
           ) : null}
           <div>
-            <label className={formLabelClass}>
-              Status
-            </label>
+            <label className={formLabelClass}>Status</label>
             <select
               className={formControlClass}
               value={listState.status}
@@ -392,9 +396,7 @@ export function InvoiceCrudView() {
             </select>
           </div>
           <div>
-            <label className={formLabelClass}>
-              Payment status
-            </label>
+            <label className={formLabelClass}>Payment status</label>
             <input
               className={formControlClass}
               value={listState.payment_status}
@@ -409,9 +411,7 @@ export function InvoiceCrudView() {
             />
           </div>
           <div>
-            <label className={formLabelClass}>
-              Date from
-            </label>
+            <label className={formLabelClass}>Date from</label>
             <input
               type="date"
               className={formControlClass}
@@ -427,9 +427,7 @@ export function InvoiceCrudView() {
             />
           </div>
           <div>
-            <label className={formLabelClass}>
-              Date to
-            </label>
+            <label className={formLabelClass}>Date to</label>
             <input
               type="date"
               className={formControlClass}
@@ -444,8 +442,25 @@ export function InvoiceCrudView() {
               }
             />
           </div>
-          <div className="flex items-end">
-            {(listState.date_from || listState.date_to) && (
+          {!isSuperAdmin ? (
+            <div className="sm:col-span-2">
+              <label className={formLabelClass}>CRM company ID (raw)</label>
+              <input
+                className={formControlClass}
+                value={listState.crm_company_id}
+                onChange={(ev) =>
+                  setListState((s) => ({
+                    ...s,
+                    page: 1,
+                    crm_company_id: ev.target.value,
+                  }))
+                }
+                placeholder="Optional filter"
+              />
+            </div>
+          ) : null}
+          {(listState.date_from || listState.date_to) && (
+            <div className="flex items-end">
               <button
                 type="button"
                 className="w-full rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-900 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-100"
@@ -460,9 +475,9 @@ export function InvoiceCrudView() {
               >
                 Clear dates
               </button>
-            )}
-          </div>
-          <div>
+            </div>
+          )}
+          {/* <div>
             <label className={formLabelClass}>
               Sort
             </label>
@@ -486,27 +501,9 @@ export function InvoiceCrudView() {
                 </option>
               ))}
             </select>
-          </div>
-          {!isSuperAdmin ? (
-            <div className="sm:col-span-2">
-              <label className={formLabelClass}>
-                CRM company ID (raw)
-              </label>
-              <input
-                className={formControlClass}
-                value={listState.crm_company_id}
-                onChange={(ev) =>
-                  setListState((s) => ({
-                    ...s,
-                    page: 1,
-                    crm_company_id: ev.target.value,
-                  }))
-                }
-                placeholder="Optional filter"
-              />
-            </div>
-          ) : null}
-          <div className="flex items-end">
+          </div> */}
+     
+          {/* <div className="flex items-end">
             <label className={formToggleRowClass}>
               <input
                 type="checkbox"
@@ -523,7 +520,7 @@ export function InvoiceCrudView() {
                 CRM company not null
               </span>
             </label>
-          </div>
+          </div> */}
         </div>
       </CollapsibleFilterPanel>
 
@@ -539,7 +536,9 @@ export function InvoiceCrudView() {
         onPageChange={(page) => setListState((s) => ({ ...s, page }))}
         limit={listState.limit}
         limitOptions={LIST_LIMIT_OPTIONS}
-        onLimitChange={(limit) => setListState((s) => ({ ...s, page: 1, limit }))}
+        onLimitChange={(limit) =>
+          setListState((s) => ({ ...s, page: 1, limit }))
+        }
         onCreate={openCreate}
         onView={(id) => setDetailId(id)}
         onEdit={(id) => {

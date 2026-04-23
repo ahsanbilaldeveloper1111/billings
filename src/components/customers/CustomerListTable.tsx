@@ -4,6 +4,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { UniversalDataTable } from "@/components/crud/UniversalDataTable";
 import type { ApiPagination, ApiSuccessResponse } from "@/lib/api/types";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { customerDisplayLabel } from "@/lib/customers/customerDisplayLabel";
 import type { Customer } from "@/models/Customer";
 
 type CustomerRow = Customer & Record<string, unknown>;
@@ -119,7 +120,35 @@ export function CustomerListTable({
       key: "name",
       header: sortHeader("name"),
       headerClassName: "whitespace-nowrap px-3 py-2",
-      render: (c: CustomerRow) => c.name ?? "—",
+      render: (c: CustomerRow) => {
+        const hasStoredName =
+          c.name != null && String(c.name).trim() !== "";
+        const crmId =
+          c.crm_company_id != null && String(c.crm_company_id).trim() !== ""
+            ? String(c.crm_company_id).trim()
+            : "";
+        const tid =
+          c.tenant_id != null && String(c.tenant_id).trim() !== ""
+            ? String(c.tenant_id).trim()
+            : "";
+        const subParts: string[] = [];
+        if (crmId) subParts.push(`CRM ${crmId}`);
+        if (tid) subParts.push(`${tid.slice(0, 8)}…`);
+        const subline =
+          !hasStoredName && subParts.length > 0 ? subParts.join(" · ") : "";
+        return (
+          <div>
+            <p>
+              {customerDisplayLabel(c, tenantNameMap, crmCompanyNameMap)}
+            </p>
+            {subline ? (
+              <p className="font-mono text-[11px] text-zinc-500 dark:text-zinc-400">
+                {subline}
+              </p>
+            ) : null}
+          </div>
+        );
+      },
       cellClassName: "px-3 py-2 font-medium text-zinc-900 dark:text-zinc-100",
     },
     {

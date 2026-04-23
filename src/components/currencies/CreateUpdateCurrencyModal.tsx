@@ -9,6 +9,7 @@ import {
   buildWorldCurrencyMap,
   worldCurrencyDropdownRows,
 } from "@/lib/currencies/worldCurrencyMap";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import type { Currency } from "@/models/Currency";
 import { formControlClass } from "@/lib/uiFormClasses";
 
@@ -232,7 +233,9 @@ export function CreateUpdateCurrencyModal({
               onChange={(e) =>
                 setForm((p) => ({
                   ...p,
-                  exchange_rate: Number(e.target.value),
+                  exchange_rate: Number(
+                    stripNumericLeadingZerosForControlledInput(e.target.value),
+                  ),
                 }))
               }
             />

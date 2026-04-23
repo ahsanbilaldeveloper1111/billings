@@ -19,7 +19,8 @@ export function formatInvoicePeriodEnd(invoice: Invoice): string {
 
 export function getInvoiceDisplayNames(
   invoice: Invoice | undefined | null,
-  mainAppNameByIdentifier: Record<string, string> = {},
+  /** Company name + main-app fallback by `tenant_id` (company keys should win in the merged map). */
+  tenantLabelByTenantId: Record<string, string> = {},
 ): {
   companyDisplayName: string;
   billToDisplayName: string;
@@ -30,20 +31,30 @@ export function getInvoiceDisplayNames(
   const companyTenantId = company?.tenant_id
     ? String(company.tenant_id).trim()
     : null;
-  const mainAppCompanyName = companyTenantId
-    ? (mainAppNameByIdentifier[companyTenantId] ?? null)
-    : null;
+  const mappedTenantLabel = companyTenantId
+    ? (tenantLabelByTenantId[companyTenantId]?.trim() ?? "")
+    : "";
   let companyDisplayName = "N/A";
   if (company) {
+    const root =
+      company.name != null && String(company.name).trim() !== ""
+        ? String(company.name).trim()
+        : "";
     const fallback = companyTenantId ? companyTenantId : "N/A";
-    companyDisplayName = mainAppCompanyName ?? company.name ?? fallback;
+    companyDisplayName = root || mappedTenantLabel || fallback;
   }
   const hasCustomer = Boolean(invoice?.customer);
   const billToDisplayName = hasCustomer
     ? (invoice?.customer?.name ??
       invoice?.customer?.email ??
       "N/A")
-    : (mainAppCompanyName ?? company?.name ?? "N/A");
+    : (() => {
+        const root =
+          company?.name != null && String(company.name).trim() !== ""
+            ? String(company.name).trim()
+            : "";
+        return root || mappedTenantLabel || "N/A";
+      })();
   const sellerDisplayName = hasCustomer
     ? (company?.name ?? companyDisplayName ?? "N/A")
     : (company?.vendor?.name ?? "N/A");

@@ -6,6 +6,7 @@ import { useStripePaymentMethods } from "@/hooks/stripe/useStripeEndpoints";
 import { useCompanyDiscountApplicability } from "@/hooks/company/useCompanyDiscountApplicability";
 import { useCompanyDocuments } from "@/hooks/company/useCompanyDocuments";
 import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { getCompanyDocumentsList } from "@/lib/company/companyDocuments";
 import { downloadCompanyDocumentFile } from "@/lib/company/downloadCompanyDocumentFile";
@@ -13,6 +14,7 @@ import { formatCurrency } from "@/lib/currency";
 import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import { parseStripePaymentMethods } from "@/lib/stripe/parseStripePaymentMethods";
+import { companyDetailDisplayName } from "@/lib/company/tenantDisplayLabel";
 import { showAppToast } from "@/lib/toast/appToast";
 import type { Company, CompanyDocument } from "@/models/Company";
 import { OutstandingInvoicesModal } from "@/components/company/OutstandingInvoicesModal";
@@ -115,11 +117,18 @@ export function CompanyProfileView({ profile, onEdit }: CompanyProfileViewProps)
   useCompanyDiscountApplicability(profile.id ?? null);
 
   const tenantMap = useTenantDisplayNameMap();
-  const tid = profile.tenant_id != null ? String(profile.tenant_id) : "";
-  const companyDisplayName =
-    (tid && tenantMap[tid]?.trim()) ||
-    (profile.name && String(profile.name).trim()) ||
-    "—";
+  const mainAppResellerMap = useMainAppResellerNameMap();
+  const tid =
+    profile.tenant_id != null && String(profile.tenant_id).trim() !== ""
+      ? String(profile.tenant_id).trim()
+      : "";
+  const companyDisplayName = companyDetailDisplayName(
+    profile,
+    tid,
+    tenantMap,
+    mainAppResellerMap,
+    "—",
+  );
 
   const { data: documentsData, isPending: documentsLoading } =
     useCompanyDocuments(tid || null);
@@ -177,7 +186,7 @@ export function CompanyProfileView({ profile, onEdit }: CompanyProfileViewProps)
           <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
             <div className="min-w-0">
               <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                Tenant: {profile.name ?? "—"}
+                Tenant: {companyDisplayName}
               </h2>
               <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 dark:text-zinc-400">
                 <span>{profile.email ?? "—"}</span>

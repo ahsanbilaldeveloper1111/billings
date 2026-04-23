@@ -5,10 +5,12 @@ import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { CustomerPaymentCardsEditor } from "@/components/customers/CustomerPaymentCardsEditor";
 import { CustomerSavedCardsInlineSummary } from "@/components/customers/CustomerSavedCardsInlineSummary";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
 import { useCrmCompanyNameMap } from "@/hooks/crm/useCrmCompanyNameMap";
 import { useCustomer } from "@/hooks/customers/useCustomer";
-import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { customerApiResourceKey } from "@/lib/customers/customerApiResourceKey";
+import { customerDisplayLabel } from "@/lib/customers/customerDisplayLabel";
 import { customerStripeCrmId } from "@/lib/customers/customerStripeCrmId";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import { ModalShell } from "@/components/ui/ModalShell";
@@ -74,7 +76,22 @@ export function ViewCustomerModal({
   onEdit,
 }: ViewCustomerModalProps) {
   const router = useRouter();
-  const tenantNameMap = useTenantDisplayNameMap();
+  const companyTenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const tenantNameMap = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const k of new Set([
+      ...Object.keys(companyTenantDisplayMap),
+      ...Object.keys(resellerNameMap),
+    ])) {
+      const v =
+        companyTenantDisplayMap[k]?.trim() ||
+        resellerNameMap[k]?.trim() ||
+        "";
+      if (v) out[k] = v;
+    }
+    return out;
+  }, [companyTenantDisplayMap, resellerNameMap]);
   const crmCompanyNameMap = useCrmCompanyNameMap();
 
   const detailQuery = useCustomer(show ? customerId : null, {
@@ -93,6 +110,14 @@ export function ViewCustomerModal({
     const tid = String(customer.tenant_id).trim();
     return tenantNameMap[tid]?.trim() || tid;
   }, [customer?.tenant_id, tenantNameMap]);
+
+  const resolvedCustomerName = useMemo(
+    () =>
+      customer
+        ? customerDisplayLabel(customer, tenantNameMap, crmCompanyNameMap)
+        : "—",
+    [customer, tenantNameMap, crmCompanyNameMap],
+  );
 
   const crmDisplay = useMemo(() => {
     if (!customer?.crm_company_id) return "—";
@@ -165,7 +190,7 @@ export function ViewCustomerModal({
             <>
               <SectionCard title="Basic information">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <GridField label="Name">{customer.name ?? "—"}</GridField>
+                  <GridField label="Name">{resolvedCustomerName}</GridField>
                   <GridField label="Email">{customer.email ?? "—"}</GridField>
                   <GridField label="Phone">{customer.phone ?? "—"}</GridField>
                   <GridField label="CRM company">{crmDisplay}</GridField>
@@ -248,7 +273,11 @@ export function ViewCustomerModal({
               {stripeCrmId && customer ? (
                 <CustomerPaymentCardsEditor
                   crmCompanyId={stripeCrmId}
-                  customerName={customer.name ?? "Customer"}
+                  customerName={
+                    resolvedCustomerName !== "—"
+                      ? resolvedCustomerName
+                      : "Customer"
+                  }
                   active={show}
                 />
               ) : null}

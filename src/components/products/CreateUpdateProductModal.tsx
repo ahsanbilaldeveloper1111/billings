@@ -11,6 +11,7 @@ import { useProductCategories } from "@/hooks/product-categories/useProductCateg
 import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { errorsFromAxios } from "@/lib/api/errorsFromAxios";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import { extractListRows, getApiData } from "@/lib/api/extractApiData";
 import {
   buildProductMutationFormData,
@@ -24,6 +25,7 @@ import {
   hasValidationErrors,
   validateProductForm,
 } from "@/lib/products/productFormValidation";
+import { formatTenantListLabel } from "@/lib/company/tenantDisplayLabel";
 import {
   showAppToast,
   showBillingBackendErrorToast,
@@ -66,13 +68,8 @@ export function CreateUpdateProductModal({
   const [logoRemoved, setLogoRemoved] = useState(false);
 
   const mutations = useProductMutations();
-  const categoriesQ = useProductCategories(
-    {
-      limit: 500,
-      ...(form.tenant_id.trim() ? { tenant_id: form.tenant_id.trim() } : {}),
-    },
-    { enabled: open },
-  );
+  /** Load categories (up to limit); options are filtered client-side by selected company. */
+  const categoriesQ = useProductCategories({ limit: 500 }, { enabled: open });
   const currenciesQ = useActiveCurrencies();
   const detailQ = useProduct(open && isEdit ? productId : null);
   const productRow = getApiData(detailQ.data) as
@@ -110,9 +107,13 @@ export function CreateUpdateProductModal({
     const tenantId = form.tenant_id.trim();
     return rows.filter((r) => {
       if (r.id == null) return false;
-      if (tenantId) return true;
-      const rowTenantId = typeof r.tenant_id === "string" ? r.tenant_id.trim() : "";
-      return rowTenantId === "";
+      const rowTenantId =
+        r.tenant_id != null && String(r.tenant_id).trim() !== ""
+          ? String(r.tenant_id).trim()
+          : "";
+      // No company: only categories not tied to a tenant. With company: only that tenant's categories.
+      if (!tenantId) return rowTenantId === "";
+      return rowTenantId === tenantId;
     });
   }, [categoriesQ.data, form.tenant_id]);
 
@@ -153,12 +154,23 @@ export function CreateUpdateProductModal({
       filteredCompaniesQ.data,
     );
     const opts = rows.map((c) => {
-      const tid = c.tenant_id != null ? String(c.tenant_id) : "";
-      const label =
-        mainAppResellerMap[String(tid)] ??
-        (typeof c.name === "string" ? c.name : "") ??
+      const tid =
+        c.tenant_id != null && String(c.tenant_id).trim() !== ""
+          ? String(c.tenant_id).trim()
+          : "";
+      const companyName =
+        typeof c.name === "string" ? String(c.name).trim() : "";
+      const resellerNested =
+        c.reseller?.name != null ? String(c.reseller.name).trim() : "";
+      const displayName =
+        companyName ||
+        resellerNested ||
+        mainAppResellerMap[tid] ||
         tid;
-      return { value: tid, label: label.trim() ? label : tid || "—" };
+      return {
+        value: tid,
+        label: tid ? formatTenantListLabel(tid, displayName) : "—",
+      };
     });
     return [{ value: "", label: "Select a company…" }, ...opts];
   }, [
@@ -565,7 +577,12 @@ export function CreateUpdateProductModal({
             className={`${formControlClass} ${inputErr("base_price")}`}
             value={form.base_price}
             onChange={(e) => {
-              setForm((s) => ({ ...s, base_price: e.target.value }));
+              setForm((s) => ({
+                ...s,
+                base_price: stripNumericLeadingZerosForControlledInput(
+                  e.target.value,
+                ),
+              }));
               if (errors.base_price)
                 setErrors((prev) => ({ ...prev, base_price: "" }));
             }}

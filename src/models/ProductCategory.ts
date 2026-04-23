@@ -16,6 +16,7 @@ export interface ProductCategory {
 /** `GET /api/backend/product-categories` — filters + `order[column]` / `order[dir]`. */
 export interface IndexProductCategoryParams {
   tenant_id?: string | null;
+  vendor_id?: number;
   page?: number;
   limit?: number;
   search?: string;

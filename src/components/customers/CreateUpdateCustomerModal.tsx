@@ -13,6 +13,7 @@ import {
   useActiveCurrencies,
 } from "@/hooks/currencies/useActiveCurrencies";
 import { errorsFromAxios } from "@/lib/api/errorsFromAxios";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import { extractListRows } from "@/lib/api/extractApiData";
 import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import {
@@ -551,14 +552,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.vat_rate
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "vat_rate",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                     <div className="flex items-center pt-6">
@@ -602,14 +604,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.payment_terms
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "payment_terms",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                     <div>
@@ -626,14 +629,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.credit_limit
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "credit_limit",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                     <div>
@@ -666,14 +670,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.discount_limit
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "discount_limit",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                     <div>
@@ -691,14 +696,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.early_payment_discount
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "early_payment_discount",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                     <div>
@@ -716,14 +722,15 @@ export function CreateUpdateCustomerModal({
                             ? ""
                             : formData.profile.late_fee_rule
                         }
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          const v = stripNumericLeadingZerosForControlledInput(
+                            e.target.value,
+                          );
                           handleProfileChange(
                             "late_fee_rule",
-                            e.target.value === ""
-                              ? ""
-                              : Number(e.target.value),
-                          )
-                        }
+                            v === "" ? "" : Number(v),
+                          );
+                        }}
                       />
                     </div>
                   </div>

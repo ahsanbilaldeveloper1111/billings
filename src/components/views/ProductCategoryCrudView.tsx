@@ -7,7 +7,12 @@ import { ProductCategoryListTable } from "@/components/product-categories/Produc
 import { ViewProductCategoryModal } from "@/components/product-categories/ViewProductCategoryModal";
 import { DeleteConfirmationDialog } from "@/components/crud/DeleteConfirmationDialog";
 import { CollapsibleFilterPanel } from "@/components/crud/ListUiControls";
+import { SearchableSelect } from "@/components/ui/SearchableSelect";
+import { TenantSearchableDropdown } from "@/components/ui/TenantSearchableDropdown";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
+import { useVendors } from "@/hooks/vendors/useVendors";
 import { useProductCategories } from "@/hooks/product-categories/useProductCategories";
 import { useProductCategoryMutations } from "@/hooks/product-categories/useProductCategoryMutations";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
@@ -52,6 +57,8 @@ export function ProductCategoryCrudView() {
     listState.limit,
     listState.sort_field,
     listState.sort_direction,
+    listState.vendor_id,
+    listState.tenant_id,
     debouncedSearch,
     pathname,
     router,
@@ -72,19 +79,65 @@ export function ProductCategoryCrudView() {
   const allowUpdate = isSuperAdmin || canUpdate(mod);
   const allowDelete = isSuperAdmin || canDelete(mod);
 
+  const vendorsForPicker = useVendors(
+    {
+      limit: 500,
+      "order[column]": "name",
+      "order[dir]": "asc",
+    },
+    { enabled: allowView },
+  );
+  const vendorRows = extractListRows(vendorsForPicker.data).rows as {
+    id: number;
+    name: string;
+  }[];
+  const vendorOptions = useMemo(
+    () =>
+      vendorRows.map((v) => ({
+        value: String(v.id),
+        label: v.name,
+      })),
+    [vendorRows],
+  );
+
+  const companyTenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const tenantNameMap = useMemo(() => {
+    const out: Record<string, string> = {};
+    for (const k of new Set([
+      ...Object.keys(companyTenantDisplayMap),
+      ...Object.keys(resellerNameMap),
+    ])) {
+      const v =
+        companyTenantDisplayMap[k]?.trim() ||
+        resellerNameMap[k]?.trim() ||
+        "";
+      if (v) out[k] = v;
+    }
+    return out;
+  }, [companyTenantDisplayMap, resellerNameMap]);
+
   const listParams = useMemo((): IndexProductCategoryParams => {
+    const vendorRaw = listState.vendor_id.trim();
+    const vendorNum = vendorRaw ? Number.parseInt(vendorRaw, 10) : NaN;
     return {
       page: listState.page,
       limit: listState.limit,
       "order[column]": listState.sort_field,
       "order[dir]": listState.sort_direction,
       ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+      ...(listState.tenant_id.trim()
+        ? { tenant_id: listState.tenant_id.trim() }
+        : {}),
+      ...(Number.isFinite(vendorNum) ? { vendor_id: vendorNum } : {}),
     };
   }, [
     listState.page,
     listState.limit,
     listState.sort_field,
     listState.sort_direction,
+    listState.tenant_id,
+    listState.vendor_id,
     debouncedSearch,
   ]);
 
@@ -187,11 +240,86 @@ export function ProductCategoryCrudView() {
               placeholder="Search categories…"
             />
           </div>
+          <div>
+            <label className={formLabelClass}>
+              Vendor
+            </label>
+            <SearchableSelect
+              value={listState.vendor_id || null}
+              onChange={(id) => {
+                setListState((s) => ({
+                  ...s,
+                  vendor_id: id ?? "",
+                  tenant_id: "",
+                  page: 1,
+                }));
+              }}
+              options={vendorOptions}
+              placeholder="All vendors"
+              loading={vendorsForPicker.isPending}
+              isClearable
+              ariaLabel="Vendor"
+              loadingText="Loading vendors…"
+              emptyText="No vendors"
+            />
+          </div>
+          <div>
+            <label className={formLabelClass}>
+              Company (tenant)
+            </label>
+            <TenantSearchableDropdown
+              className="w-full"
+              disabled={
+                !Number.isFinite(
+                  listState.vendor_id.trim()
+                    ? Number.parseInt(listState.vendor_id, 10)
+                    : NaN,
+                )
+              }
+              value={listState.tenant_id}
+              enabled={Number.isFinite(
+                listState.vendor_id.trim()
+                  ? Number.parseInt(listState.vendor_id, 10)
+                  : NaN,
+              )}
+              fetchParams={
+                Number.isFinite(
+                  listState.vendor_id.trim()
+                    ? Number.parseInt(listState.vendor_id, 10)
+                    : NaN,
+                )
+                  ? {
+                      vendor_id: Number.parseInt(
+                        listState.vendor_id,
+                        10,
+                      ),
+                    }
+                  : undefined
+              }
+              onChange={(tid) => {
+                setListState((s) => ({
+                  ...s,
+                  tenant_id: tid ?? "",
+                  page: 1,
+                }));
+              }}
+              placeholder={
+                listState.vendor_id.trim()
+                  ? "All companies — leave empty for global + all tenants"
+                  : "Select vendor first…"
+              }
+            />
+            <p className="mt-1 text-[11px] text-zinc-500 dark:text-zinc-400">
+              Leave empty to list every category. Pick a company to only show
+              categories for that tenant (plus use the Company column).
+            </p>
+          </div>
         </div>
       </CollapsibleFilterPanel>
 
       <ProductCategoryListTable
         query={listQuery}
+        tenantNameMap={tenantNameMap}
         title="Product categories"
         sortField={listState.sort_field}
         sortDir={listState.sort_direction}

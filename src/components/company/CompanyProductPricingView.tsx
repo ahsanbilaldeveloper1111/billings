@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useMemo, useState, useCallback } from "react";
 import { useCompany } from "@/hooks/company/useCompany";
+import { useTenantDisplayNameMap } from "@/hooks/company/useTenantDisplayNameMap";
+import { useMainAppResellerNameMap } from "@/hooks/resellers/useMainAppResellerNameMap";
 import { useCompanyDiscountApplicabilityListQuery } from "@/hooks/company/useCompanyDiscountApplicabilityListQuery";
 import { useCompanyDiscountApplicabilityMutations } from "@/hooks/company/useCompanyDiscountApplicabilityMutations";
 import { useCompanyProductPricingList } from "@/hooks/company/useCompanyProductPricingList";
@@ -10,7 +12,9 @@ import { useCompanyProductPricingMutations } from "@/hooks/company/useCompanyPro
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useProducts } from "@/hooks/products/useProducts";
 import { extractListRows } from "@/lib/api/extractApiData";
+import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import type { ApiSuccessResponse } from "@/lib/api/types";
+import { companyDetailDisplayName } from "@/lib/company/tenantDisplayLabel";
 import {
   formatPricingDateShort,
   normalizeProductPricingRows,
@@ -113,7 +117,19 @@ export function CompanyProductPricingView({
   const companyQuery = useCompany(trimmed || null, { load_profile: true });
   const company = unwrapApiSuccessData<Company>(companyQuery.data);
   const companyDefaultCurrency = company?.profile?.currency ?? "USD";
-  const companyName = company?.name ?? "Tenant";
+  const tenantDisplayMap = useTenantDisplayNameMap();
+  const resellerNameMap = useMainAppResellerNameMap();
+  const companyName = useMemo(
+    () =>
+      companyDetailDisplayName(
+        company ?? null,
+        trimmed,
+        tenantDisplayMap,
+        resellerNameMap,
+        "Tenant",
+      ),
+    [company, trimmed, tenantDisplayMap, resellerNameMap],
+  );
 
   const listParams = useMemo(
     () => ({
@@ -289,7 +305,9 @@ export function CompanyProductPricingView({
   };
 
   const runBulkDiscountFromModal = async () => {
-    const pct = Number.parseFloat(bulkPct);
+    const pct = Number.parseFloat(
+      stripNumericLeadingZerosForControlledInput(bulkPct),
+    );
     if (!Number.isFinite(pct) || pct <= 0) {
       showAppToast("Enter a valid discount percentage.", "warning");
       return;
@@ -444,7 +462,24 @@ export function CompanyProductPricingView({
             {companyName}
           </h1>
           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-            Tenant id: <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">{trimmed}</code>{" "}
+            {companyQuery.isSuccess &&
+            trimmed &&
+            companyName.trim() !== "" &&
+            companyName !== trimmed ? (
+              <>
+                Internal tenant ID:{" "}
+                <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
+                  {trimmed}
+                </code>
+              </>
+            ) : (
+              <>
+                Tenant id:{" "}
+                <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">
+                  {trimmed}
+                </code>
+              </>
+            )}{" "}
             · Default currency:{" "}
             <strong>{companyDefaultCurrency}</strong>
           </p>
@@ -625,7 +660,11 @@ export function CompanyProductPricingView({
                                 patchEdit(
                                   row.product_id,
                                   "selling_price",
-                                  Number.parseFloat(e.target.value) || 0,
+                                  Number.parseFloat(
+                                    stripNumericLeadingZerosForControlledInput(
+                                      e.target.value,
+                                    ),
+                                  ) || 0,
                                 )
                               }
                             />
@@ -764,7 +803,12 @@ export function CompanyProductPricingView({
                                 patchEdit(
                                   row.product_id,
                                   "subscriptions",
-                                  Number.parseInt(e.target.value, 10) || 0,
+                                  Number.parseInt(
+                                    stripNumericLeadingZerosForControlledInput(
+                                      e.target.value,
+                                    ),
+                                    10,
+                                  ) || 0,
                                 )
                               }
                             />
