@@ -33,6 +33,17 @@ function collectErrorMessages(data: unknown): string[] {
     if (typeof msg === "string" && msg.trim()) out.push(msg.trim());
   }
 
+  if (out.length === 0) {
+    const err = (data as { error?: unknown }).error;
+    if (typeof err === "string" && err.trim()) {
+      out.push(err.trim());
+    } else if (Array.isArray(err)) {
+      for (const line of err) {
+        if (typeof line === "string" && line.trim()) out.push(line.trim());
+      }
+    }
+  }
+
   return out;
 }
 
@@ -60,9 +71,15 @@ export function parseBillingBackendApiError(
     typeof (data as { message?: unknown }).message === "string"
       ? String((data as { message: string }).message).trim()
       : "";
+  const fromDataError =
+    typeof data === "object" &&
+    data &&
+    typeof (data as { error?: unknown }).error === "string"
+      ? String((data as { error: string }).error).trim()
+      : "";
 
   const headline =
-    messages[0] || fromDataMessage || error.message || FALLBACK;
+    messages[0] || fromDataMessage || fromDataError || error.message || FALLBACK;
 
   return {
     status,
