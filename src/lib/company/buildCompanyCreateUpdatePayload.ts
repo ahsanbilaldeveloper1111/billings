@@ -231,6 +231,8 @@ export function buildCompanyCreateUpdatePayload(
     ...(form.phone.trim() ? { phone: form.phone.trim() } : {}),
     ...(form.tenant_id.trim() ? { tenant_id: form.tenant_id.trim() } : {}),
     ...(p.country.trim() ? { country: p.country.trim() } : {}),
+    // Compatibility: some backend handlers validate `payment_mode` at root.
+    payment_mode: p.payment_mode,
     profile,
   };
 
