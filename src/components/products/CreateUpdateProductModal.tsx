@@ -320,8 +320,7 @@ export function CreateUpdateProductModal({
     } catch (err) {
       const mapped = errorsFromAxios(err);
       setErrors(mapped);
-      const hasField = Object.keys(mapped).some((k) => k !== "submit");
-      if (!hasField) showBillingBackendErrorToast(err);
+      showBillingBackendErrorToast(err);
     }
   }
 
@@ -419,11 +418,19 @@ export function CreateUpdateProductModal({
         </FormField>
         <FormField label="SKU">
           <input
-            className={formControlClass}
+            className={`${formControlClass} ${inputErr("sku")}`}
             value={form.sku}
-            onChange={(e) => setForm((s) => ({ ...s, sku: e.target.value }))}
+            onChange={(e) => {
+              setForm((s) => ({ ...s, sku: e.target.value }));
+              if (errors.sku) setErrors((prev) => ({ ...prev, sku: "" }));
+            }}
             placeholder="Stock keeping unit (optional)"
           />
+          {errors.sku ? (
+            <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">
+              {errors.sku}
+            </p>
+          ) : null}
         </FormField>
       </div>
 
@@ -596,11 +603,12 @@ export function CreateUpdateProductModal({
         </FormField>
         <FormField label="Currency">
           <select
-            className={formControlClass}
+          className={`${formControlClass} ${inputErr("currency")}`}
             value={form.currency}
-            onChange={(e) =>
-              setForm((s) => ({ ...s, currency: e.target.value }))
-            }
+          onChange={(e) => {
+            setForm((s) => ({ ...s, currency: e.target.value }));
+            if (errors.currency) setErrors((prev) => ({ ...prev, currency: "" }));
+          }}
           >
             {currencies.length === 0 ? (
               <option value="USD">USD</option>
@@ -612,6 +620,11 @@ export function CreateUpdateProductModal({
               ))
             )}
           </select>
+        {errors.currency ? (
+          <p className="mt-1 text-xs text-rose-600 dark:text-rose-400">
+            {errors.currency}
+          </p>
+        ) : null}
         </FormField>
       </div>
 
