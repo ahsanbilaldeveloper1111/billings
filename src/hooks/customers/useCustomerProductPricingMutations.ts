@@ -8,26 +8,30 @@ export function useCustomerProductPricingMutations(
   customerPathId: string | null | undefined,
 ) {
   const qc = useQueryClient();
-  const invalidate = () => {
-    qc.invalidateQueries({ queryKey: queryKeys.customers.all });
+  const refreshCustomerPricing = async () => {
+    await qc.invalidateQueries({ queryKey: queryKeys.customers.all });
+    await qc.refetchQueries({
+      queryKey: [...queryKeys.customers.all, "productPricing"],
+      type: "active",
+    });
   };
 
   const updateProductPricing = useMutation({
     mutationFn: (body: unknown) =>
       customerService.createProductPricing(customerPathId as string, body),
-    onSuccess: invalidate,
+    onSuccess: refreshCustomerPricing,
   });
 
   const bulkUpdateProductPricing = useMutation({
     mutationFn: (body: unknown) =>
       customerService.bulkUpdateProductPricing(customerPathId as string, body),
-    onSuccess: invalidate,
+    onSuccess: refreshCustomerPricing,
   });
 
   const deleteProductPricing = useMutation({
     mutationFn: (productId: number | string) =>
       customerService.deleteProductPricing(customerPathId as string, productId),
-    onSuccess: invalidate,
+    onSuccess: refreshCustomerPricing,
   });
 
   return {
