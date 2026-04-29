@@ -15,6 +15,8 @@ import {
   currenciesFromResponse,
   useActiveCurrencies,
 } from "@/hooks/currencies/useActiveCurrencies";
+import { baseCurrencyFromResponse, useBaseCurrency } from "@/hooks/currencies/useBaseCurrency";
+import { resolveDefaultCurrencyCode } from "@/lib/currencies/defaultCurrencyCode";
 import {
   useStripePaymentMethods,
 } from "@/hooks/stripe/useStripeEndpoints";
@@ -273,7 +275,9 @@ export function CreateUpdateCompanyModal({
   ).rows;
 
   const currenciesQ = useActiveCurrencies();
+  const baseCurrencyQ = useBaseCurrency();
   const activeCurrencies = currenciesFromResponse(currenciesQ.data);
+  const baseCurrency = baseCurrencyFromResponse(baseCurrencyQ.data);
   const currencyOptions = useMemo(
     () =>
       activeCurrencies
@@ -284,6 +288,10 @@ export function CreateUpdateCompanyModal({
           label: `${c.code} — ${c.name} (${c.symbol || c.code})`,
         })),
     [activeCurrencies],
+  );
+  const defaultCurrencyCode = useMemo(
+    () => resolveDefaultCurrencyCode(baseCurrency, activeCurrencies),
+    [baseCurrency, activeCurrencies],
   );
 
   const countryOptions = useMemo(
@@ -304,8 +312,10 @@ export function CreateUpdateCompanyModal({
       setCompanyLogoFile(null);
       if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
       setLogoRemoved(false);
-      setForm(emptyCompanyForm());
-      setNewBank(emptyBankAccountDraft("USD"));
+      const next = emptyCompanyForm();
+      next.profile.currency = defaultCurrencyCode;
+      setForm(next);
+      setNewBank(emptyBankAccountDraft(defaultCurrencyCode));
       setEditingBankIndex(null);
       setDocumentFiles([]);
       return;
@@ -325,7 +335,26 @@ export function CreateUpdateCompanyModal({
     setEditingBankIndex(null);
     setLogoRemoved(false);
     if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
-  }, [open, isEdit, row]);
+  }, [open, isEdit, row, defaultCurrencyCode]);
+
+  useEffect(() => {
+    if (!open || isEdit) return;
+    if (activeCurrencies.length === 0) return;
+    const selected = String(form.profile.currency ?? "").trim().toUpperCase();
+    const isValid = activeCurrencies.some(
+      (c) => String(c.code ?? "").trim().toUpperCase() === selected,
+    );
+    if (!selected || !isValid) {
+      setProfile("currency", defaultCurrencyCode);
+      setNewBank((b) => ({ ...b, currency: defaultCurrencyCode }));
+    }
+  }, [
+    open,
+    isEdit,
+    activeCurrencies,
+    form.profile.currency,
+    defaultCurrencyCode,
+  ]);
 
   useEffect(() => {
     if (open) return;

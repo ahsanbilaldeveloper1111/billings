@@ -5,6 +5,7 @@ import { FormField, FormModal } from "@/components/crud/FormModal";
 import { ProductCategoryManagementModal } from "@/components/product-categories/ProductCategoryManagementModal";
 import { useCompanies } from "@/hooks/company/useCompanies";
 import { useActiveCurrencies, currenciesFromResponse } from "@/hooks/currencies/useActiveCurrencies";
+import { baseCurrencyFromResponse, useBaseCurrency } from "@/hooks/currencies/useBaseCurrency";
 import { useProduct } from "@/hooks/products/useProduct";
 import { useProductMutations } from "@/hooks/products/useProductMutations";
 import { useProductCategories } from "@/hooks/product-categories/useProductCategories";
@@ -13,6 +14,7 @@ import { useVendors } from "@/hooks/vendors/useVendors";
 import { errorsFromAxios } from "@/lib/api/errorsFromAxios";
 import { stripNumericLeadingZerosForControlledInput } from "@/lib/forms/stripNumericLeadingZeros";
 import { extractListRows, getApiData } from "@/lib/api/extractApiData";
+import { resolveDefaultCurrencyCode } from "@/lib/currencies/defaultCurrencyCode";
 import {
   buildProductMutationFormData,
   buildProductMutationPayload,
@@ -71,6 +73,7 @@ export function CreateUpdateProductModal({
   /** Load categories (up to limit); options are filtered client-side by selected company. */
   const categoriesQ = useProductCategories({ limit: 500 }, { enabled: open });
   const currenciesQ = useActiveCurrencies();
+  const baseCurrencyQ = useBaseCurrency();
   const detailQ = useProduct(open && isEdit ? productId : null);
   const productRow = getApiData(detailQ.data) as
     | (Product & Record<string, unknown>)
@@ -135,6 +138,14 @@ export function CreateUpdateProductModal({
     const list = currenciesFromResponse(currenciesQ.data);
     return list.slice().sort((a, b) => a.code.localeCompare(b.code));
   }, [currenciesQ.data]);
+  const baseCurrency = useMemo(
+    () => baseCurrencyFromResponse(baseCurrencyQ.data),
+    [baseCurrencyQ.data],
+  );
+  const defaultCurrencyCode = useMemo(
+    () => resolveDefaultCurrencyCode(baseCurrency, currencies),
+    [baseCurrency, currencies],
+  );
 
   const vendorRows = useMemo(() => {
     const { rows } = extractListRows<Vendor & Record<string, unknown>>(
@@ -182,7 +193,7 @@ export function CreateUpdateProductModal({
   useEffect(() => {
     if (!open) return;
     if (!isEdit) {
-      setForm(defaultProductFormState());
+      setForm({ ...defaultProductFormState(), currency: defaultCurrencyCode });
       setErrors({});
       setProductLogoFile(null);
       setLogoRemoved(false);
@@ -208,6 +219,22 @@ export function CreateUpdateProductModal({
     });
     if (productLogoFileRef.current) productLogoFileRef.current.value = "";
   }, [open, isEdit, detailQ.data]);
+
+  useEffect(() => {
+    if (!open || isEdit) return;
+    const selected = String(form.currency ?? "").trim().toUpperCase();
+    if (!selected) {
+      setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
+      return;
+    }
+    if (currencies.length === 0) return;
+    const isValid = currencies.some(
+      (c) => String(c.code ?? "").trim().toUpperCase() === selected,
+    );
+    if (!isValid) {
+      setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
+    }
+  }, [open, isEdit, form.currency, currencies, defaultCurrencyCode]);
 
   useEffect(() => {
     if (open) return;
@@ -307,7 +334,7 @@ export function CreateUpdateProductModal({
         await mutations.create.mutateAsync(body);
         showAppToast("Product created.", "success");
       }
-      setForm(defaultProductFormState());
+      setForm({ ...defaultProductFormState(), currency: defaultCurrencyCode });
       setProductLogoFile(null);
       setLogoRemoved(false);
       setProductLogoBlobUrl((prev) => {

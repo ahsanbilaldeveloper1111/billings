@@ -8,6 +8,8 @@ import {
   currenciesFromResponse,
   useActiveCurrencies,
 } from "@/hooks/currencies/useActiveCurrencies";
+import { baseCurrencyFromResponse, useBaseCurrency } from "@/hooks/currencies/useBaseCurrency";
+import { resolveDefaultCurrencyCode } from "@/lib/currencies/defaultCurrencyCode";
 import {
   vendorPayloadToFormData,
   vendorPayloadToJson,
@@ -118,7 +120,9 @@ export function CreateUpdateVendorModal({
   const loadingVendor = Boolean(isEdit && detailQuery.isPending && open);
 
   const currenciesQuery = useActiveCurrencies();
+  const baseCurrencyQ = useBaseCurrency();
   const activeCurrencies = currenciesFromResponse(currenciesQuery.data);
+  const baseCurrency = baseCurrencyFromResponse(baseCurrencyQ.data);
 
   const currencyOptions = useMemo(() => {
     return activeCurrencies
@@ -129,6 +133,10 @@ export function CreateUpdateVendorModal({
         label: `${c.code} — ${c.name} (${c.symbol || c.code})`,
       }));
   }, [activeCurrencies]);
+  const defaultCurrencyCode = useMemo(
+    () => resolveDefaultCurrencyCode(baseCurrency, activeCurrencies),
+    [baseCurrency, activeCurrencies],
+  );
 
   const countryOptions = useMemo(
     () =>
@@ -149,6 +157,7 @@ export function CreateUpdateVendorModal({
 
   useEffect(() => {
     if (!open || isEdit) return;
+    setFormData((prev) => ({ ...prev, currency: defaultCurrencyCode }));
     setLogoRemoved(false);
     setVendorLogoFile(null);
     setVendorLogoBlobUrl((prev) => {
@@ -156,7 +165,26 @@ export function CreateUpdateVendorModal({
       return null;
     });
     if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
-  }, [open, isEdit]);
+  }, [open, isEdit, defaultCurrencyCode]);
+
+  useEffect(() => {
+    if (!open || isEdit) return;
+    if (activeCurrencies.length === 0) return;
+    const selected = String(formData.currency ?? "").trim().toUpperCase();
+    const isValid = activeCurrencies.some(
+      (c) => String(c.code ?? "").trim().toUpperCase() === selected,
+    );
+    if (!selected || !isValid) {
+      setFormData((prev) => ({ ...prev, currency: defaultCurrencyCode }));
+      setNewBankAccount((b) => ({ ...b, currency: defaultCurrencyCode }));
+    }
+  }, [
+    open,
+    isEdit,
+    activeCurrencies,
+    formData.currency,
+    defaultCurrencyCode,
+  ]);
 
   useEffect(() => {
     if (open) return;
