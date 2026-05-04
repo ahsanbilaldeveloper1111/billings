@@ -188,11 +188,13 @@ export function CreateUpdateVendorModal({
 
   useEffect(() => {
     if (open) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- clear staged logo when modal closes */
     setVendorLogoFile(null);
     setVendorLogoBlobUrl((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return null;
     });
+    /* eslint-enable react-hooks/set-state-in-effect */
     if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
   }, [open]);
 
