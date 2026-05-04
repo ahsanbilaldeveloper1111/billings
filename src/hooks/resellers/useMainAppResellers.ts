@@ -14,7 +14,7 @@ export function useMainAppResellers(
   const auth = useAuthQueryEnabled();
   const merged = useMemo(() => {
     return { limit: 500, ...(fetchParams ?? {}) } as Record<string, unknown>;
-  }, [JSON.stringify(fetchParams ?? {})]);
+  }, [fetchParams]);
 
   const enabled =
     auth && (options?.enabled === undefined ? true : options.enabled);
