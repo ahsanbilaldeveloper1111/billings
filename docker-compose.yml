@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  billing-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_LARAVEL_API_URL: ${NEXT_PUBLIC_LARAVEL_API_URL}
+        NEXT_PUBLIC_LARAVEL_PUBLIC_BASE_URL: ${NEXT_PUBLIC_LARAVEL_PUBLIC_BASE_URL}
+        NEXT_PUBLIC_API_SAME_ORIGIN_PROXY: ${NEXT_PUBLIC_API_SAME_ORIGIN_PROXY}
+    image: billing-frontend:local
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    restart: unless-stopped
