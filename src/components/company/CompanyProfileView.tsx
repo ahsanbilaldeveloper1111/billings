@@ -12,7 +12,6 @@ import { getCompanyDocumentsList } from "@/lib/company/companyDocuments";
 import { downloadCompanyDocumentFile } from "@/lib/company/downloadCompanyDocumentFile";
 import { formatCurrency } from "@/lib/currency";
 import { logoDisplaySrc, logoPreviewSource } from "@/lib/logoDisplaySrc";
-import { unwrapApiSuccessData } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import { parseStripePaymentMethods } from "@/lib/stripe/parseStripePaymentMethods";
 import { companyDetailDisplayName } from "@/lib/company/tenantDisplayLabel";
 import { showAppToast } from "@/lib/toast/appToast";

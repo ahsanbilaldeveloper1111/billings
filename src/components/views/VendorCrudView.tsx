@@ -37,9 +37,18 @@ export function VendorCrudView() {
   const debouncedSearch = useDebouncedValue(listState.search, 300);
 
   useEffect(() => {
-    const q = buildVendorListSearchParams(listState, {
-      searchOverride: debouncedSearch,
-    });
+    const q = buildVendorListSearchParams(
+      {
+        page: listState.page,
+        limit: listState.limit,
+        search: debouncedSearch,
+        sort_field: listState.sort_field,
+        sort_direction: listState.sort_direction,
+        filter_email: listState.filter_email,
+        filter_phone: listState.filter_phone,
+      },
+      { searchOverride: debouncedSearch },
+    );
     const next = q.toString();
     if (next === searchParams.toString()) return;
     router.replace(`${pathname}?${next}`, { scroll: false });

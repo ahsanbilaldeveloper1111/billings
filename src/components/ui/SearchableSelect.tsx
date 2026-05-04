@@ -61,9 +61,9 @@ export function SearchableSelect({
 
   /** When closing (e.g. click outside), reset the search field to the current label. */
   useEffect(() => {
-    if (!open) {
-      setQuery(selectedLabel);
-    }
+    if (open) return;
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- mirror closed listbox query to selection label */
+    setQuery(selectedLabel);
   }, [open, selectedLabel]);
 
   useEffect(() => {

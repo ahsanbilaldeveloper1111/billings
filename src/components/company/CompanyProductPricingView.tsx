@@ -51,16 +51,6 @@ function calculateFinalPrice(row: ProductPricingRow): number {
   return Math.max(0, base - (d.discount_amount ?? 0));
 }
 
-function calculateDiscountAmount(row: ProductPricingRow): number {
-  const base = row.selling_price;
-  const d = row.discount_applicability;
-  if (!d || !d.is_applicable) return 0;
-  if (d.discount_type === "percentage") {
-    return (base * (d.discount_percentage ?? 0)) / 100;
-  }
-  return d.discount_amount ?? 0;
-}
-
 function collectAvailableDiscounts(rows: ProductPricingRow[]): ProductDiscountApplicability[] {
   const map = new Map<number, ProductDiscountApplicability>();
   for (const r of rows) {

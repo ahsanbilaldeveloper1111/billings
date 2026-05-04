@@ -51,9 +51,19 @@ export function CustomerCrudView() {
   const debouncedSearch = useDebouncedValue(listState.search, 300);
 
   useEffect(() => {
-    const q = buildCustomerListSearchParams(listState, {
-      searchOverride: debouncedSearch,
-    });
+    const q = buildCustomerListSearchParams(
+      {
+        page: listState.page,
+        limit: listState.limit,
+        search: debouncedSearch,
+        sort_field: listState.sort_field,
+        sort_direction: listState.sort_direction,
+        tenant_id: listState.tenant_id,
+        crm_company_id: listState.crm_company_id,
+        vendor_id: listState.vendor_id,
+      },
+      { searchOverride: debouncedSearch },
+    );
     const next = q.toString();
     if (next === searchParams.toString()) return;
     router.replace(`${pathname}?${next}`, { scroll: false });

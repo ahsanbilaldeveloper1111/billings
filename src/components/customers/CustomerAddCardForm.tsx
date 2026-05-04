@@ -40,7 +40,9 @@ export function CustomerAddCardForm({
   const [isDefault, setIsDefault] = useState(false);
 
   useEffect(() => {
-    if (customerName.trim()) setCardholderName(customerName.trim());
+    if (!customerName.trim()) return;
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- sync default cardholder from customer name */
+    setCardholderName(customerName.trim());
   }, [customerName]);
 
   const isProcessing =

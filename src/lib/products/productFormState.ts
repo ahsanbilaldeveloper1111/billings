@@ -81,7 +81,6 @@ export function productFormStateFromApiProduct(
 
 export function buildProductMutationPayload(
   f: ProductFormState,
-  _isEdit: boolean,
 ): Record<string, unknown> {
   const base = Number.parseFloat(String(f.base_price).trim() || "0");
   const categoryId =

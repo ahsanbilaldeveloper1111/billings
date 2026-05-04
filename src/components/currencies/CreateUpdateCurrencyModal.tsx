@@ -63,6 +63,7 @@ export function CreateUpdateCurrencyModal({
   useEffect(() => {
     if (!open) return;
 
+    /* eslint-disable react-hooks/set-state-in-effect -- hydrate or clear form when sheet opens */
     if (isEdit && currency) {
       setForm({
         code: currency.code || "",
@@ -76,12 +77,13 @@ export function CreateUpdateCurrencyModal({
       setForm(emptyForm());
     }
     setError(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open, isEdit, currency]);
 
   useEffect(() => {
-    if (form.is_base_currency) {
-      setForm((prev) => ({ ...prev, exchange_rate: 1 }));
-    }
+    if (!form.is_base_currency) return;
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- base currency always rate 1 */
+    setForm((prev) => ({ ...prev, exchange_rate: 1 }));
   }, [form.is_base_currency]);
 
   const loading =

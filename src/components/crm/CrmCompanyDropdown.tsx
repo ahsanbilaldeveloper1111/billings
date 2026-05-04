@@ -58,7 +58,7 @@ export function CrmCompanyDropdown({
 }: CrmCompanyDropdownProps) {
   const params = useMemo(
     () => ({ limit: 500, ...(fetchParams ?? {}) }),
-    [JSON.stringify(fetchParams ?? {})],
+    [fetchParams],
   );
 
   const q = useCrmCompanies(params);

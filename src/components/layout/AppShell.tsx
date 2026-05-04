@@ -14,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- client hydration gate for auth redirect */
     setHydrated(true);
   }, []);
 

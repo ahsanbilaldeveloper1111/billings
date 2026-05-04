@@ -304,37 +304,39 @@ export function CreateUpdateCompanyModal({
 
   useEffect(() => {
     if (!open) return;
-    if (!isEdit) {
-      setCompanyLogoBlobUrl((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
+    (() => {
+      if (!isEdit) {
+        setCompanyLogoBlobUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return null;
+        });
+        setCompanyLogoFile(null);
+        if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+        setLogoRemoved(false);
+        const next = emptyCompanyForm();
+        next.profile.currency = defaultCurrencyCode;
+        setForm(next);
+        setNewBank(emptyBankAccountDraft(defaultCurrencyCode));
+        setEditingBankIndex(null);
+        setDocumentFiles([]);
+        return;
+      }
+      if (!row) return;
+      const v = row;
+      const p = v.profile;
+      setForm({
+        email: String(v.email ?? ""),
+        phone: String(v.phone ?? v.phone_no ?? ""),
+        tenant_id: v.tenant_id != null ? String(v.tenant_id) : "",
+        vendor_id: v.vendor_id != null ? String(v.vendor_id) : "",
+        profile: profileToFormSlice(v, p),
+        bank_accounts: bankAccountsFromApi(companyBankAccountsFromAny(v)),
       });
-      setCompanyLogoFile(null);
-      if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
-      setLogoRemoved(false);
-      const next = emptyCompanyForm();
-      next.profile.currency = defaultCurrencyCode;
-      setForm(next);
-      setNewBank(emptyBankAccountDraft(defaultCurrencyCode));
+      setNewBank(emptyBankAccountDraft(p?.currency ?? "USD"));
       setEditingBankIndex(null);
-      setDocumentFiles([]);
-      return;
-    }
-    if (!row) return;
-    const v = row;
-    const p = v.profile;
-    setForm({
-      email: String(v.email ?? ""),
-      phone: String(v.phone ?? v.phone_no ?? ""),
-      tenant_id: v.tenant_id != null ? String(v.tenant_id) : "",
-      vendor_id: v.vendor_id != null ? String(v.vendor_id) : "",
-      profile: profileToFormSlice(v, p),
-      bank_accounts: bankAccountsFromApi(companyBankAccountsFromAny(v)),
-    });
-    setNewBank(emptyBankAccountDraft(p?.currency ?? "USD"));
-    setEditingBankIndex(null);
-    setLogoRemoved(false);
-    if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+      setLogoRemoved(false);
+      if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+    })();
   }, [open, isEdit, row, defaultCurrencyCode]);
 
   useEffect(() => {
@@ -345,8 +347,13 @@ export function CreateUpdateCompanyModal({
       (c) => String(c.code ?? "").trim().toUpperCase() === selected,
     );
     if (!selected || !isValid) {
-      setProfile("currency", defaultCurrencyCode);
-      setNewBank((b) => ({ ...b, currency: defaultCurrencyCode }));
+      (() => {
+        setForm((prev) => ({
+          ...prev,
+          profile: { ...prev.profile, currency: defaultCurrencyCode },
+        }));
+        setNewBank((b) => ({ ...b, currency: defaultCurrencyCode }));
+      })();
     }
   }, [
     open,
@@ -358,13 +365,15 @@ export function CreateUpdateCompanyModal({
 
   useEffect(() => {
     if (open) return;
-    setCompanyLogoBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-    setCompanyLogoFile(null);
-    if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
-    setLogoRemoved(false);
+    (() => {
+      setCompanyLogoBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setCompanyLogoFile(null);
+      if (companyLogoFileRef.current) companyLogoFileRef.current.value = "";
+      setLogoRemoved(false);
+    })();
   }, [open]);
 
   const loadingRow = isEdit && detailQuery.isPending;
@@ -384,7 +393,7 @@ export function CreateUpdateCompanyModal({
       return String(row.tenant_id);
     }
     return "";
-  }, [form.tenant_id, row?.tenant_id]);
+  }, [form.tenant_id, row]);
 
   const companyLogoPreviewSrc = useMemo(() => {
     if (companyLogoBlobUrl) return companyLogoBlobUrl;
@@ -401,15 +410,7 @@ export function CreateUpdateCompanyModal({
         logoPreviewSource(form.profile.logo, form.profile.logo_url),
       ) ?? ""
     );
-  }, [
-    companyLogoBlobUrl,
-    companyLogoFile,
-    isEdit,
-    logoRemoved,
-    row?.profile,
-    form.profile.logo,
-    form.profile.logo_url,
-  ]);
+  }, [companyLogoBlobUrl, companyLogoFile, isEdit, logoRemoved, row, form.profile]);
 
   const documentsQuery = useCompanyDocuments(
     open && isEdit && tenantIdForDocs ? tenantIdForDocs : null,
@@ -482,11 +483,13 @@ export function CreateUpdateCompanyModal({
   const [addCardError, setAddCardError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!publishableKey) {
-      setStripePromise(null);
-      return;
-    }
-    setStripePromise(loadStripe(publishableKey));
+    (() => {
+      if (!publishableKey) {
+        setStripePromise(null);
+        return;
+      }
+      setStripePromise(loadStripe(publishableKey));
+    })();
   }, [publishableKey]);
 
   /** Same key as `CompanyProfileView`: tenant_id when present, else company id. */

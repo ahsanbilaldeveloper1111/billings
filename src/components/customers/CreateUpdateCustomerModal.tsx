@@ -199,8 +199,10 @@ export function CreateUpdateCustomerModal({
   useEffect(() => {
     if (!open) return;
     if (!isEdit) {
+      /* eslint-disable react-hooks/set-state-in-effect -- reset create form when sheet opens */
       setFormData(emptyForm());
       setErrors({});
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [open, isEdit]);
 
@@ -209,6 +211,7 @@ export function CreateUpdateCustomerModal({
     const raw = unwrapApiSuccessData<Customer>(detailQuery.data);
     if (!raw) return;
     const profile = raw.profile ?? null;
+    /* eslint-disable react-hooks/set-state-in-effect -- hydrate from GET customer */
     setFormData({
       crm_company_id: raw.crm_company_id ?? null,
       tenant_id: raw.tenant_id ?? null,
@@ -232,6 +235,7 @@ export function CreateUpdateCustomerModal({
       },
     });
     setErrors({});
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open, isEdit, detailQuery.data]);
 
   const handleChange = (field: keyof typeof formData, value: unknown) => {

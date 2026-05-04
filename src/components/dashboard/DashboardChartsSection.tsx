@@ -9,9 +9,6 @@ import {
 } from "@/lib/dashboard/unwrapAnalyticsPayload";
 import type {
   DashboardChartsData,
-  ExpenseBreakdownItem,
-  ExpenseTrendItem,
-  InventoryStatusDistribution,
   InventoryValueItem,
   RevenueTrendItem,
   TopSellingProduct,
@@ -197,50 +194,6 @@ function HorizontalBars({
   );
 }
 
-function InventoryStatusCard({ d }: { d: InventoryStatusDistribution }) {
-  const inStock = toFiniteNumber(d.in_stock);
-  const low = toFiniteNumber(d.low_stock);
-  const out = toFiniteNumber(d.out_of_stock);
-  const sum = inStock + low + out;
-  const empty = sum <= 0;
-
-  return (
-    <ChartCard title="Inventory status" empty={empty}>
-      <div className="flex h-3 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <div
-          className="bg-teal-500"
-          style={{ width: `${(inStock / sum) * 100}%` }}
-          title={`In stock: ${inStock}`}
-        />
-        <div
-          className="bg-amber-400"
-          style={{ width: `${(low / sum) * 100}%` }}
-          title={`Low: ${low}`}
-        />
-        <div
-          className="bg-rose-500"
-          style={{ width: `${(out / sum) * 100}%` }}
-          title={`Out: ${out}`}
-        />
-      </div>
-      <ul className="mt-3 flex flex-wrap gap-3 text-[11px] text-zinc-600 dark:text-zinc-400">
-        <li>
-          <span className="inline-block h-2 w-2 rounded-sm bg-teal-500 align-middle" />{" "}
-          In stock: <strong className="text-zinc-800 dark:text-zinc-200">{inStock}</strong>
-        </li>
-        <li>
-          <span className="inline-block h-2 w-2 rounded-sm bg-amber-400 align-middle" />{" "}
-          Low: <strong className="text-zinc-800 dark:text-zinc-200">{low}</strong>
-        </li>
-        <li>
-          <span className="inline-block h-2 w-2 rounded-sm bg-rose-500 align-middle" />{" "}
-          Out: <strong className="text-zinc-800 dark:text-zinc-200">{out}</strong>
-        </li>
-      </ul>
-    </ChartCard>
-  );
-}
-
 type ChartsSectionProps = {
   payload: unknown;
   isLoading: boolean;
@@ -325,9 +278,6 @@ export function DashboardChartsSection({
   }
 
   const revenue = asArray<RevenueTrendItem>(data.revenue_trend);
-  const expense = asArray<ExpenseTrendItem>(data.expense_trend);
-  const inv = data.inventory_status;
-  const expenseBreak = asArray<ExpenseBreakdownItem>(data.expense_breakdown);
   const invVal = asArray<InventoryValueItem>(data.inventory_value);
   const top = asArray<TopSellingProduct>(data.top_products);
 

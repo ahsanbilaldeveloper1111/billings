@@ -15,11 +15,7 @@ import { useInvoices } from "@/hooks/invoices/useInvoices";
 import { usePermissions } from "@/hooks/permissions/usePermissions";
 import { useVendors } from "@/hooks/vendors/useVendors";
 import { extractListRows } from "@/lib/api/extractApiData";
-import {
-  formControlClass,
-  formLabelClass,
-  formToggleRowClass,
-} from "@/lib/uiFormClasses";
+import { formControlClass, formLabelClass } from "@/lib/uiFormClasses";
 import { useDebouncedValue } from "@/lib/hooks/useDebouncedValue";
 import {
   buildInvoiceListSearchParams,
@@ -45,34 +41,7 @@ const INVOICE_STATUS_OPTIONS: InvoiceStatus[] = [
   "cancelled",
 ];
 
-const SORT_PRESETS = [
-  { value: "created_at_desc", label: "Created at (newest first)" },
-  { value: "created_at_asc", label: "Created at (oldest first)" },
-  { value: "invoice_date_desc", label: "Invoice date (newest first)" },
-  { value: "invoice_date_asc", label: "Invoice date (oldest first)" },
-  {
-    value: "last_payment_date_desc",
-    label: "Last payment date (newest first)",
-  },
-  {
-    value: "last_payment_date_asc",
-    label: "Last payment date (oldest first)",
-  },
-] as const;
-
 const LIST_LIMIT_OPTIONS = [10, 20, 25, 50, 100] as const;
-
-function sortPresetValue(column: string, dir: "asc" | "desc"): string {
-  return `${column}_${dir}`;
-}
-
-function parseSortPreset(
-  value: string,
-): { column: string; dir: "asc" | "desc" } | null {
-  const m = /^(.+)_(asc|desc)$/.exec(value);
-  if (!m) return null;
-  return { column: m[1], dir: m[2] as "asc" | "desc" };
-}
 
 function formatInvoiceSummaryValue(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -138,9 +107,24 @@ export function InvoiceCrudView() {
   const debouncedSearch = useDebouncedValue(listState.search, 400);
 
   useEffect(() => {
-    const q = buildInvoiceListSearchParams(listState, {
-      searchOverride: debouncedSearch,
-    });
+    const q = buildInvoiceListSearchParams(
+      {
+        page: listState.page,
+        limit: listState.limit,
+        search: debouncedSearch,
+        status: listState.status,
+        tenant_id: listState.tenant_id,
+        vendor_id: listState.vendor_id,
+        crm_company_id: listState.crm_company_id,
+        date_from: listState.date_from,
+        date_to: listState.date_to,
+        column: listState.column,
+        dir: listState.dir,
+        payment_status: listState.payment_status,
+        crm_company_not_null: listState.crm_company_not_null,
+      },
+      { searchOverride: debouncedSearch },
+    );
     const next = q.toString();
     if (next === searchParams.toString()) return;
     router.replace(`${pathname}?${next}`, { scroll: false });
@@ -265,12 +249,6 @@ export function InvoiceCrudView() {
       showBillingBackendErrorToast(err);
     }
   }
-
-  const sortSelectValue = SORT_PRESETS.some(
-    (p) => p.value === sortPresetValue(listState.column, listState.dir),
-  )
-    ? sortPresetValue(listState.column, listState.dir)
-    : SORT_PRESETS[0].value;
 
   return (
     <>
@@ -477,32 +455,6 @@ export function InvoiceCrudView() {
               </button>
             </div>
           )}
-          {/* <div>
-            <label className={formLabelClass}>
-              Sort
-            </label>
-            <select
-              className={formControlClass}
-              value={sortSelectValue}
-              onChange={(ev) => {
-                const parsed = parseSortPreset(ev.target.value);
-                if (!parsed) return;
-                setListState((s) => ({
-                  ...s,
-                  page: 1,
-                  column: parsed.column,
-                  dir: parsed.dir,
-                }));
-              }}
-            >
-              {SORT_PRESETS.map((p) => (
-                <option key={p.value} value={p.value}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-          </div> */}
-     
           {/* <div className="flex items-end">
             <label className={formToggleRowClass}>
               <input

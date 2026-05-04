@@ -123,7 +123,7 @@ export function ViewCustomerModal({
     if (!customer?.crm_company_id) return "—";
     const id = String(customer.crm_company_id);
     return crmCompanyNameMap[id]?.trim() || id;
-  }, [customer?.crm_company_id, crmCompanyNameMap]);
+  }, [customer, crmCompanyNameMap]);
 
   const profile = customer?.profile;
   const pricingHref = customer

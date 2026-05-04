@@ -10,7 +10,7 @@ services:
         NEXT_PUBLIC_LARAVEL_API_URL: ${NEXT_PUBLIC_LARAVEL_API_URL}
         NEXT_PUBLIC_LARAVEL_PUBLIC_BASE_URL: ${NEXT_PUBLIC_LARAVEL_PUBLIC_BASE_URL}
         NEXT_PUBLIC_API_SAME_ORIGIN_PROXY: ${NEXT_PUBLIC_API_SAME_ORIGIN_PROXY}
-    image: billing-frontend:local
+    image: billing-frontend:latest
     env_file:
       - .env
     ports:

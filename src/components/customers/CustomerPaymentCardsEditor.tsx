@@ -66,11 +66,13 @@ export function CustomerPaymentCardsEditor({
   );
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- sync Stripe.js promise from publishable key */
     if (!publishableKey) {
       setStripePromise(null);
       return;
     }
     setStripePromise(loadStripe(publishableKey));
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [publishableKey]);
 
   const { data: stripePmData, refetch: refetchCards } =
@@ -88,10 +90,11 @@ export function CustomerPaymentCardsEditor({
   const [addCardError, setAddCardError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!active) {
-      setAddCardOpen(false);
-      setAddCardError(null);
-    }
+    if (active) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- collapse add-card when section inactive */
+    setAddCardOpen(false);
+    setAddCardError(null);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [active]);
 
   const handleCardAdded = () => {

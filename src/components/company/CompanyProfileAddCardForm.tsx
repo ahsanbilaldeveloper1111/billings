@@ -46,7 +46,9 @@ export function CompanyProfileAddCardForm({
   const [isDefault, setIsDefault] = useState(false);
 
   useEffect(() => {
-    if (cardholderLabel.trim()) setCardholderName(cardholderLabel.trim());
+    if (!cardholderLabel.trim()) return;
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- sync default cardholder from profile label */
+    setCardholderName(cardholderLabel.trim());
   }, [cardholderLabel]);
 
   const isProcessing =

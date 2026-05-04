@@ -129,8 +129,9 @@ export function CreateUpdateProductModal({
     if (categoriesQ.isPending) return;
     const existsInOptions = categoryRows.some((c) => String(c.id) === selected);
     if (!existsInOptions) {
-      // Clear category if tenant switch made current category invalid.
-      setForm((s) => ({ ...s, category_id: "" }));
+      (() => {
+        setForm((s) => ({ ...s, category_id: "" }));
+      })();
     }
   }, [open, form.category_id, categoryRows, categoriesQ.isPending]);
 
@@ -192,8 +193,24 @@ export function CreateUpdateProductModal({
 
   useEffect(() => {
     if (!open) return;
-    if (!isEdit) {
-      setForm({ ...defaultProductFormState(), currency: defaultCurrencyCode });
+    (() => {
+      if (!isEdit) {
+        setForm({ ...defaultProductFormState(), currency: defaultCurrencyCode });
+        setErrors({});
+        setProductLogoFile(null);
+        setLogoRemoved(false);
+        setProductLogoBlobUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return null;
+        });
+        if (productLogoFileRef.current) productLogoFileRef.current.value = "";
+        return;
+      }
+      const raw = getApiData(detailQ.data) as
+        | (Product & Record<string, unknown>)
+        | undefined;
+      if (!raw) return;
+      setForm(productFormStateFromApiProduct(raw));
       setErrors({});
       setProductLogoFile(null);
       setLogoRemoved(false);
@@ -202,72 +219,63 @@ export function CreateUpdateProductModal({
         return null;
       });
       if (productLogoFileRef.current) productLogoFileRef.current.value = "";
-      return;
-    }
-    const raw = getApiData(detailQ.data) as
-      | (Product & Record<string, unknown>)
-      | undefined;
-    if (!raw) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from GET show
-    setForm(productFormStateFromApiProduct(raw));
-    setErrors({});
-    setProductLogoFile(null);
-    setLogoRemoved(false);
-    setProductLogoBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-    if (productLogoFileRef.current) productLogoFileRef.current.value = "";
-  }, [open, isEdit, detailQ.data]);
+    })();
+  }, [open, isEdit, detailQ.data, defaultCurrencyCode]);
 
   useEffect(() => {
     if (!open || isEdit) return;
     const selected = String(form.currency ?? "").trim().toUpperCase();
-    if (!selected) {
-      setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
-      return;
-    }
-    if (currencies.length === 0) return;
-    const isValid = currencies.some(
-      (c) => String(c.code ?? "").trim().toUpperCase() === selected,
-    );
-    if (!isValid) {
-      setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
-    }
+    (() => {
+      if (!selected) {
+        setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
+        return;
+      }
+      if (currencies.length === 0) return;
+      const isValid = currencies.some(
+        (c) => String(c.code ?? "").trim().toUpperCase() === selected,
+      );
+      if (!isValid) {
+        setForm((s) => ({ ...s, currency: defaultCurrencyCode }));
+      }
+    })();
   }, [open, isEdit, form.currency, currencies, defaultCurrencyCode]);
 
   useEffect(() => {
     if (open) return;
-    setProductLogoFile(null);
-    setLogoRemoved(false);
-    setProductLogoBlobUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
+    (() => {
+      setProductLogoFile(null);
+      setLogoRemoved(false);
+      setProductLogoBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    })();
     if (productLogoFileRef.current) productLogoFileRef.current.value = "";
   }, [open]);
 
   useEffect(() => {
     if (!open || !isEdit) return;
     const tid = form.tenant_id.trim();
-    if (!tid) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync vendor when tenant cleared
-      setSelectedVendorId(null);
-      return;
-    }
-    const { rows } = extractListRows<Company & Record<string, unknown>>(
-      allCompaniesQ.data,
-    );
-    const company = rows.find((c) => String(c.tenant_id ?? "") === tid);
-    if (company?.vendor_id != null) {
-      setSelectedVendorId(String(company.vendor_id));
-    }
+    (() => {
+      if (!tid) {
+        setSelectedVendorId(null);
+        return;
+      }
+      const { rows } = extractListRows<Company & Record<string, unknown>>(
+        allCompaniesQ.data,
+      );
+      const company = rows.find((c) => String(c.tenant_id ?? "") === tid);
+      if (company?.vendor_id != null) {
+        setSelectedVendorId(String(company.vendor_id));
+      }
+    })();
   }, [open, isEdit, form.tenant_id, allCompaniesQ.data]);
 
   useEffect(() => {
     if (!open) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset when sheet closes
-      setSelectedVendorId(null);
+      (() => {
+        setSelectedVendorId(null);
+      })();
     }
   }, [open]);
 
@@ -298,7 +306,7 @@ export function CreateUpdateProductModal({
     const nextErrors = validateProductForm(form, isEdit);
     setErrors(nextErrors);
     if (hasValidationErrors(nextErrors)) return;
-    const body = buildProductMutationPayload(form, isEdit) as Record<
+    const body = buildProductMutationPayload(form) as Record<
       string,
       unknown
     >;

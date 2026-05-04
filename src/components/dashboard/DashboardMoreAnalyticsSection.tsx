@@ -45,63 +45,6 @@ function ChartCard({
   );
 }
 
-function trendPoints(values: number[]): { sx: number; sy: number }[] {
-  const n = values.length;
-  if (n === 0) return [];
-  const max = Math.max(...values, 1e-9);
-  return values.map((v, i) => ({
-    sx: n <= 1 ? 0.5 : i / (n - 1),
-    sy: 1 - v / max,
-  }));
-}
-
-function TrendLineSvg({
-  values,
-  strokeClass,
-}: {
-  values: number[];
-  strokeClass: string;
-}) {
-  const w = 100;
-  const h = 36;
-  const pad = 4;
-  const innerW = w - pad * 2;
-  const innerH = h - pad * 2;
-
-  const safeValues = values.map((v) =>
-    Number.isFinite(v) ? v : 0,
-  );
-  const pts = trendPoints(safeValues);
-  let coordStr: string;
-  if (pts.length === 0) return null;
-  if (pts.length === 1) {
-    const y = pad + innerH * pts[0]!.sy;
-    coordStr = `${pad},${y} ${w - pad},${y}`;
-  } else {
-    coordStr = pts
-      .map((p) => `${pad + p.sx * innerW},${pad + p.sy * innerH}`)
-      .join(" ");
-  }
-
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      className="h-28 w-full text-zinc-900 dark:text-zinc-100"
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <polyline
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.25"
-        className={strokeClass}
-        points={coordStr}
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-}
-
 function compactAmount(v: number): string {
   return new Intl.NumberFormat(undefined, {
     notation: "compact",
@@ -321,7 +264,6 @@ export function DashboardMoreAnalyticsSection({
   const activityEmpty = !activity;
 
   const spentRows = coerceAnalyticsRowList(spent);
-  const spentEmpty = spentRows.length === 0;
 
   const byMonthEmpty =
     byMonthSeries == null ||

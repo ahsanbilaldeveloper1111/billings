@@ -187,10 +187,12 @@ export function AddProductPricingModal({
   );
   useEffect(() => {
     if (!open) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- reset draft when modal opens */
     setSearchTerm("");
     setSelectedProducts([]);
     setPricingData({});
     setValidationErrors({});
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open]);
 
   const filteredProducts = useMemo(() => {

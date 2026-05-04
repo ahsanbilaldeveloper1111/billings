@@ -65,6 +65,7 @@ function SavedMethodPanel({
   useEffect(() => {
     if (paymentMethods.length === 0 || selectedPm) return;
     const def = paymentMethods.find((p) => p.is_default);
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- pick default PM when list loads */
     setSelectedPm(def?.id ?? paymentMethods[0]!.id);
   }, [paymentMethods, selectedPm]);
 

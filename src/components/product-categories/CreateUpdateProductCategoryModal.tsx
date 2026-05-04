@@ -88,36 +88,39 @@ export function CreateUpdateProductCategoryModal({
       | undefined;
     if (!raw) return;
     const pid = raw.parent_id;
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from GET show
-    setForm({
-      name: String(raw.name ?? ""),
-      description: raw.description != null ? String(raw.description) : "",
-      tenant_id: raw.tenant_id != null ? String(raw.tenant_id).trim() : "",
-      parent_id:
-        pid != null && Number.isFinite(Number(pid)) ? Number(pid) : "",
-      is_active: raw.is_active !== false,
-    });
-    setErrors({});
+    (() => {
+      setForm({
+        name: String(raw.name ?? ""),
+        description: raw.description != null ? String(raw.description) : "",
+        tenant_id: raw.tenant_id != null ? String(raw.tenant_id).trim() : "",
+        parent_id:
+          pid != null && Number.isFinite(Number(pid)) ? Number(pid) : "",
+        is_active: raw.is_active !== false,
+      });
+      setErrors({});
+    })();
   }, [open, isEdit, detailQ.data]);
 
   useEffect(() => {
-    if (!open) {
-      setSelectedVendorId(null);
-      return;
-    }
-    if (!isEdit) return;
-    const tid = form.tenant_id.trim();
-    if (!tid) {
-      setSelectedVendorId(null);
-      return;
-    }
-    const { rows } = extractListRows<Company & Record<string, unknown>>(
-      allCompaniesQ.data,
-    );
-    const company = rows.find((c) => String(c.tenant_id ?? "") === tid);
-    if (company?.vendor_id != null) {
-      setSelectedVendorId(String(company.vendor_id));
-    }
+    (() => {
+      if (!open) {
+        setSelectedVendorId(null);
+        return;
+      }
+      if (!isEdit) return;
+      const tid = form.tenant_id.trim();
+      if (!tid) {
+        setSelectedVendorId(null);
+        return;
+      }
+      const { rows } = extractListRows<Company & Record<string, unknown>>(
+        allCompaniesQ.data,
+      );
+      const company = rows.find((c) => String(c.tenant_id ?? "") === tid);
+      if (company?.vendor_id != null) {
+        setSelectedVendorId(String(company.vendor_id));
+      }
+    })();
   }, [open, isEdit, form.tenant_id, allCompaniesQ.data]);
 
   function handleVendorChange(v: string) {

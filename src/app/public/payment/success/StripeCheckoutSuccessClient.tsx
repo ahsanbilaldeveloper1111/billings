@@ -53,10 +53,12 @@ export function StripeCheckoutSuccessClient() {
 
   useEffect(() => {
     if (!sessionId) {
+      /* eslint-disable react-hooks/set-state-in-effect -- derive terminal error when URL lacks session_id */
       setErrMsg(
         "Missing session. Return from Stripe Checkout using the success link.",
       );
       setPhase("error");
+      /* eslint-enable react-hooks/set-state-in-effect */
       return;
     }
 

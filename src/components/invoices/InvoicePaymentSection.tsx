@@ -647,15 +647,18 @@ export function InvoicePaymentSection(props: InvoicePaymentSectionProps) {
   );
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- sync Stripe.js promise from publishable key */
     if (!publishableKey) {
       setStripePromise(null);
       return;
     }
     setStripePromise(loadStripe(publishableKey));
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [publishableKey]);
 
   const [liveKeyOnHttp, setLiveKeyOnHttp] = useState(false);
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- warn when live key used off HTTPS */
     if (
       typeof globalThis.window === "undefined" ||
       !publishableKey?.startsWith("pk_live_")
@@ -664,6 +667,7 @@ export function InvoicePaymentSection(props: InvoicePaymentSectionProps) {
       return;
     }
     setLiveKeyOnHttp(globalThis.window.location.protocol !== "https:");
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [publishableKey]);
 
   if (pkQuery.isPending && !publishableKey) {
