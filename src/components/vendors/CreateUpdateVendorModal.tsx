@@ -157,6 +157,7 @@ export function CreateUpdateVendorModal({
 
   useEffect(() => {
     if (!open || isEdit) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- reset create form when sheet opens */
     setFormData((prev) => ({ ...prev, currency: defaultCurrencyCode }));
     setLogoRemoved(false);
     setVendorLogoFile(null);
@@ -164,6 +165,7 @@ export function CreateUpdateVendorModal({
       if (prev) URL.revokeObjectURL(prev);
       return null;
     });
+    /* eslint-enable react-hooks/set-state-in-effect */
     if (vendorLogoFileRef.current) vendorLogoFileRef.current.value = "";
   }, [open, isEdit, defaultCurrencyCode]);
 
@@ -175,8 +177,10 @@ export function CreateUpdateVendorModal({
       (c) => String(c.code ?? "").trim().toUpperCase() === selected,
     );
     if (!selected || !isValid) {
+      /* eslint-disable react-hooks/set-state-in-effect -- clamp currency to active catalog for create */
       setFormData((prev) => ({ ...prev, currency: defaultCurrencyCode }));
       setNewBankAccount((b) => ({ ...b, currency: defaultCurrencyCode }));
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, [
     open,
